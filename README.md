@@ -29,14 +29,22 @@ W A S D walk, E use, Q phone, Esc close, Z and X (or the mouse wheel) zoom close
 | `js/camera.js`, `js/npcs.js`, `js/interact.js` | Camera (follow, clamp, zoom, pointer helpers), neighbour NPCs, E-key context that adds map spots (sari-sari store) |
 | `js/iso.js`, `js/world.js`, `js/render.js`, `js/entities.js` | Projection and draw helpers, map and collision, rendering, player, riders, van, jeepney |
 | `js/sim/post.js`, `js/sim/shop.js` | Post model; orders, packing, riders, deliveries, chats, interaction |
-| `js/ui/*.js` | HUD, windows, studio, running post, restock, inbox, Mr. Algo |
+| `js/ui/*.js` | HUD, window dispatcher, inbox, Mr. Algo |
+| `js/pc/desktop.js`, `js/pc/apps/*.js` | The PC desktop (E at the computer): draggable windows, taskbar, in-game clock, and one module per app (TikTik Studio, Stats, Supplier, Shop Books, Notes, Feeds, Paint, Parcel Catch, Music, Settings, locked apps) |
+| `js/pc/audio.js`, `js/pc/prefs.js` | WebAudio loops and sound effects (start only after a click); PC settings kept in their own storage key |
+| `js/sim/ledger.js` | Money ledger: every cash in and out is recorded in `S.ledger` |
+| `data/pc.json` | Desktop data: clock speed, app lock ranks, fake feed text, Parcel Catch numbers |
 | `js/input.js`, `js/save.js`, `js/dev.js` | Input, save and load, developer panel |
 | `img/` | Placeholder art |
 
 ## Testing helpers
 
-`window.__game` exposes `state`, `step(seconds)` (advance game time without the render loop), `render()`, `save()` and `newGame()`.
+`window.__game` exposes `state`, `step(seconds)` (advance game time without the render loop), `render()`, `save()`, `newGame()` and `pc` (`open(appId)`, `openApp`, `closeApp`, `wins`, `byId`; `byId.catch.api` has the Parcel Catch state and `update(dt)`).
 
 ## Notes
 
 The numbers are teaching-model values for testing the feel. Art is placeholder. Fonts load from Google Fonts when online and fall back to system fonts.
+
+## PC desktop (stage 4)
+
+Press E at the desk to open the desktop. The game keeps running underneath. Click an icon to open an app. Drag a window by its title bar. Esc closes the top window, then the desktop. "Shut down" closes everything. Saved in the save file: ledger, notes, stickers, in-game clock. Saved in `algosays.prefs`: text size, reduce motion, volume, Parcel Catch best score. Pressing E at the empty shelves opens the Supplier.

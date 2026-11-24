@@ -2,6 +2,7 @@
 import { D, S, pl, toast, emit } from "../state.js";
 import { world, inR } from "../world.js";
 import { peso } from "../ui/format.js";
+import { record } from "./ledger.js";
 
 const R = Math.random;
 
@@ -37,6 +38,7 @@ function finishPack() {
 /* Flash timers, chat timeouts, packing progress. */
 export function updateShop(dt) {
   const C = D.T.chat;
+  S.clock += dt;
   for (const k in S.flash) S.flash[k] = Math.max(0, S.flash[k] - dt);
   S.chats.forEach(c => { c.t += dt; if (!c.done) { if (c.t > C.timeout) { c.done = true; c.lost = true; c.log.push(["in", "Sige, sa iba na lang po."]); } } });
   S.chats = S.chats.filter(c => !c.done || c.t < C.keepAfterDone);
@@ -65,7 +67,7 @@ export function restockCost(p, mode) {
 export function buyStock(p, mode) {
   const RS = D.T.restock, cost = restockCost(p, mode);
   if (S.cash < cost) return false;
-  S.cash -= cost; S.deliveries.push({ p, q: RS.qty, t: mode === "w" ? RS.wholesaleTime : RS.expressTime });
+  S.cash -= cost; record("out", cost, { p, qty: RS.qty, mode }); S.deliveries.push({ p, q: RS.qty, t: mode === "w" ? RS.wholesaleTime : RS.expressTime });
   toast(`Ordered ${RS.qty} ${D.PR[p].n} for ${peso(cost)}`); return true;
 }
 
@@ -89,7 +91,7 @@ export function context() {
   if (near.length) {
     const r = near.sort((a, b) => Math.abs(pl.y - a.y) - Math.abs(pl.y - b.y))[0];
     const i = S.carry.findIndex(o => o.id === r.id);
-    if (i >= 0) return { label: `Hand over #${r.id}`, fn: () => { const o = S.carry.splice(i, 1)[0]; S.cash += PR[o.p].price; S.shipped++; S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip); r.state = "leaving"; toast(`Shipped #${o.id}. +${peso(PR[o.p].price)} cash on delivery`); } };
+    if (i >= 0) return { label: `Hand over #${r.id}`, fn: () => { const o = S.carry.splice(i, 1)[0]; S.cash += PR[o.p].price; record("in", PR[o.p].price, { p: o.p, order: o.id }); S.shipped++; S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip); r.state = "leaving"; toast(`Shipped #${o.id}. +${peso(PR[o.p].price)} cash on delivery`); } };
     if (carryN) return { label: `This rider is for #${r.id}` };
   }
   // yard boxes
@@ -97,9 +99,9 @@ export function context() {
   if (yb) { if (carryN || S.box) return { label: "Hands full" }; return { label: `Pick up ${yb.q} ${PR[yb.p].n}`, fn: () => { S.yard.splice(S.yard.indexOf(yb), 1); S.box = { p: yb.p, q: yb.q }; } }; }
   const z = world.furn.find(f => f.zone && inR(f.zone, pl.x, pl.y)) || (inR(world.shelfZone, pl.x, pl.y) ? { id: "shelves" } : null);
   if (!z) return null;
-  if (z.id === "desk") return { label: S.post ? "Check your TikTik post" : "Make a TikTik video", fn: () => emit("openUI", S.post ? "running" : "studio") };
+  if (z.id === "desk") return { label: "Use the computer", fn: () => emit("openUI", "desktop") };
   if (z.id === "algo") return { label: "Talk to Mr. Algo", fn: () => emit("openUI", "algo") };
-  if (z.id === "shelves") { if (S.box) return { label: `Shelve ${S.box.q} ${PR[S.box.p].n}`, fn: () => { S.stock[S.box.p] += S.box.q; S.stocked = true; toast(`Shelved ${S.box.q} ${PR[S.box.p].n}`); S.box = null; } }; return { label: "Order stock", fn: () => emit("openUI", "restock") }; }
+  if (z.id === "shelves") { if (S.box) return { label: `Shelve ${S.box.q} ${PR[S.box.p].n}`, fn: () => { S.stock[S.box.p] += S.box.q; S.stocked = true; toast(`Shelved ${S.box.q} ${PR[S.box.p].n}`); S.box = null; } }; return { label: "Order stock on the PC", fn: () => emit("openUI", "desktop", "supplier") }; }
   if (z.id === "table") {
     if (S.box) return { label: "Put the stock box on the shelves first" };
     if (S.orders.length) { const o = S.orders[0]; return { label: `Pack #${o.id} (${PR[o.p].n})`, fn: () => { S.busy = { t: T.packTime, d: T.packTime }; } }; }

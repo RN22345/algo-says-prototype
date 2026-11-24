@@ -3,6 +3,7 @@ import { D, S, rt, emit } from "./state.js";
 import { $, registerActions } from "./ui/windows.js";
 import { makeOrder } from "./sim/shop.js";
 import { finishPostNow } from "./sim/post.js";
+import { record } from "./sim/ledger.js";
 
 let stepFn = null;
 
@@ -22,7 +23,7 @@ export function initDev({ step }) {
   stepFn = step;
   registerActions({
     "dev-toggle": () => toggleDev(),
-    "dev-cash": () => { S.cash += D.T.dev.cash; emit("refresh"); },
+    "dev-cash": () => { S.cash += D.T.dev.cash; record("in", D.T.dev.cash, { note: "Developer cash" }); emit("refresh"); },
     "dev-orders": () => { Object.keys(D.PR).forEach(p => makeOrder(p, true)); emit("refresh"); },
     "dev-stock": () => { Object.keys(D.PR).forEach(p => { S.stock[p] = D.T.dev.stock; }); emit("refresh"); },
     "dev-skip": () => { stepFn(D.T.dev.skip); },
