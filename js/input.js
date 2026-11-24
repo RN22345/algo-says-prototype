@@ -22,6 +22,7 @@ export function initInput() {
     if (k === "escape" && S.ui) { closeUI(); return; }
     if (!S.active) return;
     if (k === "q") { if (S.ui === "phone") closeUI(); else if (!S.ui) openUI("phone"); return; }
+    if (k === "i") { if (S.ui === "inv") closeUI(); else if (!S.ui) openUI("inv"); return; }
     if (S.ui) return;
     if (k === "z") { setZoom("close"); return; }
     if (k === "x") { setZoom("wide"); return; }

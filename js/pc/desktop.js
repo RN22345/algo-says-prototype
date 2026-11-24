@@ -25,7 +25,7 @@ const byId = Object.fromEntries(APPS.map(a => [a.id, a]));
 const ALIAS = { ...Object.fromEntries(SITES.map(s => [s.id, [s.id, undefined]])), studio: ["tiktik", "create"], feeds: ["tiktik", "feed"] };
 
 const CATS = [["all", "All"], ["social", "Social media"], ["business", "Business"], ["games", "Games"], ["misc", "Misc"]];
-const ORDER = ["tiktik", "youview", "facebazaar", "stats", "supplier", "toolshop", "helpers", "books", "home", "catch", "paint", "music", "notes", "bin", "settings"];
+const ORDER = ["tiktik", "youview", "hub", "stats", "supplier", "toolshop", "helpers", "books", "home", "catch", "paint", "music", "notes", "bin", "settings"];
 const CW = 7, CH = 6.8; // icon cell size in em
 
 const wins = new Map();

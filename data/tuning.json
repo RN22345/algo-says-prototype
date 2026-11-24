@@ -223,14 +223,6 @@
   "youview": 45,
   "_note": "Seconds of play at base gear. Gear makes it shorter."
  },
- "live": {
-  "duration": 75,
-  "viewersBase": 12,
-  "claimEvery": 2.2,
-  "joyChance": 0.18,
-  "hypeDrain": 0.07,
-  "payRate": 0.8
- },
  "trends": {
   "_note": "Hidden trend lifecycle per product (D-64, D-72). Seconds of game time. The player never sees stages.",
   "maxActive": 3,
@@ -335,12 +327,12 @@
   {
    "id": "big",
    "n": "BigBox Bazaar",
-   "habit": "Big live shows at the peak",
+   "habit": "Floods the feed at the peak",
    "stages": [
     "peak",
     "crowded"
    ],
-   "site": "facebazaar",
+   "site": "tiktik",
    "rate": 0.03,
    "fol": 6000
   },

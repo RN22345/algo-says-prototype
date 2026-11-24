@@ -155,12 +155,6 @@
 .br-youview .br-nv.on{background:var(--ac);color:#fff}
 .br-youview .br-nv:hover:not(.on){background:rgba(255,138,42,.18)}
 .br-youview .br-hd .chip{margin-left:0;justify-self:start}
-/* FaceBazaar: teal bar */
-.br-facebazaar{background:#effcfa}
-.br-facebazaar .br-hd{background:linear-gradient(var(--ac),var(--ac2));color:#fff}
-.br-facebazaar .br-logo{text-shadow:0 .08em 0 rgba(0,0,0,.25)}
-.br-facebazaar .br-nv{background:rgba(255,255,255,.2);color:#fff}
-.br-facebazaar .br-nv.on{background:#fff;color:var(--ac2)}
 /* Bodega Supply: kraft paper */
 .br-supplier{background:#fbf6ea}
 .br-supplier .br-hd{background:#eadfc3;color:#4f4432;border-bottom:.2em dashed #7a6a4f}
@@ -207,8 +201,6 @@
 .br-closed h2,.br-empty h2{margin:0;font-size:1.4em}
 .br-closed p,.br-empty p{margin:0;font-weight:700;color:var(--mute);max-width:26em}
 .br-prodgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(14em,1fr));gap:.6em}
-.br-livepage{display:grid;gap:.8em}
-.br-lastlive{display:grid;gap:.5em}
 
 /* covers and thumbnails */
 .br-cover{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:1.2em;max-width:11em;background:url(../img/mg_thumb_bg_sunny.png) center/cover}

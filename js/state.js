@@ -35,7 +35,7 @@ export function newState() {
     cash: T.start.cash, rating: T.start.rating, shipped: 0, replies: 0, stocked: false, posted: false,
     stock: { ...T.start.stock },
     orders: [], table: [], carry: [], box: null, riders: [], deliveries: [], yard: [], posts: [], running: [], last: null,
-    gear: {}, followers: { tiktik: 0, youview: 0, facebazaar: 0 }, shelves: T.start.shelves.map(s => ({ slots: Array.isArray(s.slots) ? [...s.slots] : Array(6).fill(null) })), hand: [], achv: {}, flags: {}, lives: [], trends: null, rivals: null, rposts: [], trendNext: null, sold: 0, back: { ...T.start.back }, missedLog: [], lows: {},
+    gear: {}, followers: { tiktik: 0, youview: 0 }, shelves: T.start.shelves.map(s => ({ slots: Array.isArray(s.slots) ? [...s.slots] : Array(6).fill(null) })), hand: [], achv: {}, flags: {}, trends: null, rivals: null, rposts: [], trendNext: null, sold: 0, back: { ...T.start.back }, missedLog: [], lows: {},
     chats: [], missed: 0, edit: null, nextId: T.start.nextOrderId, busy: null,
     clock: 0, ledger: [], notes: "", stickers: [],
     algoUnread: false, rank: 1, van: null, vanQ: [], jeep: { y: T.jeep.startY, t: T.jeep.firstDelay },

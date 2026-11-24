@@ -17,7 +17,7 @@ const all = () => [...S.posts, ...S.running].sort((a, b) => (a.at || 0) - (b.at 
 const stk = s => !s || s === "none" ? "None" : s.startsWith("my:") ? "Own sticker" : s[0].toUpperCase() + s.slice(1);
 const txt = t => ({ none: "None", price: "Price", question: "Question" }[t] || t);
 const mmss = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
-const accent = s => s === "youview" ? "#ff8a2a" : s === "facebazaar" ? "#2cc8b6" : "#9446e0";
+const accent = s => s === "youview" ? "#ff8a2a" : "#9446e0";
 const firstOf = p => siteOf(p) === "youview" ? esc(p.title || "(no title)") : D.CLIPS[p.clips[0]] ? D.CLIPS[p.clips[0]][0] : "";
 
 function detail(p, no, other) {
@@ -47,7 +47,7 @@ function render() {
   if (!root) return;
   const list = all(), PR = D.PR;
   picked = picked.filter(p => list.includes(p));
-  const sites = ["tiktik", "youview", "facebazaar"].filter(s => s !== "facebazaar" || list.some(p => siteOf(p) === s));
+  const sites = ["tiktik", "youview"];
   if (filter !== "all" && !sites.includes(filter)) filter = "all";
   let shown = list.filter(p => filter === "all" || siteOf(p) === filter);
   if (SORTS[sortKey]) shown = [...shown].sort((a, b) => (SORTS[sortKey](a) - SORTS[sortKey](b)) * -sortDir); // shown reversed below, so flip

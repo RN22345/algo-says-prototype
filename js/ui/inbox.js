@@ -5,19 +5,19 @@ import { AV, replyToChat } from "../sim/shop.js";
 import { feedCards, sigHTML } from "../pc/sites/feeds.js";
 import { shortNum, esc } from "../pc/util.js";
 
-/* Phone tabs: Inbox (buyers), Feeds (what other sellers post, all three sites), Orders (pick, pack, hand over). */
+/* Phone tabs: Inbox (buyers), Feeds (what other sellers post, both sites), Orders (pick, pack, hand over). */
 let tab = "inbox", site = "all", sig = "";
-const SITES = [["all", "All"], ["tiktik", "TikTik"], ["youview", "YouView"], ["facebazaar", "FaceBazaar"]];
+const SITES = [["all", "All"], ["tiktik", "TikTik"], ["youview", "YouView"]];
 function tabsHTML() {
   const open = S.chats.filter(c => !c.done).length;
   return [["inbox", `Inbox${open ? ` (${open})` : ""}`], ["feeds", "Feeds"], ["orders", `Orders${S.orders.length ? ` (${S.orders.length})` : ""}`]]
     .map(([k, t]) => `<button type="button" class="chip ${tab === k ? "on" : ""}" data-act="ph-tab" data-v="${k}" aria-pressed="${tab === k}">${t}</button>`).join("");
 }
 function feedsHTML() {
-  const PR = D.PR, list = site === "all" ? ["tiktik", "youview", "facebazaar"].flatMap(s => feedCards(s).slice(0, 5).map(c => ({ ...c, site: s }))) : feedCards(site).map(c => ({ ...c, site }));
-  const name = { tiktik: "TikTik", youview: "YouView", facebazaar: "FaceBazaar" };
+  const PR = D.PR, list = site === "all" ? ["tiktik", "youview"].flatMap(s => feedCards(s).slice(0, 5).map(c => ({ ...c, site: s }))) : feedCards(site).map(c => ({ ...c, site }));
+  const name = { tiktik: "TikTik", youview: "YouView" };
   return `<div class="ph-sites">${SITES.map(([k, t]) => `<button type="button" class="chip ${site === k ? "on" : ""}" data-act="ph-site" data-v="${k}">${t}</button>`).join("")}</div>` +
-    list.map(c => `<div class="ph-card ph-${c.site}"><div class="ph-top"><img src="img/${PR[c.p].icon}.png" alt=""><div><b>${esc(c.site === "youview" ? c.title : c.site === "facebazaar" ? c.live : c.caption)}</b><div class="ph-by"><img src="${AV(c.av)}" alt="">${esc(c.seller)} · ${name[c.site]} · ${c.site === "facebazaar" ? `👁 ${c.watching} live` : `${shortNum(c.views)} views`}</div></div></div>${sigHTML(c)}</div>`).join("");
+    list.map(c => `<div class="ph-card ph-${c.site}"><div class="ph-top"><img src="img/${PR[c.p].icon}.png" alt=""><div><b>${esc(c.site === "youview" ? c.title : c.caption)}</b><div class="ph-by"><img src="${AV(c.av)}" alt="">${esc(c.seller)} · ${name[c.site]} · ${shortNum(c.views)} views</div></div></div>${sigHTML(c)}</div>`).join("");
 }
 function ordersHTML() {
   const PR = D.PR, waiting = S.riders.filter(r => r.state === "waiting").map(r => r.id);

@@ -2,7 +2,7 @@
 import { S, pl, resetState, emit } from "./state.js";
 
 const KEY = "algosays.save";
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 const TRANSIENT = new Set(["ui", "active", "busy", "edit"]); // not saved
 
 export function saveGame() {

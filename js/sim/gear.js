@@ -18,11 +18,6 @@ export const shelfTotal = () => Object.values(S.stock).reduce((a, b) => a + b, 0
 export function siteAccess(site) {
   if (site === "tiktik") return { open: true, reason: "" };
   if (site === "youview") return has("camera") ? { open: true, reason: "" } : { open: false, reason: "Needs a camera (Tool Shop or the mall)." };
-  if (site === "facebazaar") {
-    if (!has("tripod")) return { open: false, reason: "Needs a phone tripod (Tool Shop or the mall)." };
-    if (shelfTotal() < 4) return { open: false, reason: "Put 4 or more items on your shelves to go live." };
-    return { open: true, reason: "" };
-  }
   return { open: false, reason: "" };
 }
 

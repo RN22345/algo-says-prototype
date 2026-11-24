@@ -1,6 +1,6 @@
 # Algo Says: web prototype
 
-A playable corner-isometric draft of the game: post short and long videos, go live, pack orders, hand parcels to riders or the courier, buy stock at the mall or the warehouse, shelve it, answer buyers. Plain ES modules. No build tool, no npm. It runs as static files (for example on GitHub Pages).
+A playable corner-isometric draft of the game: post short and long videos, pack orders, hand parcels to riders or the courier, buy stock at the mall or the warehouse, shelve it, answer buyers. Plain ES modules. No build tool, no npm. It runs as static files (for example on GitHub Pages).
 
 ## Run locally
 
@@ -14,7 +14,7 @@ Then open http://localhost:8765/
 
 ## Controls
 
-W A S D walk, E use, Q phone, Esc close, Z and X (or the mouse wheel) zoom close and wide. F1 opens the developer panel. The top-right menu has New game and Dev. The game saves to the browser (localStorage) every 10 seconds and when the page is hidden.
+W A S D walk, E use, Q phone, I bag, Esc close, Z and X (or the mouse wheel) zoom close and wide. F1 opens the developer panel. The top-right menu has New game and Dev. The game saves to the browser (localStorage) every 10 seconds and when the page is hidden.
 
 ## Folder map
 
@@ -30,7 +30,8 @@ W A S D walk, E use, Q phone, Esc close, Z and X (or the mouse wheel) zoom close
 | `js/sprites.js`, `data/sprites.json`, `img/sprites/` | Blender-rendered furniture sprites, placed by footprint centre. The old drawn shapes are the fallback |
 | `js/iso.js`, `js/world.js`, `js/render.js`, `js/entities.js` | Projection and draw helpers, map and collision, rendering, player, riders, van, jeepney |
 | `js/sim/post.js`, `js/sim/shop.js`, `js/sim/gear.js` | Post model (several posts at once, TikTik and YouView curves, YouView search trickle); shelves, storage, orders, packing, riders, deliveries, chats, stock warnings, missed-sales log; equipment that opens features |
-| `js/mini/edit.js`, `js/mini/live.js` | Editing minigame (cut on the beat) and FaceBazaar live minigame (confirm "Mine" claims) |
+| `js/mini/edit.js` | Editing minigame ("Trim the footage": swipe to cut bad tiles, keep the good ones) |
+| `js/ui/inventory.js` | Hotbar (hands, box, parcels) and the bag window (key I) |
 | `js/ui/places.js` | Plaza Mall, Bodega Supply warehouse, courier drop-off |
 | `data/gear.json` | Equipment, prices, and what each opens |
 | `js/ui/*.js` | HUD, window dispatcher, inbox, Mr. Algo |
@@ -55,11 +56,11 @@ Press E at the desk to open the desktop. The game keeps running underneath. Clic
 
 ## Shop loop (2026-11-24)
 
-Stock only sells from the shelves. Each of the 4 shelves holds one product (6 items); an empty shelf takes any product. Stand in front of a shelf with a box and press E to stock it; extra items go into the stockroom crates (storage), where E also takes a box back out. Buy stock from the Supplier site (the van brings a box to the gate), the warehouse (cheaper, carry it), or the mall (retail price, carry it). Posting or going live with no stock shows a warning and never blocks. The HUD shows missed sales, and the last two minutes by product.
+Stock only sells from the shelves. Each of the 4 shelves holds one product (6 items); an empty shelf takes any product. Stand in front of a shelf with a box and press E to stock it; extra items go into the stockroom crates (storage), where E also takes a box back out. Buy stock from the Supplier site (the van brings a box to the gate), the warehouse (cheaper, carry it), or the mall (retail price, carry it). Posting with no stock shows a warning and never blocks. The HUD shows missed sales, and the last two minutes by product.
 
 ## Trends, shelves, display (2026-11-24, second pass)
 
-- **Controls:** W A S D walk, E use, Q phone, M mute, Z and X zoom, Esc close, Space (editing) and 1 to 4 (live) in minigames. Touch: joystick, E, phone and zoom buttons (shown on touch screens, or with `?touch=1`). Full screen button in the header and the frame.
+- **Controls:** W A S D walk, E use, Q phone, I bag, M mute, Z and X zoom, Esc close, swipe or 1 to 4 (editing). Touch: joystick, E, phone and zoom buttons (shown on touch screens, or with `?touch=1`). Full screen button in the header and the frame.
 - **Trends** (`js/sim/trends.js`): each product has a hidden lifecycle; about 40% of new trends fizzle. Signals: the feeds, other sellers' posts, buyers asking in the inbox, the supplier's "in demand" tag and price, and the Seller Hub site (trending items, top sellers, other sellers' posts). Six virtual rivals post by fixed habits.
 - **Shelves:** 6 slots per shelf, any mix of products. Open a shelf with E. Orders reserve stock; pick each order's item from a shelf, then pack it at the table.
 - **Mr. Algo** explains a finished post: what helped, what held it back, and one thing to try.

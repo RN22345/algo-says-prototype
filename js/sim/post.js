@@ -9,7 +9,7 @@ import { reachMult, convMult, heat, crowd, stageOf } from "./trends.js";
 
 const R = Math.random;
 
-export const SITE_NAME = { tiktik: "TikTik", youview: "YouView", facebazaar: "FaceBazaar" };
+export const SITE_NAME = { tiktik: "TikTik", youview: "YouView" };
 export const activePosts = site => S.running.filter(p => !site || p.site === site);
 export const lastPost = site => [...S.posts].reverse().find(p => !site || p.site === site) || null;
 export const sitePosts = site => S.posts.filter(p => p.site === site);
@@ -100,7 +100,7 @@ export function updatePost(dt) {
     if (Math.floor(p.t / T.sampleEvery) > p.samples.length - 1) p.samples.push(rate(p, p.t));
     if (p.t >= p.dur) {
       p.done = true; p.base = p.views;
-      const gain = Math.round(p.views * T.followRate * (p.stk === "live" ? D.STK.live.follow : 1));
+      const gain = Math.round(p.views * T.followRate * (p.stk === "follow" ? D.STK.follow.follow : 1));
       S.followers[p.site] = (S.followers[p.site] || 0) + gain;
       S.posts.push(p); S.last = p; S.algoUnread = true;
       toast(`${SITE_NAME[p.site]} post ended: ${Math.round(p.views).toLocaleString()} views, ${p.orders} orders, +${gain} followers. Mr. Algo has notes.`, "img/algo_unit_happy.png");

@@ -10,13 +10,9 @@
    "rank": 3,
    "blurb": "Make long videos for YouView."
   },
-  "facebazaar": {
-   "rank": 2,
-   "blurb": "Go live and sell on FaceBazaar."
-  },
   "toolshop": {
    "rank": 4,
-   "blurb": "Buy lights, tripods and better gear."
+   "blurb": "Buy lights, cameras and better gear."
   },
   "helpers": {
    "rank": 5,
@@ -117,20 +113,6 @@
    "Is this {p} worth it? Full test",
    "How I pack {p} orders",
    "Testing a cheap {p} for a week"
-  ],
-  "liveTitles": [
-   "Live sale: {p}",
-   "{p} flash sale, tonight only",
-   "Ask me about the {p}",
-   "Restock day: {p}"
-  ],
-  "liveChats": [
-   "Magkano po?",
-   "Pa-reserve!",
-   "COD po ba?",
-   "Mine!",
-   "Available pa?",
-   "Saan ship?"
   ]
  }
 }

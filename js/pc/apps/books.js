@@ -17,7 +17,7 @@ export function totals() {
   return { per, other, inn, out };
 }
 
-const SITE_COLS = [["tiktik", "TikTik"], ["youview", "YouView"], ["facebazaar", "FaceBazaar"], ["inbox", "Chat"]];
+const SITE_COLS = [["tiktik", "TikTik"], ["youview", "YouView"], ["inbox", "Chat"]];
 const siteName = k => SITE_NAME[k] || (k === "inbox" ? "Chat" : k);
 
 /* Missed sales: counts per product and site, then the last 10 with game time. */

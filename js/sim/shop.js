@@ -81,7 +81,22 @@ export function takeFromStorage(p) {
   const q = Math.min(S.back[p], D.T.shop.boxMax); S.back[p] -= q; S.box = { p, q }; emit("sfx", "pick"); return true;
 }
 
-/* A warning before posting or going live with a product the player cannot sell. Null when fine. Never blocks. */
+/* True when the player stands in front of the shelves. */
+export const inShelfZone = () => inR(world.shelfZone, pl.x, pl.y);
+
+/* Put the held item at `index` back on the shelf the player stands at (first empty slot). Returns a short message. */
+export function putBack(index) {
+  const h = (S.hand || [])[index]; if (!h) return "";
+  if (!inShelfZone()) return "Stand at a shelf to put items back.";
+  const s = S.shelves[nearestShelf()], slot = s.slots.findIndex(x => !x);
+  if (slot < 0) return "This shelf is full. Try another shelf.";
+  s.slots[slot] = h.p; S.hand.splice(index, 1);
+  if (h.o != null) { const o = S.orders.find(x => x.id === h.o); if (o) o.picked = false; }
+  emit("sfx", "shelve"); syncStock();
+  return `Put ${D.PR[h.p].n} back on the shelf${h.o != null ? `. Order #${h.o} needs picking again` : ""}.`;
+}
+
+/* A warning before posting a product the player cannot sell. Null when fine. Never blocks. */
 export function stockWarning(p) {
   const n = S.stock[p], name = D.PR[p].n, back = S.back[p] || 0, inc = incoming(p);
   if (n > 0 && n > D.T.shop.lowAt) return null;
@@ -149,7 +164,7 @@ export function updateDeliveries(dt) {
 export function checkMilestone() {
   const M = D.T.milestone;
   if (!S.milestoneDone && S.stocked && S.posted && S.shipped >= M.ship && S.replies >= M.replies) {
-    S.milestoneDone = true; S.rank = M.rank; toast("Milestone done! Seller Rank 2. A phone tripod (Tool Shop or the mall) opens FaceBazaar live.", "img/algo_unit_happy.png");
+    S.milestoneDone = true; S.rank = M.rank; toast("Milestone done! Seller Rank 2. A camera (Tool Shop or the mall) opens YouView long videos.", "img/algo_unit_happy.png");
   }
 }
 

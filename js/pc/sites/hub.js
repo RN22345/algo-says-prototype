@@ -6,12 +6,12 @@ import { trendingList, leaderboard, rivalPosts } from "../../sim/trends.js";
 import { shell } from "./common.js";
 import { ACHIEVEMENTS, stickerFor } from "../../sim/achieve.js";
 
-const SITE = { tiktik: "TikTik", youview: "YouView", facebazaar: "FaceBazaar" };
+const SITE = { tiktik: "TikTik", youview: "YouView" };
 const ago = t => { const s = Math.max(0, Math.round(S.clock - t)); return s < 60 ? `${s}s ago` : `${Math.floor(s / 60)} min ago`; };
 
 function trendingPage() {
   const PR = D.PR, list = trendingList(), max = Math.max(1, list[0].posts);
-  return `<div class="lbl">Most posted items in the last few minutes, on all three sites. This shows what is being posted now, not what will sell next.</div>
+  return `<div class="lbl">Most posted items in the last few minutes, on both sites. This shows what is being posted now, not what will sell next.</div>
     <div class="hub-tr">${list.map((x, i) => `<div class="card hub-row"><b class="hub-no">${i + 1}</b><img src="img/${PR[x.p].icon}.png" alt=""><div><b>#${PR[x.p].n.toLowerCase().replace(/\s+/g, "")}</b><div class="hub-bar"><i style="width:${Math.round(x.posts / max * 100)}%"></i></div></div><span class="hub-n">${shortNum(x.posts)} posts</span></div>`).join("")}</div>`;
 }
 

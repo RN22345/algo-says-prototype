@@ -15,6 +15,7 @@ import { initInbox, renderInbox } from "./ui/inbox.js";
 import { initAlgo } from "./ui/algo.js";
 import { initPlaces, refreshPlaces } from "./ui/places.js";
 import { initShelf, refreshShelf } from "./ui/shelf.js";
+import { initInventory, refreshHotbar, refreshInv } from "./ui/inventory.js";
 import { initInput } from "./input.js";
 import { initFit } from "./fit.js";
 import { initSound } from "./sound.js";
@@ -49,7 +50,7 @@ function refreshUI() {
   renderHud();
   refreshDesktop();
   if (S.ui === "phone") renderInbox(false);
-  refreshPlaces(); refreshShelf();
+  refreshPlaces(); refreshShelf(); refreshHotbar(); refreshInv();
   devTick();
 }
 
@@ -93,7 +94,7 @@ async function boot() {
   initNpcs();
   snapCamera();
   initRender($("#iso"));
-  initWindows(); initHud(); initInbox(); initAlgo(); initPlaces(); initShelf();
+  initWindows(); initHud(); initInbox(); initAlgo(); initPlaces(); initShelf(); initInventory();
   try { await initDesktop(); } catch (e) { console.error(e); }
   initDev({ step });
   initInput();

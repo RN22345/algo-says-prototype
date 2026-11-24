@@ -7,5 +7,5 @@
  "hot":   {"label": "TRENDING 🔥",     "col": "#9446e0", "unlock": "early",    "does": "More reach when many people want the item right now. Less reach when they do not: it looks fake.", "reachHot": 1.25, "reachCold": 0.85, "hotAt": 0.5},
  "free":  {"label": "Free shipping",   "col": "#2cc8b6", "unlock": "sold25",   "does": "Many more viewers buy. You pay ₱30 of the delivery for every order from this post.", "conv": 1.3, "fee": 30},
  "zero":  {"label": "Always in stock", "col": "#5fbf55", "unlock": "nomiss5",  "does": "More viewers buy. If this post gets a missed sale, your rating drops more.", "conv": 1.1, "missRating": 0.1},
- "live":  {"label": "Live tonight",    "col": "#ffc928", "unlock": "live1",    "does": "More of the people who like this post follow you.", "follow": 1.5}
+ "follow": {"label": "Follow for more", "col": "#ffc928", "unlock": "yv1", "does": "More of the people who like this post follow you.", "follow": 1.5}
 }

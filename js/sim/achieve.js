@@ -7,7 +7,7 @@ export const ACHIEVEMENTS = {
   early:    { n: "Early bird", how: "Post an item while people are only starting to talk about it", done: () => !!(S.flags && S.flags.early) },
   sold25:   { n: "25 orders", how: "Get 25 orders", done: () => (S.sold || 0) >= 25 },
   nomiss5:  { n: "Never empty", how: "5 posts in a row with no missed sales", done: () => { const l = S.posts.slice(-5); return l.length === 5 && l.every(p => !p.missed); } },
-  live1:    { n: "On air", how: "Finish a FaceBazaar live show", done: () => (S.lives || []).length >= 1 }
+  yv1:      { n: "Long form", how: "Finish a YouView long video", done: () => S.posts.some(p => p.site === "youview") }
 };
 
 /* Stickers the player can use now. */

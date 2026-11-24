@@ -32,7 +32,7 @@
 /* phone tabs */
 #inbox .ph-sites{display:flex;gap:.3em;flex-wrap:wrap}
 .ph-card{background:#fff;border:.14em solid #1b2a66;border-left-width:.4em;border-radius:.8em;padding:.45em .6em}
-.ph-card.ph-tiktik{border-left-color:#9446e0}.ph-card.ph-youview{border-left-color:#ff8a2a}.ph-card.ph-facebazaar{border-left-color:#2cc8b6}
+.ph-card.ph-tiktik{border-left-color:#9446e0}.ph-card.ph-youview{border-left-color:#ff8a2a}
 .ph-top{display:flex;gap:.5em;align-items:center}.ph-top>img{width:2.4em}.ph-top b{font:700 .85em var(--display);display:block;line-height:1.2}
 .ph-by{display:flex;gap:.3em;align-items:center;font-size:.72em;font-weight:700;color:#6a73a0}.ph-by img{width:1.3em;border-radius:50%}
 .ph-ord{display:flex;gap:.5em;align-items:center;background:#fff;border:.14em solid #1b2a66;border-radius:.8em;padding:.4em .6em;font-size:.85em;font-weight:700}

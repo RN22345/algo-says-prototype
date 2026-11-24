@@ -15,7 +15,7 @@
 <div class="page">
   <header class="bar">
     <h1>Algo Says</h1>
-    <span class="controls">W A S D walk, E use, Q phone, M mute, Esc close, Space and 1 to 4 in minigames.</span>
+    <span class="controls">W A S D walk, E use, Q phone, I bag, M mute, Esc close, 1 to 4 in the editing minigame.</span>
     <nav class="menu keepactive" aria-label="Game menu">
       <button class="cap t sm" type="button" data-act="snd-mute" id="hdrSnd" aria-pressed="false">🔊 Sound on</button>
       <button class="cap t sm" type="button" data-act="fs-toggle" data-fs-label="long" aria-pressed="false">⛶ Full screen</button>
@@ -28,9 +28,9 @@
     <canvas id="iso" tabindex="0" aria-label="Isometric house and street. W A S D to walk, E to use, Q for the phone."></canvas>
 
     <div class="hud" id="hud"></div>
-    <div class="carry" id="carry"></div>
+    <div class="hotbar keepactive" id="hotbar" data-act="inv-open" role="button" tabindex="0" aria-label="Open your bag (I)"></div>
     <div class="card note" id="note"></div>
-    <div class="card hint"><span><kbd class="k">W</kbd><kbd class="k">A</kbd><kbd class="k">S</kbd><kbd class="k">D</kbd> move</span><span><kbd class="k">E</kbd> use</span><span><kbd class="k">Q</kbd> phone</span><span><kbd class="k">Esc</kbd> close</span></div>
+    <div class="card hint"><span><kbd class="k">W</kbd><kbd class="k">A</kbd><kbd class="k">S</kbd><kbd class="k">D</kbd> move</span><span><kbd class="k">E</kbd> use</span><span><kbd class="k">Q</kbd> phone</span><span><kbd class="k">I</kbd> bag</span><span><kbd class="k">Esc</kbd> close</span></div>
     <div class="toasts" id="toasts" aria-live="polite"></div>
     <button class="cap t phoneBtn" id="phoneBtn" type="button">📱 Phone<span class="badge" id="pbadge" hidden>0</span></button>
     <button class="start" id="start" type="button"><span class="card">Click or tap to play<small>The game keeps running while windows are open</small></span></button>
