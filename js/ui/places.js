@@ -52,7 +52,7 @@ function buy(p, place) {
 export function courierDrop() {
   const PR = D.PR, T = D.T.shop, n = S.carry.length;
   S.carry.forEach(o => {
-    S.cash += PR[o.p].price; record("in", PR[o.p].price, { p: o.p, order: o.id, via: "courier" }); S.shipped++;
+    const got = PR[o.p].price - (o.fee || 0); S.cash += got; record("in", got, { p: o.p, order: o.id, via: "courier", fee: o.fee || 0 }); S.shipped++;
     S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip);
     S.riders.forEach(r => { if (r.id === o.id) r.state = "leaving"; });
   });

@@ -1,7 +1,7 @@
 /* Shared game state, loaded data, tiny event bus. One module so every system sees the same objects. */
 
 /* Loaded data. Filled by loadData() at boot. */
-export const D = { PR: {}, CLIPS: {}, MAP: null, T: null, PC: null, GEAR: {} };
+export const D = { PR: {}, CLIPS: {}, MAP: null, T: null, PC: null, GEAR: {}, STK: {} };
 
 export async function loadData(base = "data/") {
   const get = async f => {
@@ -9,8 +9,8 @@ export async function loadData(base = "data/") {
     if (!r.ok) throw new Error(`Could not load ${f} (${r.status})`);
     return r.json();
   };
-  const [PR, CLIPS, MAP, T, GEAR] = await Promise.all([get("products.json"), get("clips.json"), get("map.json"), get("tuning.json"), get("gear.json")]);
-  delete GEAR._note;
+  const [PR, CLIPS, MAP, T, GEAR, STK] = await Promise.all([get("products.json"), get("clips.json"), get("map.json"), get("tuning.json"), get("gear.json"), get("stickers.json")]);
+  delete GEAR._note; delete STK._note; D.STK = STK;
   D.PR = PR; D.CLIPS = CLIPS; D.MAP = MAP; D.T = T; D.GEAR = GEAR;
 }
 
@@ -35,7 +35,7 @@ export function newState() {
     cash: T.start.cash, rating: T.start.rating, shipped: 0, replies: 0, stocked: false, posted: false,
     stock: { ...T.start.stock },
     orders: [], table: [], carry: [], box: null, riders: [], deliveries: [], yard: [], posts: [], running: [], last: null,
-    gear: {}, followers: { tiktik: 0, youview: 0, facebazaar: 0 }, shelves: T.start.shelves.map(s => ({ slots: Array.isArray(s.slots) ? [...s.slots] : Array(6).fill(null) })), hand: [], trends: null, rivals: null, rposts: [], trendNext: null, sold: 0, back: { ...T.start.back }, missedLog: [], lows: {},
+    gear: {}, followers: { tiktik: 0, youview: 0, facebazaar: 0 }, shelves: T.start.shelves.map(s => ({ slots: Array.isArray(s.slots) ? [...s.slots] : Array(6).fill(null) })), hand: [], achv: {}, flags: {}, lives: [], trends: null, rivals: null, rposts: [], trendNext: null, sold: 0, back: { ...T.start.back }, missedLog: [], lows: {},
     chats: [], missed: 0, edit: null, nextId: T.start.nextOrderId, busy: null,
     clock: 0, ledger: [], notes: "", stickers: [],
     algoUnread: false, rank: 1, van: null, vanQ: [], jeep: { y: T.jeep.startY, t: T.jeep.firstDelay },

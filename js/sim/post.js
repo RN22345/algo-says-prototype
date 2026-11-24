@@ -37,11 +37,21 @@ export function startPost(sel, site = "tiktik") {
     quality = (searchable ? T.searchMult : 1) * (sel.segs && sel.segs.length >= 3 ? 1 : T.fewSegsMult) * (sel.thumb === "bold" ? T.boldThumbReach : 1);
     priceShown = sel.segs && sel.segs.includes("price");
   }
+  // cover sticker (TikTik): a trade-off, applied here and described in data/stickers.json (D-86)
+  const SK = site === "tiktik" && D.STK[sel.sticker] ? D.STK[sel.sticker] : null, skId = SK ? sel.sticker : "";
+  let skReach = 1, skConv = 1;
+  if (SK) {
+    if (skId === "new") skReach = prev.filter(x => x.p === sel.p).length < 2 ? SK.reachFirst : SK.reachLater;
+    else if (skId === "hot") skReach = heat(sel.p) >= SK.hotAt ? SK.reachHot : SK.reachCold;
+    else if (skId === "legit") skConv = S.rating >= SK.minRating ? SK.conv : 1;
+    else { skReach = SK.reach || 1; skConv = SK.conv || 1; }
+  }
+  if (stageOf(sel.p) === "whisper" || stageOf(sel.p) === "rising") { S.flags = S.flags || {}; S.flags.early = true; }
   const fat = last && last.p === sel.p && S.clock - last.at < T.repeatWindow ? T.repeatMult : 1;
   const first = prev.length === 0 ? T.firstPostMult : 1;
   const fol = S.followers[site] || 0;
-  const reach = (S2.reachBase + R() * S2.reachRange + fol * T.followerSeed) * quality * fat * first;
-  const conv = T.convBase * S2.convMult * (priceShown ? T.priceShownMult : 1) * PR[sel.p].f * (sel.thumb === "bold" ? T.boldThumbConv : 1);
+  const reach = (S2.reachBase + R() * S2.reachRange + fol * T.followerSeed) * quality * fat * first * skReach;
+  const conv = T.convBase * S2.convMult * (priceShown ? T.priceShownMult : 1) * PR[sel.p].f * (sel.thumb === "bold" ? T.boldThumbConv : 1) * skConv;
   const [eb, er] = hook ? T.hookEndPct : T.noHookEndPct;
   const p = {
     site, p: sel.p, clips: [...(sel.clips || [])], shot: sel.shot, text: sel.text, sticker: sel.sticker, caption: sel.caption || "",
@@ -49,7 +59,7 @@ export function startPost(sel, site = "tiktik") {
     reach, conv, hook, priceShown, tau: S2.tau, dur: S2.duration, at: S.clock,
     t: 0, views: 0, orders: 0, missed: 0, acc: 0, cacc: 0, comments: [], counts: {}, samples: [0],
     leftAt: hook ? T.hookLeftAt : T.noHookLeftAt, endPct: eb + R() * er, first: prev.length === 0, done: false,
-    why: { heat: heat(sel.p), crowd: crowd(sel.p), stage: stageOf(sel.p), repeat: fat < 1, searchable, stock: S.stock[sel.p], fol }, mSum: 0, mT: 0
+    why: { heat: heat(sel.p), crowd: crowd(sel.p), stage: stageOf(sel.p), repeat: fat < 1, searchable, stock: S.stock[sel.p], fol }, mSum: 0, mT: 0, stk: skId, skReach, skConv, shipFee: skId === "free" ? SK.fee : 0
   };
   S.running.push(p);
   S.posted = true; toast(`Posted on ${SITE_NAME[site]}`); emit("sfx", "post");
@@ -58,7 +68,7 @@ export function startPost(sel, site = "tiktik") {
 
 function commentFor(p) {
   const W = D.T.post.commentWeights;
-  const w = [["price", p.priceShown ? W.price.shown : W.price.hidden], ["cod", W.cod], ["where", W.where], ["what", p.hook ? W.what.hook : W.what.noHook], ["praise", W.praise]];
+  const w = [["price", p.priceShown ? W.price.shown : W.price.hidden], ["cod", p.stk === "cod" ? 0 : W.cod], ["where", W.where], ["what", p.hook ? W.what.hook : W.what.noHook], ["praise", W.praise]];
   let r = R() * w.reduce((a, b) => a + b[1], 0), type = "praise"; for (const [k, v] of w) { if ((r -= v) < 0) { type = k; break; } }
   const T = { price: ["How much po?", "HM?", "Magkano?", "Price pls"], cod: ["COD po?", "Pwede COD?"], where: ["Saan location?", "Taga-saan po kayo?"], what: ["Ano 'to?", "Ano po yan?"], praise: D.PR[p.p].praise };
   return { type, text: T[type][Math.floor(R() * T[type].length)], av: Math.floor(R() * 6) };
@@ -90,7 +100,7 @@ export function updatePost(dt) {
     if (Math.floor(p.t / T.sampleEvery) > p.samples.length - 1) p.samples.push(rate(p, p.t));
     if (p.t >= p.dur) {
       p.done = true; p.base = p.views;
-      const gain = Math.round(p.views * T.followRate);
+      const gain = Math.round(p.views * T.followRate * (p.stk === "live" ? D.STK.live.follow : 1));
       S.followers[p.site] = (S.followers[p.site] || 0) + gain;
       S.posts.push(p); S.last = p; S.algoUnread = true;
       toast(`${SITE_NAME[p.site]} post ended: ${Math.round(p.views).toLocaleString()} views, ${p.orders} orders, +${gain} followers. Mr. Algo has notes.`, "img/algo_unit_happy.png");

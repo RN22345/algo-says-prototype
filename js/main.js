@@ -6,6 +6,7 @@ import { updateCamera, snapCamera, cam, setZoom, screenToTile, tileToScreen } fr
 import { initNpcs, updateNpcs, npcs } from "./npcs.js";
 import { updatePost } from "./sim/post.js";
 import { updateTrends, initTrends } from "./sim/trends.js";
+import { updateAchievements } from "./sim/achieve.js";
 import { updateShop, updateDeliveries, checkMilestone, syncStock } from "./sim/shop.js";
 import { updateRiders, updateVan, updateJeep, updatePlayer } from "./entities.js";
 import { initWindows, $ } from "./ui/windows.js";
@@ -31,6 +32,7 @@ let acc = 0, uiT = 0;
 function update(dt) {
   rt.perf += dt;
   updateTrends(dt);
+  updateAchievements(dt);
   updatePost(dt);
   updateShop(dt);
   updateRiders(dt);

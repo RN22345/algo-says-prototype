@@ -95,13 +95,14 @@ export function stockWarning(p) {
 export function makeOrder(p, force = false, post = null) {
   const PR = D.PR;
   if (force || S.stock[p] > 0) {
-    const o = { id: S.nextId++, p, picked: false }; S.orders.push(o); if (post) post.orders++;
+    const o = { id: S.nextId++, p, picked: false, fee: post && post.shipFee ? post.shipFee : 0 }; S.orders.push(o); if (post) post.orders++;
     S.sold = (S.sold || 0) + 1; syncStock();
     toast(`New order #${o.id}: ${PR[p].n}. Pick it from a shelf`, AV(o.id)); emit("sfx", "order");
     const T = D.T.shop;
     if (!force && S.stock[p] <= T.lowAt && !S.lows[p]) { S.lows[p] = true; toast(S.stock[p] ? `Low stock: ${S.stock[p]} ${PR[p].n} left on the shelf` : `${PR[p].n} shelf is empty${S.back[p] ? `. ${S.back[p]} in storage` : ""}`); }
   } else {
     S.missed++; if (post) post.missed++; S.flash[p] = 2;
+    if (post && post.stk === "zero") S.rating = Math.max(D.T.shop.ratingMin, S.rating - D.STK.zero.missRating);
     S.missedLog.push({ p, at: S.clock, site: post ? post.site : "inbox" }); if (S.missedLog.length > 200) S.missedLog.shift();
     toast(`Missed sale: no ${PR[p].n} on the shelf`); emit("sfx", "missed");
   }
@@ -123,7 +124,7 @@ function packable() {
 function finishPack() {
   const T = D.T.shop, m = packable(); if (!m) return;
   S.hand.splice(S.hand.indexOf(m.h), 1); S.orders.splice(S.orders.indexOf(m.o), 1);
-  const k = { id: m.o.id, p: m.o.p };
+  const k = { id: m.o.id, p: m.o.p, fee: m.o.fee || 0 };
   if (S.carry.length < T.carryMax) S.carry.push(k); else S.table.push(k);
   bookRider(k.id, T.riderDelayMin + R() * T.riderDelayRange); syncStock(); emit("sfx", "pack");
 }
@@ -184,7 +185,7 @@ export function context() {
   if (near.length) {
     const r = near.sort((a, b) => Math.abs(pl.y - a.y) - Math.abs(pl.y - b.y))[0];
     const i = S.carry.findIndex(o => o.id === r.id);
-    if (i >= 0) return { label: `Hand over #${r.id}`, fn: () => { const o = S.carry.splice(i, 1)[0]; S.cash += PR[o.p].price; record("in", PR[o.p].price, { p: o.p, order: o.id }); S.shipped++; S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip); r.state = "leaving"; toast(`Shipped #${o.id}. +${peso(PR[o.p].price)} cash on delivery`); emit("sfx", "cash"); } };
+    if (i >= 0) return { label: `Hand over #${r.id}`, fn: () => { const o = S.carry.splice(i, 1)[0], got = PR[o.p].price - (o.fee || 0); S.cash += got; record("in", got, { p: o.p, order: o.id, fee: o.fee || 0 }); S.shipped++; S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip); r.state = "leaving"; toast(`Shipped #${o.id}. +${peso(got)} cash on delivery${o.fee ? ` (you paid ${peso(o.fee)} shipping)` : ""}`); emit("sfx", "cash"); } };
     if (carryN) return { label: `This rider is for #${r.id}` };
   }
   // yard boxes

@@ -1,0 +1,11 @@
+{
+ "_note": "Cover stickers (D-86). Each has a trade-off. Most unlock through an achievement. Labels say what a sticker does, never if it is a good choice. Teaching-model values.",
+ "new":   {"label": "NEW!",            "col": "#ef3b4f", "unlock": null,     "does": "More reach on a product's first 2 posts. After that, viewers who saw it before scroll past.", "reachFirst": 1.15, "reachLater": 0.92},
+ "sale":  {"label": "SALE",            "col": "#ff8a2a", "unlock": null,     "does": "More people click. Fewer of them buy, because they expect a lower price than you show.", "reach": 1.2, "conv": 0.82},
+ "cod":   {"label": "COD OK",          "col": "#139180", "unlock": "replies5", "does": "More viewers buy, and fewer comments ask if you take cash on delivery.", "conv": 1.15},
+ "legit": {"label": "Legit seller ✓",  "col": "#3a6fd8", "unlock": "ship10",   "does": "More viewers buy while your rating is 4.5 or higher. Below that, it does nothing.", "conv": 1.2, "minRating": 4.5},
+ "hot":   {"label": "TRENDING 🔥",     "col": "#9446e0", "unlock": "early",    "does": "More reach when many people want the item right now. Less reach when they do not: it looks fake.", "reachHot": 1.25, "reachCold": 0.85, "hotAt": 0.5},
+ "free":  {"label": "Free shipping",   "col": "#2cc8b6", "unlock": "sold25",   "does": "Many more viewers buy. You pay ₱30 of the delivery for every order from this post.", "conv": 1.3, "fee": 30},
+ "zero":  {"label": "Always in stock", "col": "#5fbf55", "unlock": "nomiss5",  "does": "More viewers buy. If this post gets a missed sale, your rating drops more.", "conv": 1.1, "missRating": 0.1},
+ "live":  {"label": "Live tonight",    "col": "#ffc928", "unlock": "live1",    "does": "More of the people who like this post follow you.", "follow": 1.5}
+}

@@ -29,6 +29,13 @@ export function analyse(p) {
     if (p.segs.length < 3) out.push([`The video had only ${p.segs.length} segments.`, `Use at least 3: for example intro, demo, and price.`]);
     if (p.thumb === "bold") out.push(["The bold cover pulled clicks, but fewer viewers bought.", "A plain cover that shows the real product can bring buyers who are sure."]);
   }
+  const SK = D.STK[p.stk];
+  if (SK) {
+    if (p.skConv < 1) out.push([`The ${SK.label} sticker brought clicks, but fewer of those viewers bought.`, "Use it when you want reach, not when you need sales from a small crowd."]);
+    else if (p.skReach < 1) out.push([`The ${SK.label} sticker cost reach this time. ${SK.does}`, "Check when it helps before you use it again."]);
+    else if (p.skConv > 1 || p.skReach > 1) good.push(`The ${SK.label} sticker helped: ${SK.does}${p.shipFee && p.orders ? ` This post cost you ₱${p.shipFee * p.orders} in shipping.` : ""}`);
+    else if (p.stk === "legit") out.push(["The Legit seller sticker did nothing, because your rating was below 4.5.", "Ship on time and answer buyers to raise your rating."]);
+  }
   if (p.first) out.push([`This was your first ${SITE_NAME[p.site]} post, so the site showed it to few people.`, `Keep posting. Followers see your next post first.`]);
   if (avgMult > 1.25) good.push(`People were talking about ${n.toLowerCase()} while your post ran. That gave it extra reach.`);
   return { out, good };

@@ -48,3 +48,4 @@
 .desk .st-kv.diff .lbl{color:#b36b00}
 .desk .st-tags{grid-column:3/-1;display:flex;gap:.3em;margin-top:.1em}
 .desk .st-tags .st-top{margin-left:0}
+.chip.lockd{opacity:.55;cursor:help;border:.14em dashed #1b2a66;border-radius:999px;padding:.12em .75em;font:600 .85em var(--display);display:inline-flex;align-items:center;gap:.3em}

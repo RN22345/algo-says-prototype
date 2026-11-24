@@ -4,6 +4,7 @@ import { D, S } from "../../state.js";
 import { esc, shortNum } from "../util.js";
 import { trendingList, leaderboard, rivalPosts } from "../../sim/trends.js";
 import { shell } from "./common.js";
+import { ACHIEVEMENTS, stickerFor } from "../../sim/achieve.js";
 
 const SITE = { tiktik: "TikTik", youview: "YouView", facebazaar: "FaceBazaar" };
 const ago = t => { const s = Math.max(0, Math.round(S.clock - t)); return s < 60 ? `${s}s ago` : `${Math.floor(s / 60)} min ago`; };
@@ -26,9 +27,16 @@ function postsPage() {
   return `<div class="lbl">Latest posts by other sellers</div><div class="hub-posts">${list.map(x => `<div class="card hub-row"><img src="img/${PR[x.p].icon}.png" alt=""><div><b>${esc(x.name)}</b> posted <b>${PR[x.p].n}</b><div class="br-sub">on ${SITE[x.site]} · ${ago(x.at)}</div></div><span class="hub-n">${shortNum(x.views)} views</span></div>`).join("")}</div>`;
 }
 
+function achvPage() {
+  return `<div class="lbl">Achievements open new cover stickers for TikTik posts.</div><div class="hub-board">${Object.entries(ACHIEVEMENTS).map(([id, a]) => {
+    const done = S.achv && S.achv[id], st = stickerFor(id);
+    return `<div class="card hub-row ${done ? "me" : ""}"><b class="hub-no">${done ? "✅" : "🔒"}</b><div><b>${esc(a.n)}</b><div class="br-sub">${esc(a.how)}</div></div><span class="hub-n">${st ? "Sticker: " + esc(st[1].label) : ""}</span><span class="hub-n">${done ? "Done" : ""}</span></div>`;
+  }).join("")}</div>`;
+}
+
 export default {
   id: "hub", name: "Seller Hub", host: "sellerhub.example", icon: "📈", cat: "business", ac: "#3a6fd8", ac2: "#1d3f8c", c1: "#7aa8f7", c2: "#3a6fd8",
-  pages: [{ id: "trending", label: "Trending items", path: "trending" }, { id: "board", label: "Top sellers", path: "top-sellers" }, { id: "posts", label: "Other sellers' posts", path: "posts" }],
+  pages: [{ id: "trending", label: "Trending items", path: "trending" }, { id: "board", label: "Top sellers", path: "top-sellers" }, { id: "posts", label: "Other sellers' posts", path: "posts" }, { id: "achv", label: "Achievements", path: "achievements" }],
   path(tab) { return (this.pages.find(x => x.id === tab.page) || this.pages[0]).path; },
-  render(tab) { return shell(this, tab, tab.page === "board" ? boardPage() : tab.page === "posts" ? postsPage() : trendingPage()); }
+  render(tab) { return shell(this, tab, tab.page === "board" ? boardPage() : tab.page === "posts" ? postsPage() : tab.page === "achv" ? achvPage() : trendingPage()); }
 };

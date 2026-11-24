@@ -21,7 +21,7 @@ export function productRow(k, act, on, extra = "", disabled = false) {
 export function stickerHTML(s) {
   if (!s || s === "none") return "";
   if (s.startsWith("my:")) { const u = S.stickers[+s.slice(3)]; return u ? `<img src="${u}" alt="Your sticker" style="position:absolute;left:3%;bottom:4%;width:36%;transform:rotate(-8deg)">` : ""; }
-  return `<div class="br-stk">${esc(s.toUpperCase())}</div>`;
+  const k = D.STK && D.STK[s]; return `<div class="br-stk"${k ? ` style="background:${k.col}"` : ""}>${esc(k ? k.label : s.toUpperCase())}</div>`;
 }
 
 /* ---------- post lists and results ---------- */

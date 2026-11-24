@@ -8,6 +8,7 @@ import { esc } from "../util.js";
 import { nav } from "./nav.js";
 import { feedHTML } from "./feeds.js";
 import { productRow, stickerHTML, shell, postList, postNo, isLive, resultsHTML } from "./common.js";
+import { stickerOpen, ACHIEVEMENTS } from "../../sim/achieve.js";
 
 const AC = "#9446e0";
 const st = { warn: null, busy: false };
@@ -16,7 +17,10 @@ const chipRow = (key, opts) => opts.map(([v, t]) => `<button type="button" class
 
 function stickerChips() {
   const own = S.stickers.map((u, i) => `<button type="button" class="chip ${sel.sticker === "my:" + i ? "on" : ""}" data-act="br-tt-set" data-k="sticker" data-v="my:${i}" title="Your sticker ${i + 1}"><img src="${u}" alt="Your sticker ${i + 1}" style="height:1.5em;width:1.5em;object-fit:contain"></button>`).join("");
-  return chipRow("sticker", [["none", "None"], ["new", "New"], ["sale", "Sale"]]) + own;
+  const built = Object.entries(D.STK).map(([k, s]) => stickerOpen(k)
+    ? `<button type="button" class="chip ${sel.sticker === k ? "on" : ""}" data-act="br-tt-set" data-k="sticker" data-v="${k}" aria-pressed="${sel.sticker === k}">${esc(s.label)}</button>`
+    : `<span class="chip lockd" title="Unlock: ${esc(ACHIEVEMENTS[s.unlock].how)}">🔒 ${esc(s.label)}</span>`).join("");
+  return chipRow("sticker", [["none", "None"]]) + built + own;
 }
 
 function createPage() {
@@ -42,6 +46,7 @@ function createPage() {
           <span class="lbl">Shot</span><div class="br-wrap">${chipRow("shot", [["product", "Product"], ["face", "Face + product"]])}</div>
           <span class="lbl">Text</span><div class="br-wrap">${chipRow("text", [["none", "None"], ["price", "Price"], ["question", "Question"]])}</div>
           <span class="lbl">Sticker</span><div class="br-wrap">${stickerChips()}</div>
+          <span class="br-sub">${D.STK[sel.sticker] ? "What it does: " + esc(D.STK[sel.sticker].does) : sel.sticker.startsWith("my:") ? "Your own sticker. Decoration only." : "Locked stickers open with achievements (Seller Hub)."}</span>
           ${S.stickers.length < D.PC.stickerMax ? `<span class="br-sub">Draw your own stickers in Paint.</span>` : ""}
         </div></div>
       <div><div class="lbl">Caption</div><textarea class="cap-in" id="br-caption" maxlength="120" placeholder="Type a caption">${esc(sel.caption)}</textarea></div>
