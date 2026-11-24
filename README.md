@@ -56,3 +56,13 @@ Press E at the desk to open the desktop. The game keeps running underneath. Clic
 ## Shop loop (2026-11-24)
 
 Stock only sells from the shelves. Each of the 4 shelves holds one product (6 items); an empty shelf takes any product. Stand in front of a shelf with a box and press E to stock it; extra items go into the stockroom crates (storage), where E also takes a box back out. Buy stock from the Supplier site (the van brings a box to the gate), the warehouse (cheaper, carry it), or the mall (retail price, carry it). Posting or going live with no stock shows a warning and never blocks. The HUD shows missed sales, and the last two minutes by product.
+
+## Trends, shelves, display (2026-11-24, second pass)
+
+- **Controls:** W A S D walk, E use, Q phone, M mute, Z and X zoom, Esc close, Space (editing) and 1 to 4 (live) in minigames. Touch: joystick, E, phone and zoom buttons (shown on touch screens, or with `?touch=1`). Full screen button in the header and the frame.
+- **Trends** (`js/sim/trends.js`): each product has a hidden lifecycle; about 40% of new trends fizzle. Signals: the feeds, other sellers' posts, buyers asking in the inbox, the supplier's "in demand" tag and price, and the Seller Hub site (trending items, top sellers, other sellers' posts). Six virtual rivals post by fixed habits.
+- **Shelves:** 6 slots per shelf, any mix of products. Open a shelf with E. Orders reserve stock; pick each order's item from a shelf, then pack it at the table.
+- **Mr. Algo** explains a finished post: what helped, what held it back, and one thing to try.
+- **Display:** the 1920x1080 frame scales as one picture (`js/fit.js`). Sound effects and optional world music (`js/sound.js`).
+- After an update, hard-reload (Ctrl+F5) if the game looks half-updated: browsers cache the modules.
+

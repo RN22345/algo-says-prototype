@@ -4,6 +4,7 @@ import { world, inR } from "../world.js";
 import { peso } from "../ui/format.js";
 import { record } from "./ledger.js";
 import { packSpeed } from "./gear.js";
+import { costMult } from "./trends.js";
 
 /* Which of the 4 shelves the player stands in front of. */
 export function nearestShelf() {
@@ -25,23 +26,59 @@ export function bookRider(id, delay) {
   S.riders.push({ id, state: "queued", delay, x: st.riderX, y: st.riderStartY, slot: -1, pat, max: pat, walk: 0 });
 }
 
-/* ---------- shelves and storage ----------
-   S.shelves: [{p, n}] one product per shelf, up to shop.shelfCap items. An empty shelf takes any product.
-   S.back: backstock in the stockroom crates. Only shelf stock can be sold (FOUNDATION §5).
-   S.stock[p] is the shelf total, kept in sync for the UI. */
+/* ---------- shelves, storage, hands ----------
+   S.shelves: [{slots: [product id or null] x 6}]. Any product can go in any slot (mixed shelves).
+   S.back: backstock in the stockroom crates (whole boxes). S.hand: items the player holds [{p, o}], where o is
+   the order the item was picked for (or null for a loose item being moved). An order reserves stock when it
+   comes in; the player must pick the item from a shelf and bring it to the packing table.
+   S.stock[p] = items that can still be sold = on shelves + loose in hand - orders not yet picked. */
+export const shelfCount = p => S.shelves.reduce((a, s) => a + s.slots.filter(x => x === p).length, 0);
 export function syncStock() {
-  for (const k in D.PR) S.stock[k] = 0;
-  S.shelves.forEach(s => { if (s.n <= 0) { s.n = 0; s.p = null; } else S.stock[s.p] += s.n; });
+  S.hand = S.hand || [];
+  for (const k in D.PR) S.stock[k] = shelfCount(k) + S.hand.filter(h => h.p === k && h.o == null).length - S.orders.filter(o => o.p === k && !o.picked).length;
+  for (const k in D.PR) if (S.stock[k] < 0) S.stock[k] = 0;
 }
 export const shelfCap = () => D.T.shop.shelfCap;
+export const handFree = () => (S.hand || []).length < D.T.shop.handMax;
+export const handsEmpty = () => !S.box && !S.carry.length && !(S.hand || []).length;
 export const incoming = p => S.deliveries.filter(d => d.p === p).reduce((a, d) => a + d.q, 0) + S.yard.filter(b => b.p === p).reduce((a, b) => a + b.q, 0) + (S.box && S.box.p === p ? S.box.q : 0);
+const unpicked = p => S.orders.find(o => o.p === p && !o.picked);
 
-/* Put items from the box on shelf k. Returns how many went on. */
-export function stockShelf(k, box) {
-  const s = S.shelves[k]; if (!s || (s.p && s.p !== box.p)) return 0;
-  const n = Math.min(box.q, shelfCap() - s.n); if (n <= 0) return 0;
-  s.p = box.p; s.n += n; box.q -= n; syncStock(); S.stocked = true; delete S.lows[box.p];
+/* Shelf panel actions. Each returns a short message or "" when nothing happened. */
+export function slotClick(k, i) {
+  const s = S.shelves[k], PR = D.PR; if (!s) return "";
+  const item = s.slots[i];
+  if (item) {
+    if (!handFree()) return "Your hands are full. Pack or put items down first.";
+    if (S.box) return "Put the box down first.";
+    const o = unpicked(item);
+    s.slots[i] = null;
+    if (o) { o.picked = true; S.hand.push({ p: item, o: o.id }); emit("sfx", "pick"); syncStock(); return `Picked ${PR[item].n} for order #${o.id}`; }
+    S.hand.push({ p: item, o: null }); emit("sfx", "pick"); syncStock(); return `Took a ${PR[item].n} to move it`;
+  }
+  const li = S.hand.findIndex(h => h.o == null);
+  if (li >= 0) { s.slots[i] = S.hand.splice(li, 1)[0].p; emit("sfx", "shelve"); syncStock(); return ""; }
+  if (S.box && S.box.q > 0) { s.slots[i] = S.box.p; S.box.q--; if (!S.box.q) S.box = null; S.stocked = true; delete S.lows[s.slots[i]]; emit("sfx", "shelve"); syncStock(); return ""; }
+  return "Hold a box or an item to fill this slot.";
+}
+export function fillFromBox(k) {
+  const s = S.shelves[k]; let n = 0;
+  for (let i = 0; i < s.slots.length && S.box && S.box.q > 0; i++) if (!s.slots[i]) { s.slots[i] = S.box.p; S.box.q--; n++; }
+  if (n) { S.stocked = true; delete S.lows[s.slots.find(Boolean)]; emit("sfx", "shelve"); }
+  if (S.box && !S.box.q) S.box = null;
+  syncStock(); return n;
+}
+export function pickAllHere(k) {
+  const s = S.shelves[k]; let n = 0;
+  for (let i = 0; i < s.slots.length; i++) { const it = s.slots[i]; if (it && unpicked(it) && handFree() && !S.box) { slotClick(k, i); n++; } }
   return n;
+}
+export function storeBox() {
+  if (!S.box) return; S.back[S.box.p] = (S.back[S.box.p] || 0) + S.box.q; toast(`Stored ${S.box.q} ${D.PR[S.box.p].n}`); S.box = null; emit("sfx", "shelve"); syncStock();
+}
+export function takeFromStorage(p) {
+  if (!handsEmpty() || !(S.back[p] > 0)) return false;
+  const q = Math.min(S.back[p], D.T.shop.boxMax); S.back[p] -= q; S.box = { p, q }; emit("sfx", "pick"); return true;
 }
 
 /* A warning before posting or going live with a product the player cannot sell. Null when fine. Never blocks. */
@@ -58,15 +95,15 @@ export function stockWarning(p) {
 export function makeOrder(p, force = false, post = null) {
   const PR = D.PR;
   if (force || S.stock[p] > 0) {
-    if (!force) { const s = S.shelves.filter(x => x.p === p).sort((a, b) => a.n - b.n)[0]; s.n--; syncStock(); }
-    const o = { id: S.nextId++, p }; S.orders.push(o); if (post) post.orders++;
-    toast(`New order #${o.id}: ${PR[p].n}`, AV(o.id));
+    const o = { id: S.nextId++, p, picked: false }; S.orders.push(o); if (post) post.orders++;
+    S.sold = (S.sold || 0) + 1; syncStock();
+    toast(`New order #${o.id}: ${PR[p].n}. Pick it from a shelf`, AV(o.id)); emit("sfx", "order");
     const T = D.T.shop;
     if (!force && S.stock[p] <= T.lowAt && !S.lows[p]) { S.lows[p] = true; toast(S.stock[p] ? `Low stock: ${S.stock[p]} ${PR[p].n} left on the shelf` : `${PR[p].n} shelf is empty${S.back[p] ? `. ${S.back[p]} in storage` : ""}`); }
   } else {
     S.missed++; if (post) post.missed++; S.flash[p] = 2;
     S.missedLog.push({ p, at: S.clock, site: post ? post.site : "inbox" }); if (S.missedLog.length > 200) S.missedLog.shift();
-    toast(`Missed sale: no ${PR[p].n} on the shelf`);
+    toast(`Missed sale: no ${PR[p].n} on the shelf`); emit("sfx", "missed");
   }
 }
 
@@ -75,11 +112,20 @@ export function recentMissed(secs = 120) {
   const out = {}; S.missedLog.filter(m => S.clock - m.at <= secs).forEach(m => { out[m.p] = (out[m.p] || 0) + 1; }); return out;
 }
 
+/* The order and hand item the packing table can use now. */
+function packable() {
+  for (const h of S.hand || []) {
+    const o = h.o != null ? S.orders.find(x => x.id === h.o) : S.orders.find(x => x.p === h.p && !x.picked);
+    if (o) return { o, h };
+  }
+  return null;
+}
 function finishPack() {
-  const T = D.T.shop;
-  const k = S.orders.shift(); if (!k) return;
+  const T = D.T.shop, m = packable(); if (!m) return;
+  S.hand.splice(S.hand.indexOf(m.h), 1); S.orders.splice(S.orders.indexOf(m.o), 1);
+  const k = { id: m.o.id, p: m.o.p };
   if (S.carry.length < T.carryMax) S.carry.push(k); else S.table.push(k);
-  bookRider(k.id, T.riderDelayMin + R() * T.riderDelayRange);
+  bookRider(k.id, T.riderDelayMin + R() * T.riderDelayRange); syncStock(); emit("sfx", "pack");
 }
 
 /* Flash timers, chat timeouts, packing progress. */
@@ -107,7 +153,7 @@ export function checkMilestone() {
 }
 
 export function restockCost(p, mode) {
-  const RS = D.T.restock, base = D.PR[p].cost * RS.qty;
+  const RS = D.T.restock, base = Math.round(D.PR[p].cost * RS.qty * costMult(p));
   return mode === "w" ? base : Math.round(base * RS.expressMult);
 }
 
@@ -115,7 +161,7 @@ export function buyStock(p, mode) {
   const RS = D.T.restock, cost = restockCost(p, mode);
   if (S.cash < cost) return false;
   S.cash -= cost; record("out", cost, { p, qty: RS.qty, mode }); S.deliveries.push({ p, q: RS.qty, t: mode === "w" ? RS.wholesaleTime : RS.expressTime });
-  toast(`Ordered ${RS.qty} ${D.PR[p].n} for ${peso(cost)}`); return true;
+  toast(`Ordered ${RS.qty} ${D.PR[p].n} for ${peso(cost)}`); emit("sfx", "buy"); return true;
 }
 
 const REPLY_TEXT = { price: p => `₱${D.PR[p].price} po!`, avail: () => "Yes po, available!", cod: () => "COD is OK po.", where: () => "We ship from Valenzuela po." };
@@ -138,37 +184,28 @@ export function context() {
   if (near.length) {
     const r = near.sort((a, b) => Math.abs(pl.y - a.y) - Math.abs(pl.y - b.y))[0];
     const i = S.carry.findIndex(o => o.id === r.id);
-    if (i >= 0) return { label: `Hand over #${r.id}`, fn: () => { const o = S.carry.splice(i, 1)[0]; S.cash += PR[o.p].price; record("in", PR[o.p].price, { p: o.p, order: o.id }); S.shipped++; S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip); r.state = "leaving"; toast(`Shipped #${o.id}. +${peso(PR[o.p].price)} cash on delivery`); } };
+    if (i >= 0) return { label: `Hand over #${r.id}`, fn: () => { const o = S.carry.splice(i, 1)[0]; S.cash += PR[o.p].price; record("in", PR[o.p].price, { p: o.p, order: o.id }); S.shipped++; S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip); r.state = "leaving"; toast(`Shipped #${o.id}. +${peso(PR[o.p].price)} cash on delivery`); emit("sfx", "cash"); } };
     if (carryN) return { label: `This rider is for #${r.id}` };
   }
   // yard boxes
   const yb = S.yard.find(b => Math.hypot(pl.x - b.x, pl.y - b.y) < T.pickupRadius);
-  if (yb) { if (carryN || S.box) return { label: "Hands full" }; return { label: `Pick up ${yb.q} ${PR[yb.p].n}`, fn: () => { S.yard.splice(S.yard.indexOf(yb), 1); S.box = { p: yb.p, q: yb.q }; } }; }
+  if (yb) { if (!handsEmpty()) return { label: "Hands full" }; return { label: `Pick up ${yb.q} ${PR[yb.p].n}`, fn: () => { S.yard.splice(S.yard.indexOf(yb), 1); S.box = { p: yb.p, q: yb.q }; } }; }
   const z = (inR(world.shelfZone, pl.x, pl.y) ? { id: "shelves" } : null) || world.furn.find(f => f.zone && inR(f.zone, pl.x, pl.y));
   if (!z) return null;
   if (z.id === "desk") return { label: "Use the computer", fn: () => emit("openUI", "desktop") };
   if (z.id === "algo") return { label: "Talk to Mr. Algo", fn: () => emit("openUI", "algo") };
   if (z.id === "shelves") {
-    const k = nearestShelf(), s = S.shelves[k], cap = shelfCap();
-    const tag = s.p ? `${PR[s.p].n} ${s.n}/${cap}` : "empty";
-    if (S.box) {
-      if (s.p && s.p !== S.box.p) return { label: `Shelf ${k + 1} holds ${PR[s.p].n}. Walk to an empty shelf` };
-      if (s.n >= cap) return { label: `Shelf ${k + 1} is full (${tag})` };
-      return { label: `Stock shelf ${k + 1} (${tag}) with ${Math.min(S.box.q, cap - s.n)} ${PR[S.box.p].n}`, fn: () => { S.busy = { t: T.shelveTime || 0.8, d: T.shelveTime || 0.8, fn: () => { const n = stockShelf(k, S.box); toast(`Shelved ${n} ${PR[S.box.p].n} on shelf ${k + 1}${S.box.q ? `. ${S.box.q} left in the box` : ""}`); if (!S.box.q) S.box = null; } }; } };
-    }
-    return { label: `Shelf ${k + 1}: ${tag}${s.p && S.back[s.p] ? ` · ${S.back[s.p]} in storage` : ""}` };
+    const k = nearestShelf(), s = S.shelves[k], here = s.slots.filter(Boolean);
+    const sum = here.length ? Object.entries(here.reduce((a, p) => (a[p] = (a[p] || 0) + 1, a), {})).map(([p, n]) => `${PR[p].n} ${n}`).join(", ") : "empty";
+    const want = S.orders.filter(o => !o.picked && s.slots.includes(o.p)).length;
+    return { label: `Open shelf ${k + 1} (${sum})${want ? ` · ${want} to pick here` : ""}`, fn: () => emit("openUI", "shelf", k) };
   }
-  if (z.id === "crates") {
-    if (S.box) return { label: `Put ${S.box.q} ${PR[S.box.p].n} in storage`, fn: () => { S.back[S.box.p] = (S.back[S.box.p] || 0) + S.box.q; toast(`Stored ${S.box.q} ${PR[S.box.p].n}`); S.box = null; } };
-    if (carryN) return { label: "Hands full" };
-    const want = Object.keys(PR).filter(p => (S.back[p] || 0) > 0).sort((a, b) => S.stock[a] - S.stock[b])[0];
-    if (!want) return { label: "Storage is empty. Order stock on the PC" };
-    const q = Math.min(S.back[want], T.boxMax);
-    return { label: `Take ${q} ${PR[want].n} from storage (shelf has ${S.stock[want]})`, fn: () => { S.back[want] -= q; S.box = { p: want, q }; } };
-  }
+  if (z.id === "crates") return { label: S.box ? `Put ${S.box.q} ${PR[S.box.p].n} in storage` : "Open storage", fn: () => { if (S.box) storeBox(); else emit("openUI", "storage"); } };
   if (z.id === "table") {
     if (S.box) return { label: "Put the stock box on a shelf or in storage first" };
-    if (S.orders.length) { const o = S.orders[0], pt = T.packTime * packSpeed(); return { label: `Pack #${o.id} (${PR[o.p].n})`, fn: () => { S.busy = { t: pt, d: pt }; } }; }
+    const m = packable(), pt = T.packTime * packSpeed();
+    if (m) return { label: `Pack #${m.o.id} (${PR[m.o.p].n})`, fn: () => { S.busy = { t: pt, d: pt }; } };
+    if (S.orders.length) { const o = S.orders.find(x => !x.picked) || S.orders[0]; return { label: `Pick #${o.id} (${PR[o.p].n}) from a shelf first` }; }
     if (S.table.length && carryN < T.carryMax) return { label: "Pick up a parcel", fn: () => S.carry.push(S.table.shift()) };
     if (S.table.length) return { label: "Hands full" };
     return { label: "No orders to pack" };

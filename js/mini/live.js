@@ -3,7 +3,7 @@
    with keys 1-4 or a click. Joy miners look slightly off (new account, no photo) and never pay if confirmed.
    Hype drains over time and when claims are missed; it sets how many viewers stay and how often they claim.
    The real Philippine routine: mine + item code, CF, joy miners, tally after the show (sourced in the paper). */
-import { D, S, toast } from "../state.js";
+import { D, S, toast, emit } from "../state.js";
 import { makeOrder, syncStock } from "../sim/shop.js";
 
 const R = Math.random;
@@ -47,10 +47,10 @@ export function playLive(opts = {}) {
       if (over || i < 0 || i >= items.length) return;
       const cand = notes.filter(n => !n.done && n.i === i && Math.abs(n.t - FALL) < WIN).sort((a, b) => Math.abs(a.t - FALL) - Math.abs(b.t - FALL))[0];
       lanes[i].classList.add("tap"); setTimeout(() => lanes[i].classList.remove("tap"), 120);
-      if (!cand) { hype = Math.max(0, hype - 0.03); return; }
+      if (!cand) { hype = Math.max(0, hype - 0.03); emit("sfx", "miss"); return; }
       cand.done = true; res.claims++;
-      if (cand.joy) { res.joy++; cand.el.classList.add("cfjoy"); const s = S.shelves.find(x => x.p === items[i] && x.n > 0); if (s) { s.n--; syncStock(); S.back[items[i]] = (S.back[items[i]] || 0) + 1; } }
-      else { res.sold++; cand.el.classList.add("cf"); makeOrder(items[i]); hype = Math.min(1, hype + 0.08); }
+      if (cand.joy) { res.joy++; cand.el.classList.add("cfjoy"); emit("sfx", "joy"); }
+      else { res.sold++; cand.el.classList.add("cf"); emit("sfx", "claim"); makeOrder(items[i]); hype = Math.min(1, hype + 0.08); }
       setTimeout(() => cand.el.remove(), 260);
     }
     function key(e) {
@@ -82,7 +82,7 @@ export function playLive(opts = {}) {
       const gain = res.sold * 3 + Math.round(res.peakViewers / 4);
       S.followers.facebazaar = fol + gain; res.followers = gain;
       (S.lives = S.lives || []).push({ ...res, items, at: S.clock });
-      el.querySelector(".mini-foot").innerHTML = `<b>Show over.</b> ${res.claims} claims confirmed: ${res.sold} paid, ${res.joy} never paid (their items went back to storage). ${res.missedClaims} claims were missed. +${gain} followers.`;
+      el.querySelector(".mini-foot").innerHTML = `<b>Show over.</b> ${res.claims} claims confirmed: ${res.sold} paid, ${res.joy} never paid. ${res.missedClaims} claims were missed. +${gain} followers.`;
       el.classList.add("done");
       toast(`Live ended: ${res.sold} orders to pack`);
       setTimeout(() => { el.remove(); S.edit = null; resolve(res); }, 3500);

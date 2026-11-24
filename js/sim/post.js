@@ -3,8 +3,9 @@
    TikTik  - fast spike, fades fast.
    YouView - slow start, long run, then a small search trickle (catalogue).
    Followers only seed the start of a post (FOUNDATION §5). */
-import { D, S, toast } from "../state.js";
+import { D, S, toast, emit } from "../state.js";
 import { makeOrder } from "./shop.js";
+import { reachMult, convMult, heat, crowd, stageOf } from "./trends.js";
 
 const R = Math.random;
 
@@ -24,7 +25,7 @@ function rate(p, t) {
 export function startPost(sel, site = "tiktik") {
   const T = D.T.post, S2 = T.sites[site], PR = D.PR;
   const prev = sitePosts(site), last = prev[prev.length - 1];
-  let quality = 1, priceShown = false, hook = true;
+  let quality = 1, priceShown = false, hook = true, searchable = true;
   if (site === "tiktik") {
     hook = T.hookClips.includes(sel.clips[0]);
     priceShown = sel.text === "price" || /₱|\d{2,}/.test(sel.caption || "");
@@ -32,7 +33,7 @@ export function startPost(sel, site = "tiktik") {
     if (!priceShown && sel.clips.includes("price")) priceShown = true;
   } else if (site === "youview") {
     const title = (sel.title || "").toLowerCase(), name = PR[sel.p].n.toLowerCase();
-    const searchable = title.includes(name.split(" ")[0]) || /review|unbox|sulit|legit|test/.test(title);
+    searchable = title.includes(name.split(" ")[0]) || /review|unbox|sulit|legit|test/.test(title);
     quality = (searchable ? T.searchMult : 1) * (sel.segs && sel.segs.length >= 3 ? 1 : T.fewSegsMult) * (sel.thumb === "bold" ? T.boldThumbReach : 1);
     priceShown = sel.segs && sel.segs.includes("price");
   }
@@ -47,10 +48,11 @@ export function startPost(sel, site = "tiktik") {
     title: sel.title || "", segs: [...(sel.segs || [])], thumb: sel.thumb || "",
     reach, conv, hook, priceShown, tau: S2.tau, dur: S2.duration, at: S.clock,
     t: 0, views: 0, orders: 0, missed: 0, acc: 0, cacc: 0, comments: [], counts: {}, samples: [0],
-    leftAt: hook ? T.hookLeftAt : T.noHookLeftAt, endPct: eb + R() * er, first: prev.length === 0, done: false
+    leftAt: hook ? T.hookLeftAt : T.noHookLeftAt, endPct: eb + R() * er, first: prev.length === 0, done: false,
+    why: { heat: heat(sel.p), crowd: crowd(sel.p), stage: stageOf(sel.p), repeat: fat < 1, searchable, stock: S.stock[sel.p], fol }, mSum: 0, mT: 0
   };
   S.running.push(p);
-  S.posted = true; toast(`Posted on ${SITE_NAME[site]}`);
+  S.posted = true; toast(`Posted on ${SITE_NAME[site]}`); emit("sfx", "post");
   return p;
 }
 
@@ -65,14 +67,14 @@ function commentFor(p) {
 function addViews(p, dv) {
   const T = D.T.post, PR = D.PR;
   p.views += dv;
-  p.acc += dv * p.conv * (S.rating / T.ratingRef) * (T.convJitterMin + R() * T.convJitterRange);
+  p.acc += dv * p.conv * convMult(p.p) * (S.rating / T.ratingRef) * (T.convJitterMin + R() * T.convJitterRange);
   while (p.acc >= 1) { p.acc--; makeOrder(p.p, false, p); }
   p.cacc += dv * T.commentRate; while (p.cacc >= 1) {
     p.cacc--; const c = commentFor(p); p.comments.unshift(c); p.comments.length = Math.min(p.comments.length, T.maxComments); p.counts[c.text] = (p.counts[c.text] || 0) + 1;
     if (c.type !== "what" && R() < T.chatChance && S.chats.filter(x => !x.done).length < T.maxOpenChats) {
       const name = D.T.chat.names[Math.floor(R() * D.T.chat.names.length)];
       const ask = { price: "Hi! How much po yung " + PR[p.p].n.toLowerCase() + "?", cod: "Pwede po COD?", where: "Saan po kayo located?", praise: "Available pa po?" }[c.type];
-      S.chats.push({ name, av: c.av, site: SITE_NAME[p.site], type: c.type === "praise" ? "avail" : c.type, p: p.p, t: 0, done: false, log: [["in", ask]] });
+      emit("sfx", "chat"); S.chats.push({ name, av: c.av, site: SITE_NAME[p.site], type: c.type === "praise" ? "avail" : c.type, p: p.p, t: 0, done: false, log: [["in", ask]] });
     }
   }
 }
@@ -82,7 +84,8 @@ export function updatePost(dt) {
   for (const p of S.running) {
     const t0 = p.t; p.t = Math.min(p.dur, p.t + dt);
     // integrate the rate with two half steps (smooth enough for both curve shapes)
-    const dv = (rate(p, t0) + rate(p, p.t)) / 2 * (p.t - t0);
+    const m = reachMult(p.p); p.mSum += m * dt; p.mT += dt;
+    const dv = (rate(p, t0) + rate(p, p.t)) / 2 * (p.t - t0) * m;
     addViews(p, dv);
     if (Math.floor(p.t / T.sampleEvery) > p.samples.length - 1) p.samples.push(rate(p, p.t));
     if (p.t >= p.dur) {
@@ -99,7 +102,7 @@ export function updatePost(dt) {
   if (S.trickleAcc >= 5) {
     const step = S.trickleAcc; S.trickleAcc = 0;
     const yv = sitePosts("youview"), cap = 1 + T.catalogueK * yv.length;
-    yv.forEach(p => { if (S.stock[p.p] > 0) addViews(p, (p.base || p.views) * T.trickle * step / cap); });
+    yv.forEach(p => { if (S.stock[p.p] > 0) addViews(p, (p.base || p.views) * T.trickle * step / cap * (0.3 + heat(p.p))); });
   }
 }
 

@@ -4,35 +4,52 @@
   "cash": 3500,
   "rating": 4.6,
   "nextOrderId": 1024,
-  "stock": {
-   "earbuds": 4,
-   "case": 3,
-   "powerbank": 0,
-   "tint": 0
-  },
+  "stock": {},
   "shelves": [
    {
-    "p": "earbuds",
-    "n": 4
+    "slots": [
+     "earbuds",
+     "earbuds",
+     "earbuds",
+     "earbuds",
+     null,
+     null
+    ]
    },
    {
-    "p": "case",
-    "n": 3
+    "slots": [
+     "case",
+     "case",
+     "case",
+     null,
+     null,
+     null
+    ]
    },
    {
-    "p": null,
-    "n": 0
+    "slots": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
    },
    {
-    "p": null,
-    "n": 0
+    "slots": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
    }
   ],
   "back": {
    "earbuds": 2,
-   "case": 2,
-   "powerbank": 0,
-   "tint": 0
+   "case": 2
   }
  },
  "post": {
@@ -51,9 +68,9 @@
   "convJitterMin": 0.6,
   "convJitterRange": 0.8,
   "commentRate": 0.04,
-  "maxComments": 7,
+  "maxComments": 9,
   "likeRate": 0.07,
-  "chatChance": 0.16,
+  "chatChance": 0.45,
   "maxOpenChats": 4,
   "hookLeftAt": 6,
   "noHookLeftAt": 2,
@@ -126,7 +143,10 @@
   "playerRadius": 0.26,
   "shelfCap": 6,
   "lowAt": 2,
-  "boxMax": 6
+  "boxMax": 6,
+  "handMax": 4,
+  "pickTime": 0.5,
+  "slotTime": 0.25
  },
  "chat": {
   "timeout": 80,
@@ -210,5 +230,144 @@
   "joyChance": 0.18,
   "hypeDrain": 0.07,
   "payRate": 0.8
- }
+ },
+ "trends": {
+  "_note": "Hidden trend lifecycle per product (D-64, D-72). Seconds of game time. The player never sees stages.",
+  "maxActive": 3,
+  "startEvery": [
+   40,
+   80
+  ],
+  "fizzle": 0.4,
+  "stages": {
+   "whisper": [
+    70,
+    120
+   ],
+   "rising": [
+    90,
+    150
+   ],
+   "peak": [
+    70,
+    120
+   ],
+   "crowded": [
+    90,
+    150
+   ],
+   "afterglow": [
+    120,
+    200
+   ]
+  },
+  "heat": {
+   "calm": 0.12,
+   "whisper": 0.25,
+   "rising": [
+    0.3,
+    1.0
+   ],
+   "peak": 1.0,
+   "crowded": [
+    1.0,
+    0.45
+   ],
+   "afterglow": 0.2
+  },
+  "reachHeat": 1.6,
+  "reachBase": 0.6,
+  "convHeat": 0.6,
+  "convBase": 0.7,
+  "crowdK": 0.12,
+  "costHeat": 0.35,
+  "askRate": 0.012,
+  "evergreen": [
+   "earbuds",
+   "case"
+  ],
+  "rivalStage": {
+   "calm": 0.15,
+   "whisper": 0.35,
+   "rising": 0.55,
+   "peak": 1.2,
+   "crowded": 1.5,
+   "afterglow": 0.3
+  }
+ },
+ "rivals": [
+  {
+   "id": "kiko",
+   "n": "Kiko's Cart",
+   "habit": "Jumps on new items early",
+   "stages": [
+    "whisper",
+    "rising"
+   ],
+   "site": "tiktik",
+   "rate": 0.03,
+   "fol": 900
+  },
+  {
+   "id": "tess",
+   "n": "Trendy Tess",
+   "habit": "Posts what is rising",
+   "stages": [
+    "rising",
+    "peak"
+   ],
+   "site": "tiktik",
+   "rate": 0.03,
+   "fol": 2400
+  },
+  {
+   "id": "mura",
+   "n": "Mura Lang PH",
+   "habit": "Copies hot items, cheaper",
+   "stages": [
+    "peak",
+    "crowded"
+   ],
+   "site": "tiktik",
+   "rate": 0.042,
+   "fol": 1500
+  },
+  {
+   "id": "big",
+   "n": "BigBox Bazaar",
+   "habit": "Big live shows at the peak",
+   "stages": [
+    "peak",
+    "crowded"
+   ],
+   "site": "facebazaar",
+   "rate": 0.03,
+   "fol": 6000
+  },
+  {
+   "id": "ate",
+   "n": "Ate Rina Reviews",
+   "habit": "Careful reviews people search for",
+   "stages": [
+    "rising",
+    "afterglow"
+   ],
+   "site": "youview",
+   "rate": 0.015,
+   "fol": 3200
+  },
+  {
+   "id": "budol",
+   "n": "Budol Finds",
+   "habit": "Posts everything, all the time",
+   "stages": [
+    "crowded",
+    "afterglow",
+    "calm"
+   ],
+   "site": "tiktik",
+   "rate": 0.018,
+   "fol": 700
+  }
+ ]
 }

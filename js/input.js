@@ -10,10 +10,11 @@ const KM = { w: "w", arrowup: "w", a: "a", arrowleft: "a", s: "s", arrowdown: "s
 export function initInput() {
   const cv = $("#iso");
   $("#phoneBtn").onclick = () => { if (S.ui === "phone") closeUI(); else openUI("phone"); };
-  $("#start").onclick = () => { S.active = true; $("#start").hidden = true; cv.focus(); };
+  const startPlay = () => { S.active = true; $("#start").hidden = true; };
+  $("#start").onclick = () => { startPlay(); cv.focus(); };
+  cv.addEventListener("pointerdown", startPlay); // a tap on the world starts play too
   cv.addEventListener("wheel", e => { if (S.ui) return; e.preventDefault(); setZoom(e.deltaY < 0 ? "close" : "wide"); }, { passive: false });
-  cv.addEventListener("mousedown", () => { S.active = true; $("#start").hidden = true; });
-  document.addEventListener("mousedown", e => { if (!e.target.closest("#frame, .keepactive")) { S.active = false; keys.clear(); } });
+  document.addEventListener("mousedown", e => { if (!e.target.closest("#frame, #stage, .keepactive")) { S.active = false; keys.clear(); } });
   document.addEventListener("keydown", e => {
     if (e.key === "F1") { e.preventDefault(); toggleDev(); return; }
     if (e.target.matches && e.target.matches("input,textarea")) { if (e.key === "Escape") e.target.blur(); return; }

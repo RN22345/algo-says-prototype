@@ -1,23 +1,29 @@
-/* Layout: dark showcase page with one 16:9 game frame (1920x1080 logical): canvas world, DOM HUD, DOM windows over it. */
+/* Layout: dark page with one 16:9 game frame (1920x1080 logical, scaled to fit the window): canvas world, DOM HUD, DOM windows over it. */
 :root{color-scheme:dark;
 --page:#141a33;--page2:#1d2547;--pageInk:#eef1ff;--pageMute:#a9b2d6;
 --navy:#1b2a66;--cream:#fff8e8;--paper:#ffffff;--ink:#1b2a66;--mute:#6a73a0;
 --purple:#9446e0;--purpleD:#6224a8;--yellow:#ffc928;--yellowD:#d49a00;--teal:#2cc8b6;--tealD:#139180;--orange:#ff8a2a;--orangeD:#cf5e00;--red:#ef3b4f;--redD:#b31e31;--sky:#dff1ff;
 --display:"Fredoka",system-ui,sans-serif;--body:"Nunito",system-ui,sans-serif}
 [hidden]{display:none!important}
-body{margin:0;background:var(--page);color:var(--pageInk);font:15px/1.5 var(--body)}
-.page{max-width:1360px;margin:0 auto;padding-block:16px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:12px}
-.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-h1{font:700 26px/1.1 var(--display);margin:0;text-wrap:balance}
-.controls{color:var(--pageMute);font-size:14px;flex:1;min-width:200px}
-.menu{display:flex;gap:10px;margin-left:auto;font-size:14px}
-.stage{overflow-x:auto;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
-.frame{min-width:960px;aspect-ratio:16/9;container-type:inline-size;position:relative;overflow:hidden;background:#2b3466;font-size:1.05cqw;color:var(--ink);user-select:none}
+html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--pageInk);font:15px/1.5 var(--body);overflow:hidden;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+/* The page fills the window: a small header and the stage. The frame inside is 1920x1080 and is scaled with transform (js/fit.js). */
+.page{position:fixed;inset:0;display:flex;flex-direction:column;box-sizing:border-box;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.bar{flex:none;display:flex;align-items:center;gap:10px;min-height:36px;padding:3px 12px;box-sizing:border-box;font-size:13px}
+h1{font:700 18px/1.1 var(--display);margin:0;white-space:nowrap}
+.controls{color:var(--pageMute);font-size:12px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu{display:flex;gap:8px;margin-left:auto;flex:none}
+.bar .cap{font-size:13px}
+.bar .cap.sm{font-size:12px;padding:.3em .9em}
+html.nohdr .bar{display:none}
+.stage{position:relative;flex:1;min-height:0;overflow:hidden}
+.frame{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#2b3466;font-size:20.16px;color:var(--ink);user-select:none;-webkit-user-select:none;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 10px 40px rgba(0,0,0,.45)}
+html:not(.fit-ready) .frame{visibility:hidden}
 #iso{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none}
 #iso:focus-visible{outline:4px solid var(--yellow);outline-offset:-4px}
 .loaderr{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;color:#fff;font:700 1.4em var(--display);text-align:center;padding:2em}
 /* developer panel */
-.dev{position:fixed;right:12px;top:64px;z-index:50;width:260px;max-width:calc(100vw - 24px);background:#0e1330;color:var(--pageInk);border:2px solid var(--yellow);border-radius:12px;padding:12px;display:grid;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.dev{position:fixed;right:12px;top:48px;max-height:calc(100% - 60px);overflow:auto;z-index:50;width:260px;max-width:calc(100vw - 24px);background:#0e1330;color:var(--pageInk);border:2px solid var(--yellow);border-radius:12px;padding:12px;display:grid;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .dev h2{font:700 15px var(--display);margin:0;color:var(--yellow)}
 .dev small{color:var(--pageMute);font-size:12px}
 .dev .cap{font-size:14px}
@@ -248,7 +254,7 @@ textarea.cap-in:focus{outline:.15em solid var(--purple)}
 .mu-vol{display:flex;gap:.7em;align-items:center;font:700 .95em var(--display)}
 .mu-vol input,.se input{flex:1;accent-color:var(--purple)}
 .se{display:grid;gap:1em;align-content:start;padding:1em}
-.se-opts{display:grid;gap:1em}
+.se-opts{display:grid;gap:.7em}
 .se-row{display:grid;gap:.4em}
 .se-row>div{display:flex;gap:.4em}
 
@@ -315,3 +321,49 @@ textarea.cap-in:focus{outline:.15em solid var(--purple)}
 .lv-note.cf{background:#3ddc84;transform:scale(1.08);transition:.2s}
 .lv-note.cfjoy{background:#ffd34e;transition:.2s}
 .lv-note.gone{opacity:.25;transition:.3s}
+
+/* ---------- sound, full screen, touch (js/fit.js, js/sound.js, js/touch.js) ---------- */
+html.nohdr .dev{top:12px}
+.sys{position:absolute;right:13%;bottom:3.2%;display:flex;gap:.5em;align-items:center}
+.sys-b{font-size:1.2em;padding:.3em .6em;min-width:2.2em}
+.snd{position:absolute;right:0;bottom:calc(100% + .7em);width:17em;padding:.7em .9em;display:grid;gap:.6em}
+.snd-row{display:grid;grid-template-columns:4.6em minmax(0,1fr);align-items:center;gap:.5em}
+.snd-row input{width:100%;min-width:0;accent-color:var(--purple);height:1.6em;margin:0}
+.snd-chips{display:flex;gap:.5em;flex-wrap:wrap}
+.snd-menu{display:none;justify-content:flex-end;border-top:.1em dashed #d8d2bd;padding-top:.5em}
+html.nohdr .snd-menu{display:flex}
+.tctl{display:none}
+html.tm .tctl{display:block}
+html.tm .hint{display:none}
+.joy{position:absolute;left:3%;bottom:6%;width:9.5em;height:9.5em;border-radius:50%;background:rgba(255,255,255,.28);border:.18em solid rgba(27,42,102,.7);box-shadow:inset 0 0 0 .5em rgba(27,42,102,.12),0 .3em 0 rgba(27,42,102,.5);touch-action:none;pointer-events:auto}
+.joy.on{background:rgba(255,255,255,.4)}
+.joy-k{position:absolute;left:50%;top:50%;width:4.2em;height:4.2em;margin:-2.1em 0 0 -2.1em;border-radius:50%;background:linear-gradient(#fff,#d8cdfa);border:.18em solid var(--navy);box-shadow:0 .25em 0 var(--navy);pointer-events:none}
+.ebtn{position:absolute;right:2.6%;bottom:17%;width:5.2em;height:5.2em;border-radius:50%;padding:0;font-size:1.8em;touch-action:none;pointer-events:auto}
+.ebtn.off{filter:grayscale(.6);opacity:.7}
+.tz{position:absolute;right:13%;bottom:17%;display:grid;gap:.5em;pointer-events:none}
+.tz-b{width:2.6em;height:2.6em;padding:0;font-size:1.5em;pointer-events:auto;touch-action:none}
+html.tm .phoneBtn{font-size:1.5em}
+html.tm .toasts{bottom:36%;width:26%}
+html.tm .frame.pc-open .toasts{bottom:4.8em}
+html.tm #iso{touch-action:none}
+html.tm .frame{touch-action:pan-x pan-y}
+html.tm .sys{right:18%}
+html.tm .tz{right:18%}
+/* Touch: tap targets. --k is the page scale, so 34px / k is 34 screen pixels in layout pixels. */
+html.tm{--tap:calc(34px / var(--k,1))}
+html.tm :is(.cap,.chip,.dk-task,.sm-cat,.sm-app,.st-row,.bn-item,.fd-tab,.br-nv,.br-tabb,.dk-pw){min-height:min(var(--tap),3.4em);box-sizing:border-box}
+html.tm :is(.chip,.br-nv,.br-tabb,.fd-tab,.st-row,.bn-item,.sm-cat){display:inline-flex;align-items:center}
+html.tm :is(.st-row){display:grid}
+html.tm .desk .dw .wbar :is(.wb,.x){position:relative;width:2.1em;height:2.1em;line-height:1.9em}
+html.tm .desk .dw .wbar :is(.wb,.x)::after{content:"";position:absolute;inset:-.5em}
+html.tm .x{position:relative}
+html.tm input[type=range]{height:2.2em}
+/* Portrait notice, touch devices only */
+.rotate{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;background:rgba(20,26,60,.94);padding:24px;box-sizing:border-box;font-size:18px}
+.rotate .card{display:grid;gap:.6em;justify-items:center;text-align:center;padding:1.2em 1.6em;color:var(--ink);max-width:20em}
+.rotate b{font:700 1.3em var(--display)}
+.rotate small{font:700 .9em var(--body);color:var(--mute)}
+.rot-ic{font-size:3em;line-height:1;display:inline-block;transform:rotate(-90deg)}
+html.tm.portrait:not(.rot-ok) .rotate{display:flex}
+@media (prefers-reduced-motion:no-preference){.rot-ic{animation:rot 2.4s ease-in-out infinite}}
+@keyframes rot{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}

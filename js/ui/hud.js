@@ -26,10 +26,12 @@ export function renderHud() {
   $("#hud").innerHTML = `<span class="pill"><img src="img/icon_hud_cash.png" alt="">${peso(S.cash)}</span>
    <span class="pill"><img src="img/icon_hud_seller_rank.png" alt="">Rank ${S.rank}</span>
    <span class="pill"><img src="img/icon_hud_trust.png" alt="">${S.rating.toFixed(1)}</span>
-   <span class="pill plain">📦 ${S.orders.length} to pack</span>
+   <span class="pill plain">📦 ${S.orders.filter(o => !o.picked).length} to pick · ${S.orders.length} to pack</span>
    ${S.running.length ? `<span class="pill plain">● ${S.running.length} post${S.running.length > 1 ? "s" : ""} running</span>` : ""}
    ${missedPill()}`;
-  $("#carry").innerHTML = S.box ? `<span class="pill plain">Carrying: ${S.box.q} ${D.PR[S.box.p].n}</span>` : S.carry.length ? `<span class="pill plain">Carrying: ${S.carry.map(o => "#" + o.id).join(", ")}</span>` : "";
+  const hand = (S.hand || []).map(h => `${D.PR[h.p].n}${h.o != null ? " #" + h.o : ""}`);
+  const bits = [S.box ? `box of ${S.box.q} ${D.PR[S.box.p].n}` : "", hand.length ? `items: ${hand.join(", ")}` : "", S.carry.length ? `parcels ${S.carry.map(o => "#" + o.id).join(", ")}` : ""].filter(Boolean);
+  $("#carry").innerHTML = bits.length ? `<span class="pill plain">Carrying: ${bits.join(" · ")}</span>` : "";
   const ck = (b, t) => `<span>${b ? "✅" : "⬜"} ${t}</span>`;
   $("#note").innerHTML = `<h3>${S.milestoneDone ? "Milestone 1 done" : "Launch the shop"}</h3><div>${ck(S.stocked, "Restock a product")}${ck(S.posted, "Post a video")}${ck(S.shipped >= M.ship, `Ship ${M.ship} orders (${Math.min(M.ship, S.shipped)}/${M.ship})`)}${ck(S.replies >= M.replies, `Answer ${M.replies} buyers (${Math.min(M.replies, S.replies)}/${M.replies})`)}</div>`;
   const open = S.chats.filter(c => !c.done).length; $("#pbadge").hidden = !open; $("#pbadge").textContent = open;

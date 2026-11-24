@@ -1,0 +1,26 @@
+/* Game UI added 2026-11-24: shelf and storage panels, Seller Hub site, supplier tags. */
+.win.place.t-shelf .wt{background:linear-gradient(#d9a066,#9a6230)}
+.shelf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,9em));grid-template-rows:repeat(3,auto);gap:.6em;justify-content:center;background:linear-gradient(#b97a3d,#8a5a2b);border:.25em solid #5c3a1a;border-radius:1em;padding:.8em}
+.slotb{all:unset;cursor:pointer;position:relative;display:grid;place-items:center;gap:.1em;height:5.4em;border-radius:.7em;background:#ffffff1f;border:.15em dashed #ffffff66;color:#fff;font:700 .85em var(--display);text-align:center}
+.slotb.full{background:linear-gradient(#fff8e8,#f0e2c2);border:.15em solid var(--navy);color:var(--navy);box-shadow:0 .2em 0 #0005}
+.slotb img{width:2.8em}.slotb small{font-size:.8em}
+.slotb.need{outline:.25em solid var(--gold);outline-offset:.1em}
+.slotb i{position:absolute;top:-.6em;right:-.4em;background:var(--gold);color:var(--navy);border:.12em solid var(--navy);border-radius:999px;padding:0 .5em;font:700 .8em var(--display);font-style:normal}
+.slotb:focus-visible{outline:.2em solid #fff}
+.win.place .row{display:flex;gap:.5em;flex-wrap:wrap;justify-content:center}
+.hd{display:flex;gap:.5em;align-items:center;flex-wrap:wrap}
+.hd-box,.hd-it,.ord{display:inline-flex;align-items:center;gap:.3em;background:#ffffff1a;border:.12em solid #ffffff44;border-radius:999px;padding:.1em .7em .1em .2em;font:700 .85em var(--display)}
+.hd-box img,.hd-it img,.ord img{width:1.8em}
+.ords{display:flex;gap:.4em;flex-wrap:wrap;margin-top:.3em}
+.ord.ok{background:#3ddc8433;border-color:#3ddc84}
+.win.place .sub{font-size:.9em;font-weight:700;color:#cdb8ff}
+/* Seller Hub */
+.hub-tr,.hub-board,.hub-posts{display:grid;gap:.5em}
+.hub-row{display:grid;grid-template-columns:auto 2.6em minmax(0,1fr) auto auto;gap:.8em;align-items:center;padding:.45em .9em}
+.hub-board .hub-row{grid-template-columns:auto minmax(0,1fr) auto auto}
+.hub-posts .hub-row{grid-template-columns:2.6em minmax(0,1fr) auto}
+.hub-row img{width:2.6em}.hub-row.me{outline:.2em solid var(--gold);background:#fff8d6}
+.hub-no{font:700 1.3em var(--display);min-width:1.4em;text-align:center}
+.hub-n{font:700 .9em var(--display);white-space:nowrap}
+.hub-bar{height:.6em;background:#0001;border-radius:1em;overflow:hidden;margin-top:.25em}.hub-bar i{display:block;height:100%;background:linear-gradient(90deg,#7aa8f7,#3a6fd8)}
+.br-tag{display:inline-block;background:#ef3b4f;color:#fff;border-radius:999px;padding:0 .6em;font:700 .75em var(--display);vertical-align:.1em}

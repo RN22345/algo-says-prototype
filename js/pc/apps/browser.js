@@ -8,8 +8,9 @@ import youview from "../sites/youview.js";
 import facebazaar from "../sites/facebazaar.js";
 import supplier from "../sites/supplier.js";
 import toolshop from "../sites/toolshop.js";
+import hub from "../sites/hub.js";
 
-export const SITES = [tiktik, youview, facebazaar, supplier, toolshop];
+export const SITES = [tiktik, youview, facebazaar, hub, supplier, toolshop];
 export const bySite = Object.fromEntries(SITES.map(s => [s.id, s]));
 const byHost = Object.fromEntries(SITES.map(s => [s.host, s]));
 

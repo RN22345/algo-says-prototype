@@ -2,7 +2,7 @@
    The clip strip scrolls past the cut line. Press Space (or click) when a cut marker crosses it.
    Hits finish the edit sooner. Misses only slow it down. The video turns out the same either way
    (skill changes speed, never results). The player stays at the desk while it runs; the shop keeps going. */
-import { D, S, sel } from "../state.js";
+import { D, S, sel, emit } from "../state.js";
 import { editSpeed } from "../sim/gear.js";
 
 const SEGS = {
@@ -47,8 +47,8 @@ export function playEdit(opts = {}) {
     function hit() {
       if (over) return;
       const lx = off, near = marks.find(m => !m.done && Math.abs(m.x - lx) < 26);
-      if (near) { near.done = true; near.el.classList.add("hit"); prog += perHit; streak++; hits++; combo.textContent = streak > 2 ? `Clean cuts ×${streak}` : "Cut!"; }
-      else { streak = 0; combo.textContent = "Missed the cut"; el.classList.add("shake"); setTimeout(() => el.classList.remove("shake"), 180); }
+      if (near) { near.done = true; near.el.classList.add("hit"); prog += perHit; streak++; hits++; emit("sfx", "hit"); combo.textContent = streak > 2 ? `Clean cuts ×${streak}` : "Cut!"; }
+      else { streak = 0; emit("sfx", "miss"); combo.textContent = "Missed the cut"; el.classList.add("shake"); setTimeout(() => el.classList.remove("shake"), 180); }
     }
     function key(e) {
       if (e.code === "Space" || e.key === " ") { e.preventDefault(); e.stopPropagation(); hit(); }
@@ -67,7 +67,7 @@ export function playEdit(opts = {}) {
       over = true; cancelAnimationFrame(raf);
       document.removeEventListener("keydown", key, true);
       el.querySelector(".mini-foot").textContent = `Edit done. ${hits} clean cuts.`;
-      el.classList.add("done");
+      el.classList.add("done"); emit("sfx", "done");
       setTimeout(() => { el.remove(); S.edit = null; resolve({ secs: (performance.now() - t0) / 1000, hits }); }, 700);
     }
     const t0 = performance.now();

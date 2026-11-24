@@ -79,15 +79,17 @@ export function drawFurn(f) {
       if (f.id.startsWith("tree")) drawTree(f.b);
       else if (!f.id.startsWith("shelf")) { if (!sprite(f.id, f.b)) box(x0, y0, x1, y1, 0, 40, "#e2ae74", "#c08445", "#a26c33"); }
       else if (f.id.startsWith("shelf")) {
-        const k = +f.id[5], sh = S.shelves[k] || { p: null, n: 0 }, p = sh.p, n = Math.min(6, sh.n);
+        const k = +f.id[5], sl = (S.shelves[k] || { slots: [] }).slots;
         const shelfSpr = sprite("shelf", f.b);
         if (!shelfSpr) box(x0, y0, x1, y1, 0, 150, "#d9a066", "#b97a3d", "#9a6230");
         [10, 58, 106].forEach((z, r) => {
           if (!shelfSpr) { g.lineWidth = 3; g.strokeStyle = NAVY; g.beginPath(); g.moveTo(...P(x0, y1, z)); g.lineTo(...P(x1, y1, z)); g.stroke(); }
-          for (let c = 0; c < 2; c++) { const idx = r * 2 + c; if (idx >= n) continue; const xa = x0 + .12 + c * .42; poly([P(xa, y1, z + 3), P(xa + .34, y1, z + 3), P(xa + .34, y1, z + 38), P(xa, y1, z + 38)], PR[p].col, 2); }
+          for (let c = 0; c < 2; c++) { const it = sl[r * 2 + c]; if (!it) continue; const xa = x0 + .12 + c * .42; poly([P(xa, y1, z + 3), P(xa + .34, y1, z + 3), P(xa + .34, y1, z + 38), P(xa, y1, z + 38)], PR[it].col, 2); }
         });
         if (!shelfSpr) poly([P(x0, y1, 0), P(x1, y1, 0), P(x1, y1, 150), P(x0, y1, 150)], null, 3);
-        const lowN = D.T.shop.lowAt; if (!p) overlay.bubbles.push([(x0 + x1) / 2, (y0 + y1) / 2, k % 2 ? 205 : 165, `Shelf ${k + 1}: empty`, "#ffffff"]); else if (sh.n <= lowN) overlay.bubbles.push([(x0 + x1) / 2, (y0 + y1) / 2, k % 2 ? 205 : 165, `${PR[p].n}: ${sh.n}`, (S.flash[p] || 0) > 0 ? "#ff9aa8" : "#fff4b8"]);
+        const pick = S.orders.filter(o => !o.picked && sl.includes(o.p)).length, bx = (x0 + x1) / 2, by = (y0 + y1) / 2, bz = k % 2 ? 205 : 165;
+        if (pick) overlay.bubbles.push([bx, by, bz, `Pick ${pick}`, "#ffe06b"]);
+        else if (!sl.some(Boolean)) overlay.bubbles.push([bx, by, bz, `Shelf ${k + 1}: empty`, "#ffffff"]);
       }
   }
 }

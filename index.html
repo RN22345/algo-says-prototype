@@ -2,26 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Algo Says</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&family=Nunito:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/pc.css">
+<link rel="stylesheet" href="css/game.css">
 </head>
 <body>
 <div class="page">
   <header class="bar">
     <h1>Algo Says</h1>
-    <span class="controls">W A S D walk, E use, Q phone, Esc close, Space and 1 to 4 in minigames.</span>
+    <span class="controls">W A S D walk, E use, Q phone, M mute, Esc close, Space and 1 to 4 in minigames.</span>
     <nav class="menu keepactive" aria-label="Game menu">
+      <button class="cap t sm" type="button" data-act="snd-mute" id="hdrSnd" aria-pressed="false">🔊 Sound on</button>
+      <button class="cap t sm" type="button" data-act="fs-toggle" data-fs-label="long" aria-pressed="false">⛶ Full screen</button>
       <button class="cap y sm" type="button" data-act="menu-new">New game</button>
       <button class="cap t sm" type="button" data-act="dev-toggle" id="devBtn" aria-expanded="false" aria-controls="dev">Dev</button>
     </nav>
   </header>
 
-  <div class="stage"><div class="frame" id="frame">
+  <div class="stage" id="stage"><div class="frame" id="frame">
     <canvas id="iso" tabindex="0" aria-label="Isometric house and street. W A S D to walk, E to use, Q for the phone."></canvas>
 
     <div class="hud" id="hud"></div>
@@ -30,7 +33,27 @@
     <div class="card hint"><span><kbd class="k">W</kbd><kbd class="k">A</kbd><kbd class="k">S</kbd><kbd class="k">D</kbd> move</span><span><kbd class="k">E</kbd> use</span><span><kbd class="k">Q</kbd> phone</span><span><kbd class="k">Esc</kbd> close</span></div>
     <div class="toasts" id="toasts" aria-live="polite"></div>
     <button class="cap t phoneBtn" id="phoneBtn" type="button">📱 Phone<span class="badge" id="pbadge" hidden>0</span></button>
-    <button class="start" id="start" type="button"><span class="card">Click to play<small>The game keeps running while windows are open</small></span></button>
+    <button class="start" id="start" type="button"><span class="card">Click or tap to play<small>The game keeps running while windows are open</small></span></button>
+
+    <!-- SOUND AND VIEW -->
+    <div class="sys keepactive" id="sys">
+      <div class="card snd" id="snd" hidden role="group" aria-label="Sound options">
+        <label class="snd-row" for="sndVol"><span class="lbl">Volume</span><input id="sndVol" data-pref="volume" type="range" min="0" max="1" step="0.05" value="0.7"></label>
+        <label class="snd-row" for="sndFx"><span class="lbl">Effects</span><input id="sndFx" data-pref="sfxVol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+        <label class="snd-row" for="sndMu"><span class="lbl">Music</span><input id="sndMu" data-pref="musicVol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+        <div class="snd-chips"><button class="chip" type="button" id="sndMute" data-act="snd-mute" aria-pressed="false">Mute</button><button class="chip" type="button" id="sndWorld" data-act="snd-world" aria-pressed="false">World music: Off</button></div>
+        <div class="snd-chips snd-menu"><button class="cap y sm" type="button" data-act="menu-new">New game</button><button class="cap t sm" type="button" data-act="dev-toggle">Dev</button></div>
+      </div>
+      <button class="cap t sys-b" id="sndBtn" type="button" data-act="snd-panel" aria-expanded="false" aria-label="Sound options">🔊</button>
+      <button class="cap t sys-b" type="button" data-act="fs-toggle" data-fs-label="short" aria-label="Full screen" aria-pressed="false">⛶</button>
+    </div>
+
+    <!-- TOUCH CONTROLS (shown on touch devices; js/touch.js) -->
+    <div class="tctl" id="touch">
+      <div class="joy" id="joy" aria-label="Move stick"><i class="joy-k" id="joyK"></i></div>
+      <div class="tz"><button class="cap y tz-b" id="zIn" type="button" aria-label="Zoom in">+</button><button class="cap y tz-b" id="zOut" type="button" aria-label="Zoom out">-</button></div>
+      <button class="cap o ebtn" id="eBtn" type="button" aria-label="Use (nothing here)">E</button>
+    </div>
 
     <!-- PC DESKTOP (built by js/pc/desktop.js) -->
     <div class="ov desk" id="w-desktop" hidden></div>
@@ -62,6 +85,9 @@
     </div>
   </div></div>
 </div>
+
+<!-- Portrait notice for touch devices -->
+<div class="rotate" id="rotate" role="alert"><div class="card"><span class="rot-ic" aria-hidden="true">📱</span><b>Turn your phone sideways</b><small>Algo Says plays best in landscape.</small><button class="cap y sm" id="rotOk" type="button">Play anyway</button></div></div>
 
 <!-- DEVELOPER PANEL -->
 <aside class="dev keepactive" id="dev" hidden aria-label="Developer panel">

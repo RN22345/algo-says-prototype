@@ -5,12 +5,13 @@ import { registerActions } from "../../ui/windows.js";
 import { buyStock, restockCost } from "../../sim/shop.js";
 import { nav } from "./nav.js";
 import { shell, stockLine } from "./common.js";
+import { inDemand, costMult } from "../../sim/trends.js";
 
 function page() {
   const PR = D.PR, RS = D.T.restock;
   const rows = Object.entries(PR).map(([k, v]) => {
     const w = restockCost(k, "w"), e = restockCost(k, "e");
-    return `<div class="card br-sup"><img src="img/${v.icon}.png" alt=""><div><b>${v.n}</b><div class="br-sub">You sell at ${peso(v.price)} · cost ${peso(v.cost)} each</div>${stockLine(k)}</div>
+    return `<div class="card br-sup"><img src="img/${v.icon}.png" alt=""><div><b>${v.n}</b>${inDemand(k) ? ` <span class="br-tag">In demand</span>` : ""}<div class="br-sub">You sell at ${peso(v.price)} · cost ${peso(Math.round(v.cost * costMult(k)))} each${costMult(k) > 1.04 ? " (price is up now)" : ""}</div>${stockLine(k)}</div>
       <button class="cap sm" type="button" data-act="br-buy" data-v="${k}" data-m="w" ${S.cash < w ? "disabled" : ""}>Wholesale ${peso(w)} · ${RS.wholesaleTime}s</button>
       <button class="cap sm o" type="button" data-act="br-buy" data-v="${k}" data-m="e" ${S.cash < e ? "disabled" : ""}>Express ${peso(e)} · ${RS.expressTime}s</button></div>`;
   }).join("");

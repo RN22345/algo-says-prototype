@@ -5,6 +5,7 @@ import { initRender, render } from "./render.js";
 import { updateCamera, snapCamera, cam, setZoom, screenToTile, tileToScreen } from "./camera.js";
 import { initNpcs, updateNpcs, npcs } from "./npcs.js";
 import { updatePost } from "./sim/post.js";
+import { updateTrends, initTrends } from "./sim/trends.js";
 import { updateShop, updateDeliveries, checkMilestone, syncStock } from "./sim/shop.js";
 import { updateRiders, updateVan, updateJeep, updatePlayer } from "./entities.js";
 import { initWindows, $ } from "./ui/windows.js";
@@ -12,7 +13,11 @@ import { renderHud, initHud } from "./ui/hud.js";
 import { initInbox, renderInbox } from "./ui/inbox.js";
 import { initAlgo } from "./ui/algo.js";
 import { initPlaces, refreshPlaces } from "./ui/places.js";
+import { initShelf, refreshShelf } from "./ui/shelf.js";
 import { initInput } from "./input.js";
+import { initFit } from "./fit.js";
+import { initSound } from "./sound.js";
+import { initTouch } from "./touch.js";
 import { initSave, loadGame, saveGame, newGame } from "./save.js";
 import { initDev, devTick } from "./dev.js";
 import { initDesktop, refreshDesktop, pcApi } from "./pc/desktop.js";
@@ -25,6 +30,7 @@ let acc = 0, uiT = 0;
 /* One simulation step. Same order as the original loop. */
 function update(dt) {
   rt.perf += dt;
+  updateTrends(dt);
   updatePost(dt);
   updateShop(dt);
   updateRiders(dt);
@@ -41,7 +47,7 @@ function refreshUI() {
   renderHud();
   refreshDesktop();
   if (S.ui === "phone") renderInbox(false);
-  refreshPlaces();
+  refreshPlaces(); refreshShelf();
   devTick();
 }
 
@@ -68,6 +74,7 @@ function frame(now) {
 let last = performance.now();
 
 async function boot() {
+  initFit();
   try { await loadData(); }
   catch (e) {
     $("#start").hidden = true;
@@ -79,14 +86,16 @@ async function boot() {
   initWorld(D.MAP);
   resetState();
   loadGame();
+  initTrends();
   syncStock();
   initNpcs();
   snapCamera();
   initRender($("#iso"));
-  initWindows(); initHud(); initInbox(); initAlgo(); initPlaces();
+  initWindows(); initHud(); initInbox(); initAlgo(); initPlaces(); initShelf();
   try { await initDesktop(); } catch (e) { console.error(e); }
   initDev({ step });
   initInput();
+  initSound(); initTouch();
   initSave();
   on("refresh", refreshUI);
   window.__game = { state: S, player: pl, step, render, refresh: refreshUI, save: saveGame, newGame, data: D, cam, npcs, setZoom, screenToTile: (x, y) => screenToTile(x, y, $("#iso").getBoundingClientRect()), tileToScreen: (i, j, z) => tileToScreen(i, j, $("#iso").getBoundingClientRect(), z), pc: pcApi };

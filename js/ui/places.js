@@ -5,9 +5,10 @@ import { peso } from "./format.js";
 import { $, registerWindow, registerActions } from "./windows.js";
 import { record } from "../sim/ledger.js";
 import { has, buyGear } from "../sim/gear.js";
+import { costMult } from "../sim/trends.js";
 
-const handsFree = () => !S.box && !S.carry.length;
-const cost = (p, place) => Math.round(D.PR[p].cost * D.T[place].mult * D.T[place].qty);
+const handsFree = () => !S.box && !S.carry.length && !(S.hand || []).length;
+const cost = (p, place) => Math.round(D.PR[p].cost * D.T[place].mult * D.T[place].qty * costMult(p));
 let mallTab = "gadgets";
 
 function shell(id, title, sub, cls) {
@@ -42,7 +43,7 @@ function renderWarehouse() { const b = $("#warehouseBody"); if (b) b.innerHTML =
 function buy(p, place) {
   const c = cost(p, place), q = D.T[place].qty;
   if (S.cash < c || !handsFree()) return;
-  S.cash -= c; record("out", c, { p, qty: q, place }); S.box = { p, q };
+  S.cash -= c; record("out", c, { p, qty: q, place }); S.box = { p, q }; emit("sfx", "buy");
   toast(`Bought ${q} ${D.PR[p].n} for ${peso(c)}. Carry the box home.`);
   emit("refresh");
 }
@@ -55,7 +56,7 @@ export function courierDrop() {
     S.rating = Math.min(T.ratingMax, S.rating + T.ratingGainShip);
     S.riders.forEach(r => { if (r.id === o.id) r.state = "leaving"; });
   });
-  S.carry = [];
+  S.carry = []; emit("sfx", "cash");
   toast(`Dropped ${n} parcel${n > 1 ? "s" : ""} at the courier. Paid on delivery.`);
   emit("refresh");
 }

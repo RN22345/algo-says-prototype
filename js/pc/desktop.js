@@ -5,6 +5,7 @@ import { $, registerWindow, registerActions, closeUI, openUI } from "../ui/windo
 import { peso } from "../ui/format.js";
 import { clockText, setHTML } from "./util.js";
 import { loadPrefs, prefs, setPref } from "./prefs.js";
+import { getScale } from "../fit.js";
 import { unlock, stopLoop } from "./audio.js";
 import browser, { SITES, showSite } from "./apps/browser.js";
 import stats from "./apps/stats.js";
@@ -117,7 +118,7 @@ function startIconDrag(e) {
   let moved = false;
   try { el.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
   const mv = ev => {
-    const dx = ev.clientX - sx, dy = ev.clientY - sy;
+    const k = getScale(), dx = (ev.clientX - sx) / k, dy = (ev.clientY - sy) / k; // the frame is scaled: screen pixels to layout pixels
     if (!moved && Math.hypot(dx, dy) < 5) return;
     moved = true; dragIc = true; el.classList.add("drag");
     el.style.left = l0 + dx + "px"; el.style.top = t0 + dy + "px";
@@ -247,7 +248,7 @@ export function refreshDesktop() {
 }
 
 export async function initDesktop() {
-  const r = await fetch("data/pc.json"); if (!r.ok) throw new Error("Could not load pc.json");
+  const r = await fetch("data/pc.json", { cache: "no-cache" }); if (!r.ok) throw new Error("Could not load pc.json");
   D.PC = await r.json();
   loadPrefs();
   registerWindow("desktop", {

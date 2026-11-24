@@ -1,27 +1,136 @@
 {
-  "_note": "PC desktop data: clock, app locks, fake feeds, Parcel Catch tuning.",
-  "clock": {"startHour": 9, "minutesPerSecond": 1},
-  "stickerMax": 3,
-  "locks": {
-    "youview":    {"rank": 3, "blurb": "Make long videos for YouView."},
-    "facebazaar": {"rank": 2, "blurb": "Go live and sell on FaceBazaar."},
-    "toolshop":   {"rank": 4, "blurb": "Buy lights, tripods and better gear."},
-    "helpers":    {"rank": 5, "blurb": "Hire helpers to film and pack. You still make every decision."}
+ "_note": "PC desktop data: clock, app locks, fake feeds, Parcel Catch tuning.",
+ "clock": {
+  "startHour": 9,
+  "minutesPerSecond": 1
+ },
+ "stickerMax": 3,
+ "locks": {
+  "youview": {
+   "rank": 3,
+   "blurb": "Make long videos for YouView."
   },
-  "catch": {
-    "lives": 3, "basketW": 76, "basketSpeed": 380,
-    "speed0": 150, "speedGain": 7, "spawn0": 0.9, "spawnMin": 0.32, "spawnDecay": 0.012, "tomatoChance": 0.22
+  "facebazaar": {
+   "rank": 2,
+   "blurb": "Go live and sell on FaceBazaar."
   },
-  "feeds": {
-    "sellers": ["Ate Mia Finds", "Kuya Jun Gadgets", "Pastel Corner", "Mayari Mart", "Tindahan ni Lola", "Budget Bae", "Lakwatsa Loot", "Sulit Stop", "Berry Bazaar", "Pinoy Picks", "Chill Kiosk", "Gadget Gelo", "Kiko's Cart", "Luna Lane Shop", "Tipid Tito", "Mango Market"],
-    "captions": {
-      "earbuds": ["Sulit na earbuds, 3 colors!", "Bass check! Sound on", "Unboxing my new earbuds", "Pang-gym, pang-commute", "Earbuds vs. the noisy jeep"],
-      "case": ["Cute cases, new drop", "Pick your shade", "Protect your phone, look good", "Case for every mood", "Drop test! It survived"],
-      "powerbank": ["Charge all day, 10000 mAh", "Power bank for long commutes", "Never hit 1% again", "Fast charge test", "What is in my bag"],
-      "tint": ["Lip tint swatches", "One tint, three looks", "Soft glam in 30 seconds", "Shade check by the window", "Tint that stays on"]
-    },
-    "titles": ["Honest review: {p}", "{p} unboxing and first impressions", "Is this {p} worth it? Full test", "How I pack {p} orders", "Testing a cheap {p} for a week"],
-    "liveTitles": ["Live sale: {p}", "{p} flash sale, tonight only", "Ask me about the {p}", "Restock day: {p}"],
-    "liveChats": ["Magkano po?", "Pa-reserve!", "COD po ba?", "Mine!", "Available pa?", "Saan ship?"]
+  "toolshop": {
+   "rank": 4,
+   "blurb": "Buy lights, tripods and better gear."
+  },
+  "helpers": {
+   "rank": 5,
+   "blurb": "Hire helpers to film and pack. You still make every decision."
   }
+ },
+ "catch": {
+  "lives": 3,
+  "basketW": 76,
+  "basketSpeed": 380,
+  "speed0": 150,
+  "speedGain": 7,
+  "spawn0": 0.9,
+  "spawnMin": 0.32,
+  "spawnDecay": 0.012,
+  "tomatoChance": 0.22
+ },
+ "feeds": {
+  "sellers": [
+   "Ate Mia Finds",
+   "Kuya Jun Gadgets",
+   "Pastel Corner",
+   "Mayari Mart",
+   "Tindahan ni Lola",
+   "Budget Bae",
+   "Lakwatsa Loot",
+   "Sulit Stop",
+   "Berry Bazaar",
+   "Pinoy Picks",
+   "Chill Kiosk",
+   "Gadget Gelo",
+   "Kiko's Cart",
+   "Luna Lane Shop",
+   "Tipid Tito",
+   "Mango Market"
+  ],
+  "captions": {
+   "earbuds": [
+    "Sulit na earbuds, 3 colors!",
+    "Bass check! Sound on",
+    "Unboxing my new earbuds",
+    "Pang-gym, pang-commute",
+    "Earbuds vs. the noisy jeep"
+   ],
+   "case": [
+    "Cute cases, new drop",
+    "Pick your shade",
+    "Protect your phone, look good",
+    "Case for every mood",
+    "Drop test! It survived"
+   ],
+   "powerbank": [
+    "Charge all day, 10000 mAh",
+    "Power bank for long commutes",
+    "Never hit 1% again",
+    "Fast charge test",
+    "What is in my bag"
+   ],
+   "tint": [
+    "Lip tint swatches",
+    "One tint, three looks",
+    "Soft glam in 30 seconds",
+    "Shade check by the window",
+    "Tint that stays on"
+   ],
+   "fan": [
+    "Survive the heat with this",
+    "Mini fan, maxi lamig",
+    "Commute essential this summer",
+    "Fan check! 3 speeds",
+    "Pocket fan unboxing"
+   ],
+   "tote": [
+    "Tote bag for school and work",
+    "New print drop!",
+    "What fits in my tote",
+    "Canvas tote, sulit",
+    "Tote bag haul"
+   ],
+   "tumbler": [
+    "Ice still there after 12 hours",
+    "Aesthetic tumbler unboxing",
+    "Tumbler for the office",
+    "Leak test! Shake it",
+    "Pick your color"
+   ],
+   "plush": [
+    "Cutest keychain ever",
+    "Plush keychain haul",
+    "Bag charm check",
+    "Gift idea under 150",
+    "Collect them all"
+   ]
+  },
+  "titles": [
+   "Honest review: {p}",
+   "{p} unboxing and first impressions",
+   "Is this {p} worth it? Full test",
+   "How I pack {p} orders",
+   "Testing a cheap {p} for a week"
+  ],
+  "liveTitles": [
+   "Live sale: {p}",
+   "{p} flash sale, tonight only",
+   "Ask me about the {p}",
+   "Restock day: {p}"
+  ],
+  "liveChats": [
+   "Magkano po?",
+   "Pa-reserve!",
+   "COD po ba?",
+   "Mine!",
+   "Available pa?",
+   "Saan ship?"
+  ]
+ }
 }

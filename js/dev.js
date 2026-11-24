@@ -25,7 +25,7 @@ export function initDev({ step }) {
     "dev-toggle": () => toggleDev(),
     "dev-cash": () => { S.cash += D.T.dev.cash; record("in", D.T.dev.cash, { note: "Developer cash" }); emit("refresh"); },
     "dev-orders": () => { Object.keys(D.PR).forEach(p => makeOrder(p, true)); emit("refresh"); },
-    "dev-stock": () => { Object.keys(D.PR).forEach((p, i) => { if (S.shelves[i]) S.shelves[i] = { p, n: D.T.shop.shelfCap }; S.back[p] = D.T.dev.stock; }); syncStock(); emit("refresh"); },
+    "dev-stock": () => { const ks = Object.keys(D.PR); S.shelves.forEach((s, i) => { s.slots = s.slots.map((_, j) => ks[(i * 2 + (j >> 1) * 0 + (j % 2)) % ks.length]); }); ks.forEach(p => { S.back[p] = D.T.dev.stock; }); syncStock(); emit("refresh"); },
     "dev-gear": () => { Object.keys(D.GEAR).forEach(k => { S.gear[k] = true; }); emit("refresh"); },
     "dev-skip": () => { stepFn(D.T.dev.skip); },
     "dev-finish": () => { finishPostNow(); emit("refresh"); },

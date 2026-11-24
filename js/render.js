@@ -12,11 +12,14 @@ let cv = null, main = null, bgCanvas = null, statics = null;
 
 export function initRender(canvas) {
   cv = canvas; main = cv.getContext("2d");
+  // The frame is scaled with a CSS transform, so the box on screen (getBoundingClientRect) is the logical size times the scale.
+  // Backing size = screen size x device pixel ratio (at most 2), capped at 3840 wide, always 16:9.
   const fit = () => {
     const r = cv.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
-    cv.width = Math.max(1, Math.round(r.width * d)); cv.height = Math.max(1, Math.round(r.height * d));
+    const w = Math.max(16, Math.min(3840, Math.round(r.width * d)));
+    cv.width = w; cv.height = Math.round(w * LH / LW);
   };
-  new ResizeObserver(fit).observe(cv); fit();
+  new ResizeObserver(fit).observe(cv); window.addEventListener("algo:scale", fit); fit();
   setCtx(main);
 }
 

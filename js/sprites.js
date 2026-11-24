@@ -5,7 +5,7 @@ import { P, getG } from "./iso.js";
 const spr = {};
 
 export async function loadSprites(base = "data/") {
-  const meta = await (await fetch(base + "sprites.json")).json();
+  const meta = await (await fetch(base + "sprites.json", { cache: "no-cache" })).json();
   await Promise.all(Object.entries(meta).map(([id, m]) => new Promise(res => {
     const im = new Image();
     im.onload = () => { spr[id] = { ...m, im }; res(); };
