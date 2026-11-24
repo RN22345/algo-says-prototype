@@ -16,6 +16,7 @@ import { initInput } from "./input.js";
 import { initSave, loadGame, saveGame, newGame } from "./save.js";
 import { initDev, devTick } from "./dev.js";
 import { initDesktop, refreshDesktop, pcApi } from "./pc/desktop.js";
+import { loadSprites } from "./sprites.js";
 
 const DT = 1 / 60;       // fixed simulation step (seconds)
 const MAX_STEPS = 15;    // catch-up limit per frame
@@ -73,6 +74,7 @@ async function boot() {
     m.textContent = "Could not load game data. Run this folder from a web server (see README).";
     $("#frame").appendChild(m); console.error(e); return;
   }
+  try { await loadSprites(); } catch (e) { console.warn("sprites not loaded, using drawn shapes", e); }
   initWorld(D.MAP);
   resetState();
   loadGame();

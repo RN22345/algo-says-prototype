@@ -1,0 +1,72 @@
+{
+ "desk": {
+  "src": "img/sprites/desk.png",
+  "dx": -102.27999999999999,
+  "dy": -180.36,
+  "w": 204,
+  "h": 232
+ },
+ "light": {
+  "src": "img/sprites/light.png",
+  "dx": -34.20000000000002,
+  "dy": -181.20000000000002,
+  "w": 68,
+  "h": 195
+ },
+ "algo": {
+  "src": "img/sprites/algo.png",
+  "dx": -63.619999999999976,
+  "dy": -149.11,
+  "w": 127,
+  "h": 184
+ },
+ "plant": {
+  "src": "img/sprites/plant.png",
+  "dx": -40.0,
+  "dy": -103.4,
+  "w": 81,
+  "h": 123
+ },
+ "shelf": {
+  "src": "img/sprites/shelf.png",
+  "dx": -54.18000000000001,
+  "dy": -181.91,
+  "w": 108,
+  "h": 212
+ },
+ "crates": {
+  "src": "img/sprites/crates.png",
+  "dx": -70.19999999999999,
+  "dy": -107.40000000000003,
+  "w": 139,
+  "h": 145
+ },
+ "table": {
+  "src": "img/sprites/table.png",
+  "dx": -105.4,
+  "dy": -117.39999999999998,
+  "w": 211,
+  "h": 171
+ },
+ "sofa": {
+  "src": "img/sprites/sofa.png",
+  "dx": -88.89999999999998,
+  "dy": -123.05000000000001,
+  "w": 177,
+  "h": 168
+ },
+ "lamp": {
+  "src": "img/sprites/lamp.png",
+  "dx": -19.400000000000034,
+  "dy": -179.8,
+  "w": 39,
+  "h": 191
+ },
+ "tree": {
+  "src": "img/sprites/tree.png",
+  "dx": -66.19999999999993,
+  "dy": -148.2,
+  "w": 133,
+  "h": 162
+ }
+}

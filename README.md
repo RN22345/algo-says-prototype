@@ -27,6 +27,7 @@ W A S D walk, E use, Q phone, Esc close, Z and X (or the mouse wheel) zoom close
 | `js/main.js` | Boot, fixed-timestep loop, `window.__game` |
 | `js/state.js` | Shared state, loaded data, event bus |
 | `js/camera.js`, `js/npcs.js`, `js/interact.js` | Camera (follow, clamp, zoom, pointer helpers), neighbour NPCs, E-key context that adds map spots (sari-sari store) |
+| `js/sprites.js`, `data/sprites.json`, `img/sprites/` | Blender-rendered furniture sprites, placed by footprint centre. The old drawn shapes are the fallback |
 | `js/iso.js`, `js/world.js`, `js/render.js`, `js/entities.js` | Projection and draw helpers, map and collision, rendering, player, riders, van, jeepney |
 | `js/sim/post.js`, `js/sim/shop.js` | Post model; orders, packing, riders, deliveries, chats, interaction |
 | `js/ui/*.js` | HUD, window dispatcher, inbox, Mr. Algo |
