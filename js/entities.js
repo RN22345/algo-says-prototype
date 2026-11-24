@@ -7,7 +7,7 @@ import { bookRider, freeSlot } from "./sim/shop.js";
 const PLC = { legs: "#3a4a8c", body: "#9446e0", stripe: "#ffc928", hair: NAVY };
 const RDC = { legs: "#3a4a8c", body: "#2cc8b6", stripe: "#ffffff", hair: "#ff8a2a", helmet: 1 };
 
-function drawPerson(sx, sy, face, walk, moving, c) {
+export function drawPerson(sx, sy, face, walk, moving, c) {
   const g = getG();
   const b = moving ? Math.sin(walk * 12) * 3 : 0, l = moving ? Math.sin(walk * 12) * 6 : 0;
   g.beginPath(); g.ellipse(sx, sy, 22, 10, 0, 0, 7); g.fillStyle = "rgba(27,42,102,.3)"; g.fill();

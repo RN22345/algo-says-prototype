@@ -28,7 +28,7 @@
     "riderDelayMin": 3, "riderDelayRange": 4, "riderPatience": 50, "riderSpeed": 6,
     "riderReplaceDelay": 6, "ratingLossLeave": 0.15, "ratingGainShip": 0.02,
     "ratingMin": 1, "ratingMax": 5,
-    "handoverReach": 0.95, "handoverMinX": 12.9, "pickupRadius": 0.85,
+    "handoverReach": 0.95, "handoverMinX": 12.9, "handoverMaxX": 17.2, "pickupRadius": 0.85,
     "playerSpeed": 4, "playerRadius": 0.26
   },
   "chat": {
@@ -38,7 +38,10 @@
   },
   "restock": {"qty": 5, "wholesaleTime": 25, "expressTime": 8, "expressMult": 1.2},
   "van": {"speed": 7, "dropWait": 1.2},
-  "jeep": {"startY": -8, "firstDelay": 10, "speed": 5, "endY": 15, "respawnMin": 18, "respawnRange": 10},
+  "jeep": {"startY": -8, "firstDelay": 10, "speed": 5, "endY": 28, "respawnMin": 18, "respawnRange": 10},
+  "sarisari": {"qty": 2, "mult": 1.5},
+  "camera": {"follow": 9, "zoomClose": 1, "zoomWide": 0.5, "zoomRate": 10, "snapDist": 1500, "anchorZ": 60},
+  "npc": {"pauseMin": 1.5, "pauseMax": 4, "stopChance": 0.1, "stopMin": 1, "stopMax": 3},
   "milestone": {"ship": 5, "replies": 3, "rank": 2},
   "dev": {"cash": 1000, "stock": 10, "skip": 10}
 }

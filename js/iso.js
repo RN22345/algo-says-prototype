@@ -39,6 +39,24 @@ export function bubble(x, y, text, col = "#fff", tc = NAVY, size = 21) {
   g.fillStyle = tc; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, x, by + h / 2 + 1);
 }
 
+/* Darken (f < 1) or lighten (f > 1) a #rrggbb colour. */
+export function shade(hex, f) {
+  const n = parseInt(hex.slice(1), 16), c = k => Math.max(0, Math.min(255, Math.round(((n >> k) & 255) * f)));
+  return `rgb(${c(16)},${c(8)},${c(0)})`;
+}
+
+/* Text laid flat on a wall, centred at position t along it and height z.
+   face "x": the wall at x = c, text runs up-right. face "y": the wall at y = c, text runs down-right.
+   `span` is the wall length in tiles. The text shrinks to fit it. */
+export function faceText(face, c, t, z, text, span, size, col = NAVY) {
+  const p = face === "x" ? P(c, t, z) : P(t, c, z);
+  g.save(); g.translate(p[0], p[1]); g.transform(1, face === "x" ? -0.5 : 0.5, 0, 1, 0, 0);
+  g.font = `700 100px ${FONT}`;
+  const px = Math.min(size, span * TW * 0.92 / (g.measureText(text).width || 1) * 100);
+  g.font = `700 ${px}px ${FONT}`; g.fillStyle = col; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, 0, 0);
+  g.restore();
+}
+
 export function bar(x, y, w, p, col) {
   g.beginPath(); g.roundRect(x - w / 2, y, w, 12, 6); g.fillStyle = "#fff"; g.fill(); g.lineWidth = 2.5; g.strokeStyle = NAVY; g.stroke();
   g.beginPath(); g.roundRect(x - w / 2 + 2, y + 2, Math.max(0, (w - 4) * p), 8, 4); g.fillStyle = col; g.fill();

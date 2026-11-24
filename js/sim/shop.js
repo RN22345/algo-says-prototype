@@ -85,7 +85,7 @@ export function context() {
   const T = D.T.shop, PR = D.PR;
   const carryN = S.carry.length;
   // riders
-  const near = S.riders.filter(r => r.state === "waiting" && Math.abs(pl.y - r.y) < T.handoverReach && pl.x > T.handoverMinX);
+  const near = S.riders.filter(r => r.state === "waiting" && Math.abs(pl.y - r.y) < T.handoverReach && pl.x > T.handoverMinX && pl.x < T.handoverMaxX);
   if (near.length) {
     const r = near.sort((a, b) => Math.abs(pl.y - a.y) - Math.abs(pl.y - b.y))[0];
     const i = S.carry.findIndex(o => o.id === r.id);

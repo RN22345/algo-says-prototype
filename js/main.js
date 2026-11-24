@@ -2,6 +2,8 @@
 import { S, rt, on, loadData, D, resetState, pl } from "./state.js";
 import { initWorld } from "./world.js";
 import { initRender, render } from "./render.js";
+import { updateCamera, snapCamera, cam, setZoom, screenToTile, tileToScreen } from "./camera.js";
+import { initNpcs, updateNpcs, npcs } from "./npcs.js";
 import { updatePost } from "./sim/post.js";
 import { updateShop, updateDeliveries, checkMilestone } from "./sim/shop.js";
 import { updateRiders, updateVan, updateJeep, updatePlayer } from "./entities.js";
@@ -12,6 +14,7 @@ import { initRunning, renderRunning } from "./ui/running.js";
 import { initRestock } from "./ui/restock.js";
 import { initInbox, renderInbox } from "./ui/inbox.js";
 import { initAlgo } from "./ui/algo.js";
+import { initSariSari } from "./ui/sarisari.js";
 import { initInput } from "./input.js";
 import { initSave, loadGame, saveGame, newGame } from "./save.js";
 import { initDev, devTick } from "./dev.js";
@@ -30,6 +33,8 @@ function update(dt) {
   updateVan(dt);
   updateJeep(dt);
   updatePlayer(dt);
+  updateNpcs(dt);
+  updateCamera(dt);
   checkMilestone();
 }
 
@@ -73,13 +78,15 @@ async function boot() {
   initWorld(D.MAP);
   resetState();
   loadGame();
+  initNpcs();
+  snapCamera();
   initRender($("#iso"));
-  initWindows(); initHud(); initStudio(); initRunning(); initRestock(); initInbox(); initAlgo();
+  initWindows(); initHud(); initStudio(); initRunning(); initRestock(); initInbox(); initAlgo(); initSariSari();
   initDev({ step });
   initInput();
   initSave();
   on("refresh", refreshUI);
-  window.__game = { state: S, player: pl, step, render, refresh: refreshUI, save: saveGame, newGame, data: D };
+  window.__game = { state: S, player: pl, step, render, refresh: refreshUI, save: saveGame, newGame, data: D, cam, npcs, setZoom, screenToTile: (x, y) => screenToTile(x, y, $("#iso").getBoundingClientRect()), tileToScreen: (i, j, z) => tileToScreen(i, j, $("#iso").getBoundingClientRect(), z) };
   refreshUI();
   last = performance.now();
   requestAnimationFrame(frame);

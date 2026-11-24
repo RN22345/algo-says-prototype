@@ -1,6 +1,6 @@
 /* Map, walls, furniture, solids, collision, zones. Layout comes from data/map.json. */
 import { D, S, rt } from "./state.js";
-import { P, poly, box, circ, getG, overlay, CUT, NAVY, FONT } from "./iso.js";
+import { P, poly, box, circ, getG, overlay, shade, faceText, CUT, NAVY, FONT } from "./iso.js";
 
 export const world = {};
 
@@ -11,7 +11,10 @@ export function initWorld(M) {
   world.furn = M.furniture;
   world.shelfProducts = M.shelfProducts;
   world.shelfZone = M.shelfZone;
-  world.solids = [...M.walls, ...M.furniture.map(f => f.b)];
+  world.scenery = M.scenery || [];
+  const store = world.scenery.find(o => o.kind === "store");
+  world.sarisariZone = store ? store.zone : null;
+  world.solids = [...M.walls, ...M.furniture.map(f => f.b), ...world.scenery.filter(o => o.solid !== false).map(o => o.b)];
 }
 
 export function tileCol(i, j) {
@@ -68,7 +71,7 @@ export function drawFurn(f) {
     case "sofa": box(x0, y0, x1, y1, 0, 34, "#5b8def", "#4673c9", "#3a62ad"); box(x0, y0, x0 + .3, y1, 34, 40, "#6c9bf5", "#4673c9", "#3a62ad"); break;
     case "lamp": { const b = P(13.37, 5.42), t = P(13.37, 5.42, 160); g.lineWidth = 6; g.strokeStyle = NAVY; g.beginPath(); g.moveTo(...b); g.lineTo(...t); g.stroke(); circ(t[0], t[1], 12, "#ffe06b"); break; }
     default:
-      if (f.id.startsWith("tree")) { const c = P((x0 + x1) / 2, (y0 + y1) / 2); box(x0 + .15, y0 + .15, x1 - .15, y1 - .15, 0, 50, "#9a6230", "#8a5a2b", "#6f4520", 2);[[0, -80, 40], [-30, -60, 30], [30, -58, 30], [0, -112, 30]].forEach(([dx, dy, r]) => circ(c[0] + dx, c[1] + dy, r, "#4caf50")); }
+      if (f.id.startsWith("tree")) drawTree(f.b);
       else if (f.id.startsWith("shelf")) {
         const k = +f.id[5], p = world.shelfProducts[k], n = Math.min(6, S.stock[p]);
         box(x0, y0, x1, y1, 0, 150, "#d9a066", "#b97a3d", "#9a6230");
@@ -83,3 +86,85 @@ export function drawFurn(f) {
 }
 
 export function drawWallSeg(x0, y0, x1, y1) { box(x0, y0, x1, y1, 0, CUT, "#fffaf0", "#e9dcc4", "#d6c6a8", 2.5); }
+
+function drawTree([x0, y0, x1, y1]) {
+  const g = getG(), c = P((x0 + x1) / 2, (y0 + y1) / 2);
+  box(x0 + .15, y0 + .15, x1 - .15, y1 - .15, 0, 50, "#9a6230", "#8a5a2b", "#6f4520", 2);
+  [[0, -80, 40], [-30, -60, 30], [30, -58, 30], [0, -112, 30]].forEach(([dx, dy, r]) => circ(c[0] + dx, c[1] + dy, r, "#4caf50"));
+}
+
+const wallQuad = (face, c, a, b, z0, z1, fill, lw = 2.5) =>
+  poly(face === "y" ? [P(a, c, z0), P(b, c, z0), P(b, c, z1), P(a, c, z1)] : [P(c, a, z0), P(c, b, z0), P(c, b, z1), P(c, a, z1)], fill, lw);
+
+/* Scenery from map.json: neighbour houses, the sari-sari store, the courier booth, signs, court, trees. */
+export function drawScenery(s) {
+  const g = getG(), [x0, y0, x1, y1] = s.b, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  switch (s.kind) {
+    case "tree": drawTree(s.b); break;
+    case "house": {
+      const h = s.h, o = .25, A = P(cx, cy, h + 62);
+      box(x0, y0, x1, y1, 0, h, "#fff", shade(s.wall, .96), shade(s.wall, .8));
+      wallQuad("y", y1, x0 + .6, x0 + 1.5, 0, 58, "#8a5a2b");
+      wallQuad("y", y1, x0 + 2.2, x0 + 3.3, 40, 72, "#cfeeff");
+      wallQuad("x", x1, y0 + .6, y0 + 1.6, 40, 72, "#cfeeff");
+      wallQuad("x", x1, y0 + 2.2, y0 + 3.2, 40, 72, "#cfeeff");
+      poly([P(x0 - o, y1 + o, h), P(x1 + o, y1 + o, h), A], shade(s.roof, 1.0));
+      poly([P(x1 + o, y1 + o, h), P(x1 + o, y0 - o, h), A], shade(s.roof, .78));
+      break;
+    }
+    case "store": {
+      const h = s.h, oy0 = y0 + .45, oy1 = y1 - .45;
+      box(x0, y0, x1, y1, 0, h, "#fff7d6", shade(s.wall, 1), shade(s.wall, .82));
+      wallQuad("x", x1, oy0, oy1, 26, 78, "#3a2a52", 3);
+      const goods = ["#ef3b4f", "#ffc928", "#2cc8b6", "#9446e0", "#ff8a2a", "#5b8def"];
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 6; c++) {
+        const ya = oy0 + .1 + c * ((oy1 - oy0 - .2) / 6), yb = ya + (oy1 - oy0 - .2) / 6 - .06, za = 34 + r * 22;
+        wallQuad("x", x1, ya, yb, za, za + 16, goods[(c + r * 2) % 6], 1.5);
+      }
+      box(x1, oy0 - .05, x1 + .22, oy1 + .05, 22, 6, "#d9a066", "#c08445", "#a26c33", 2);
+      const n = 8, step = (oy1 - oy0 + .4) / n;
+      for (let k = 0; k < n; k++) { const ya = oy0 - .2 + k * step; poly([P(x1, ya, 88), P(x1, ya + step, 88), P(x1 + .55, ya + step, 68), P(x1 + .55, ya, 68)], k % 2 ? "#fff" : "#ef3b4f", 2); }
+      wallQuad("x", x1 + .02, y0 + .25, y1 - .25, 94, 134, "#2b3466", 3);
+      faceText("x", x1 + .02, cy, 114, "SARI-SARI STORE", y1 - y0 - .6, 26, "#ffe06b");
+      wallQuad("y", y1, x0 + 1, x0 + 2.4, 40, 78, "#cfeeff");
+      wallQuad("y", y1, x0 + 2.8, x0 + 3.6, 0, 62, "#8a5a2b");
+      break;
+    }
+    case "booth": {
+      const h = s.h;
+      box(x0, y0, x1, y1, 0, h, "#fff", "#f4f0e0", "#d8d2bc");
+      wallQuad("x", x1, y0 + .3, y1 - .3, 34, 64, "#3a2a52", 3);
+      box(x1, y0 + .2, x1 + .2, y1 - .2, 30, 5, "#d9a066", "#c08445", "#a26c33", 2);
+      wallQuad("x", x1, y0 + .45, y0 + .8, 6, 24, "#d9a066", 2);
+      box(x0 - .2, y0 - .2, x1 + .2, y1 + .2, h, 8, "#ff8a2a", "#e06d12", "#c25a08", 2.5);
+      [y0 - .1, y1 + .1].forEach(y => box(x1 + .07, y - .05, x1 + .17, y + .05, h + 8, 30, "#c9cde6", "#aab0d6", "#8f96c4", 2));
+      wallQuad("x", x1 + .12, y0 - .15, y1 + .15, h + 20, h + 60, "#ff8a2a", 3);
+      faceText("x", x1 + .12, cy, h + 49, "COURIER", y1 - y0, 19, NAVY);
+      faceText("x", x1 + .12, cy, h + 31, "DROP-OFF", y1 - y0, 19, NAVY);
+      break;
+    }
+    case "sign": {
+      [y0 + .2, y1 - .2].forEach(y => box(x0 + .04, y - .05, x0 + .14, y + .05, 0, 100, "#9a6230", "#8a5a2b", "#6f4520", 2));
+      box(x0, y0, x1, y1, 58, 62, "#fff8e8", "#e2dcc8", "#fff3c4", 3);
+      faceText("x", x1, cy, 103, "FOR FUTURE", y1 - y0, 30, NAVY);
+      faceText("x", x1, cy, 77, "ROOMS", y1 - y0, 30, NAVY);
+      break;
+    }
+    case "hoop": {
+      box(x0, y0, x1, y1, 0, 172, "#c9cde6", "#aab0d6", "#8f96c4", 2);
+      box(x0 - .22, cy - .55, x0 - .14, cy + .55, 150, 56, "#ffffff", "#e0e4f4", "#f4f6ff", 2.5);
+      const r = P(x0 - .55, cy, 156); g.beginPath(); g.ellipse(r[0], r[1], 19, 9.5, 0, 0, 7); g.lineWidth = 5; g.strokeStyle = "#ff8a2a"; g.stroke();
+      break;
+    }
+    case "bench": {
+      box(x0, y0 + .08, x1, y1, 0, 16, "#c08445", "#a26c33", "#8a5a2b", 2.5);
+      box(x0, y0, x1, y0 + .1, 16, 26, "#d9a066", "#c08445", "#a26c33", 2.5);
+      break;
+    }
+    case "streetlamp": {
+      const b = P(cx, cy, 0), t = P(cx, cy, 160); g.lineWidth = 6; g.strokeStyle = NAVY; g.beginPath(); g.moveTo(...b); g.lineTo(...t); g.stroke(); circ(t[0], t[1], 12, "#ffe06b");
+      break;
+    }
+    case "stake": box(x0, y0, x1, y1, 0, 26, "#ffe9a8", "#ffc928", "#d49a00", 2); break;
+  }
+}

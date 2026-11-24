@@ -1,11 +1,14 @@
-/* Background cache, depth sorting, world labels, interaction prompt, developer overlays. */
+/* Background cache, camera transform, depth sorting, world labels, interaction prompt, developer overlays. */
 import { D, S, pl, rt } from "./state.js";
-import { LW, LH, WALLH, FONT, NAVY, P, poly, box, bubble, bar, setCtx, getG, overlay } from "./iso.js";
-import { world, tileCol, drawFurn, drawWallSeg } from "./world.js";
+import { LW, LH, WALLH, TW, FONT, NAVY, P, poly, box, bubble, bar, setCtx, overlay } from "./iso.js";
+import { world, tileCol, drawFurn, drawWallSeg, drawScenery } from "./world.js";
 import { drawPlayer, drawRider, drawVan, drawJeep, drawYardBox } from "./entities.js";
-import { context } from "./sim/shop.js";
+import { npcs, drawNpc } from "./npcs.js";
+import { cam, getBounds, viewRect, labelScale } from "./camera.js";
+import { context } from "./interact.js";
 
-let cv = null, main = null, bgCanvas = null;
+const VOID = "#2b3466";
+let cv = null, main = null, bgCanvas = null, statics = null;
 
 export function initRender(canvas) {
   cv = canvas; main = cv.getContext("2d");
@@ -17,17 +20,41 @@ export function initRender(canvas) {
   setCtx(main);
 }
 
+const arc = (cx, cy, r, a0, a1, n = 24) => Array.from({ length: n + 1 }, (_, k) => { const a = a0 + (a1 - a0) * k / n; return P(cx - r * Math.cos(a), cy + r * Math.sin(a)); });
+const line = (g, pts) => { g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.stroke(); };
+
+/* The whole map as one image at 1x. Only the part in view is blitted each frame. */
 function buildBg() {
-  const M = D.MAP, MW = world.MW, MH = world.MH;
-  bgCanvas = document.createElement("canvas"); bgCanvas.width = LW; bgCanvas.height = LH;
+  const M = D.MAP, MW = world.MW, MH = world.MH, B = getBounds();
+  bgCanvas = document.createElement("canvas"); bgCanvas.width = Math.ceil(B.x1 - B.x0); bgCanvas.height = Math.ceil(B.y1 - B.y0);
   const g = bgCanvas.getContext("2d"); setCtx(g);
-  g.fillStyle = "#2b3466"; g.fillRect(0, 0, LW, LH);
+  g.translate(-B.x0, -B.y0);
+  g.fillStyle = VOID; g.fillRect(B.x0, B.y0, bgCanvas.width, bgCanvas.height);
   // ground tiles
   for (let i = 0; i < MW; i++) for (let j = 0; j < MH; j++) poly([P(i, j), P(i + 1, j), P(i + 1, j + 1), P(i, j + 1)], tileCol(i, j), 1, "rgba(27,42,102,.22)");
-  // road markings
+  // road markings and crossings
   const rx = M.roadLineX;
   for (let j = 0; j < MH; j += 1.5) poly([P(rx - .06, j + .2), P(rx + .06, j + .2), P(rx + .06, j + .9), P(rx - .06, j + .9)], "#ffe9a8", 0);
+  (M.crossings || []).forEach(([x0, x1, y0, y1]) => { for (let x = x0 + .1; x < x1 - .1; x += .5) poly([P(x, y0), P(x + .27, y0), P(x + .27, y1), P(x, y1)], "#f4f6ff", 0); });
   poly([P(0, 0), P(MW, 0), P(MW, MH), P(0, MH)], null, 5);
+  // lot lines for the empty land
+  if (M.lot) {
+    const [x0, y0, x1, y1] = M.lot.rect;
+    g.save(); g.setLineDash([16, 12]); g.lineWidth = 4; g.strokeStyle = "#fffdf0"; g.lineCap = "round";
+    line(g, [P(x0, y0), P(x1, y0), P(x1, y1), P(x0, y1), P(x0, y0)]); g.restore();
+  }
+  // basketball half-court lines
+  if (M.court) {
+    const [x0, x1, y0, y1] = M.court.rect, [hx, hy] = M.court.hoop, bx = x1 - .2;
+    g.save(); g.lineWidth = 3; g.strokeStyle = "#fff8e8"; g.lineJoin = "round";
+    line(g, [P(x0 + .2, y0 + .2), P(bx, y0 + .2), P(bx, y1 - .2), P(x0 + .2, y1 - .2), P(x0 + .2, y0 + .2)]);
+    line(g, [P(bx, hy - 1.5), P(bx - 3.6, hy - 1.5), P(bx - 3.6, hy + 1.5), P(bx, hy + 1.5)]);        // the key
+    line(g, arc(bx - 3.6, hy, 1.5, -Math.PI / 2, Math.PI / 2).map(p => p));                              // free-throw circle
+    const a = 1.3, r = 4.5, cxm = hx - .45; line(g, [P(bx, hy - r * Math.sin(a)), P(cxm - r * Math.cos(a), hy - r * Math.sin(a))]);
+    line(g, arc(cxm, hy, r, -a, a, 32)); line(g, [P(cxm - r * Math.cos(a), hy + r * Math.sin(a)), P(bx, hy + r * Math.sin(a))]);
+    line(g, [P(x0 + .2, hy - 1.2), P(x0 + .2, hy + 1.2)]);
+    g.restore();
+  }
   // rugs
   M.rugs.forEach(r => { const [x0, y0, x1, y1] = r.b; poly([P(x0, y0), P(x1, y0), P(x1, y1), P(x0, y1)], r.col, r.lw); });
   // back walls of house
@@ -52,11 +79,23 @@ function buildBg() {
   // wall top edges
   g.lineWidth = 5; g.strokeStyle = NAVY; g.beginPath(); g.moveTo(...P(0, 9, WALLH)); g.lineTo(...P(0, 0, WALLH)); g.lineTo(...P(11, 0, WALLH)); g.moveTo(...P(0, 0, 0)); g.lineTo(...P(0, 0, WALLH));
   g.moveTo(...P(0, 9, 0)); g.lineTo(...P(0, 9, WALLH)); g.moveTo(...P(11, 0, 0)); g.lineTo(...P(11, 0, WALLH)); g.moveTo(...P(0, 5, 0)); g.lineTo(...P(0, 5, WALLH)); g.moveTo(...P(6, 0, 0)); g.lineTo(...P(6, 0, WALLH)); g.stroke();
-  // hedges at the back of the yard
+  // hedges at the back of the yard and along the lot
   M.hedges.forEach(([x0, y0, x1, y1]) => box(x0, y0, x1, y1, 0, 36, "#5fbf55", "#4aa842", "#3b9135"));
   // house number sign by the door
   poly([P(11.1, 5.4, 70), P(11.1, 5.9, 70), P(11.1, 5.9, 100), P(11.1, 5.4, 100)], "#ffc928", 2);
   setCtx(main);
+}
+
+/* Things that never move, sorted once by depth. `r` is a generous screen radius for culling. */
+function buildStatics() {
+  const list = [], add = (k, x, y, r, d) => { const [ax, ay] = P(x, y); list.push({ k, ax, ay, r, d }); };
+  world.furn.forEach(f => { const b = f.b; add((b[0] + b[2]) / 2 + (b[1] + b[3]) / 2, (b[0] + b[2]) / 2, (b[1] + b[3]) / 2, 320 + (b[2] - b[0] + b[3] - b[1]) * TW / 2, () => drawFurn(f)); });
+  world.scenery.forEach(s => { const b = s.b; add((b[0] + b[2]) / 2 + (b[1] + b[3]) / 2, (b[0] + b[2]) / 2, (b[1] + b[3]) / 2, 320 + (b[2] - b[0] + b[3] - b[1]) * TW / 2, () => drawScenery(s)); });
+  world.walls.forEach(w => {
+    const horiz = w[2] - w[0] > w[3] - w[1]; const a = horiz ? w[0] : w[1], b = horiz ? w[2] : w[3];
+    for (let t = a; t < b - 1e-6; t += 1) { const e = Math.min(b, t + 1); const seg = horiz ? [t, w[1], e, w[3]] : [w[0], t, w[2], e]; add((seg[0] + seg[2]) / 2 + (seg[1] + seg[3]) / 2, (seg[0] + seg[2]) / 2, (seg[1] + seg[3]) / 2, 140, () => drawWallSeg(...seg)); }
+  });
+  statics = list.sort((a, b) => a.k - b.k);
 }
 
 function debugOverlay(g) {
@@ -64,45 +103,72 @@ function debugOverlay(g) {
   const rect = (b, col, fill) => { const [x0, y0, x1, y1] = b; poly([P(x0, y0), P(x1, y0), P(x1, y1), P(x0, y1)], fill, 2, col); };
   world.solids.forEach(b => rect(b, "#ef3b4f", "rgba(239,59,79,.25)"));
   world.furn.forEach(f => { if (f.zone) rect(f.zone, "#139180", "rgba(44,200,182,.25)"); });
+  if (world.sarisariZone) rect(world.sarisariZone, "#139180", "rgba(44,200,182,.25)");
   rect(world.shelfZone, "#139180", "rgba(44,200,182,.25)");
   const T = D.T.shop;
-  rect([T.handoverMinX, 0, D.MAP.size[0], world.MH], "#cf5e00", "rgba(255,138,42,.18)");
+  rect([T.handoverMinX, 0, T.handoverMaxX, world.MH], "#cf5e00", "rgba(255,138,42,.18)");
   g.restore();
+}
+
+/* A label drawn at a world position, scaled up a little when zoomed out. */
+function bub(V, x, y, text, col, tc = NAVY, size = 21) {
+  if (x < V.x0 - 200 || x > V.x1 + 200 || y < V.y0 - 200 || y > V.y1 + 200) return;
+  const g = main, k = labelScale();
+  g.save(); g.translate(x, y); g.scale(k, k); bubble(0, 0, text, col, tc, size); g.restore();
 }
 
 export function render() {
   if (!cv) return;
   const g = main; setCtx(g);
-  const s = cv.width / LW; g.setTransform(s, 0, 0, s, 0, 0);
+  const s = cv.width / LW, z = cam.zoom;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = VOID; g.fillRect(0, 0, cv.width, cv.height);
+  g.setTransform(s * z, 0, 0, s * z, s * (LW / 2 - cam.x * z), s * (LH / 2 - cam.y * z));
   if (!bgCanvas) buildBg();
-  g.drawImage(bgCanvas, 0, 0);
+  if (!statics) buildStatics();
+  const V = viewRect(), B = getBounds();
+  // background: blit only the visible part
+  const sx0 = Math.floor(Math.max(V.x0, B.x0)), sy0 = Math.floor(Math.max(V.y0, B.y0)), sx1 = Math.ceil(Math.min(V.x1, B.x1)), sy1 = Math.ceil(Math.min(V.y1, B.y1));
+  if (sx1 > sx0 && sy1 > sy0) g.drawImage(bgCanvas, sx0 - B.x0, sy0 - B.y0, sx1 - sx0, sy1 - sy0, sx0, sy0, sx1 - sx0, sy1 - sy0);
   overlay.bubbles = []; overlay.bars = [];
-  const list = [];
-  world.furn.forEach(f => { const b = f.b; list.push({ k: (b[0] + b[2]) / 2 + (b[1] + b[3]) / 2, d: () => drawFurn(f) }); });
-  world.walls.forEach(w => {
-    const horiz = w[2] - w[0] > w[3] - w[1]; const a = horiz ? w[0] : w[1], b = horiz ? w[2] : w[3];
-    for (let t = a; t < b - 1e-6; t += 1) { const e = Math.min(b, t + 1); const seg = horiz ? [t, w[1], e, w[3]] : [w[0], t, w[2], e]; list.push({ k: (seg[0] + seg[2]) / 2 + (seg[1] + seg[3]) / 2, d: () => drawWallSeg(...seg) }); }
-  });
-  const st = D.MAP.street;
-  S.yard.forEach(b => list.push({ k: b.x + b.y, d: () => drawYardBox(b) }));
-  S.riders.forEach(r => { if (r.y > st.riderHideY) list.push({ k: r.x + r.y, d: () => drawRider(r) }); });
-  if (S.van) list.push({ k: S.van.x + S.van.y + .3, d: () => drawVan(S.van) });
-  if (S.jeep.y > st.jeepVisibleY) list.push({ k: st.jeepX + S.jeep.y, d: () => drawJeep({ x: st.jeepX, y: S.jeep.y }) });
+  const seen = (ax, ay, r) => ax + r > V.x0 && ax - r < V.x1 && ay + r > V.y0 && ay - r < V.y1;
+  const list = statics.filter(o => seen(o.ax, o.ay, o.r));
+  const add = (k, x, y, d) => { const [ax, ay] = P(x, y); if (seen(ax, ay, 340)) list.push({ k, d }); };
+  const st = D.MAP.street, MH = world.MH;
+  S.yard.forEach(b => add(b.x + b.y, b.x, b.y, () => drawYardBox(b)));
+  S.riders.forEach(r => { if (r.y > st.riderHideY && r.y < MH + .6) add(r.x + r.y, r.x, r.y, () => drawRider(r)); });
+  if (S.van && S.van.y > st.vanHideY && S.van.y < MH + 1.3) add(S.van.x + S.van.y + .3, S.van.x, S.van.y, () => drawVan(S.van));
+  if (S.jeep.y > st.jeepVisibleY && S.jeep.y < MH + 1.6) add(st.jeepX + S.jeep.y, st.jeepX, S.jeep.y, () => drawJeep({ x: st.jeepX, y: S.jeep.y }));
+  npcs.forEach(n => add(n.x + n.y, n.x, n.y, () => drawNpc(n)));
   list.push({ k: pl.x + pl.y, d: drawPlayer });
   list.sort((a, b) => a.k - b.k).forEach(o => o.d());
   if (rt.showZones) debugOverlay(g);
   // world labels
-  if (S.post) { const p = P(2.8, .3, 175); bubble(p[0], p[1], `TikTik: ${Math.round(S.post.views).toLocaleString()} views`, "#efe1ff"); }
-  if (S.orders.length || S.table.length) { const p = P(6.3, 7.1, 110); bubble(p[0], p[1], [S.orders.length ? `${S.orders.length} to pack` : "", S.table.length ? `${S.table.length} ready` : ""].filter(Boolean).join(" · ")); }
-  if (S.algoUnread && !S.ui) { const p = P(.6, 2.65, 170); bubble(p[0], p[1], "!", "#ffe06b"); }
-  if (!S.algoMet && !S.ui) { const p = P(.6, 2.65, 170); bubble(p[0], p[1], "Hi!", "#c8fff6"); }
-  overlay.bubbles.forEach(([x, y, z, t, c]) => { const p = P(x, y, z); bubble(p[0], p[1], t, c, NAVY, 18); });
-  overlay.bars.forEach(([x, y, z, v, c]) => { const p = P(x, y, z); bar(p[0], p[1], 64, v, c); });
-  if (S.deliveries.length) { const d = S.deliveries[0]; const p = P(14, .6, 40); bubble(p[0], p[1], `Van in ${Math.ceil(d.t)}s`, "#c8fff6", NAVY, 18); }
+  if (S.post) { const p = P(2.8, .3, 175); bub(V, p[0], p[1], `TikTik: ${Math.round(S.post.views).toLocaleString()} views`, "#efe1ff"); }
+  if (S.orders.length || S.table.length) { const p = P(6.3, 7.1, 110); bub(V, p[0], p[1], [S.orders.length ? `${S.orders.length} to pack` : "", S.table.length ? `${S.table.length} ready` : ""].filter(Boolean).join(" · "), "#fff"); }
+  if (S.algoUnread && !S.ui) { const p = P(.6, 2.65, 170); bub(V, p[0], p[1], "!", "#ffe06b"); }
+  if (!S.algoMet && !S.ui) { const p = P(.6, 2.65, 170); bub(V, p[0], p[1], "Hi!", "#c8fff6"); }
+  overlay.bubbles.forEach(([x, y, zz, t, c]) => { const p = P(x, y, zz); bub(V, p[0], p[1], t, c, NAVY, 18); });
+  overlay.bars.forEach(([x, y, zz, v, c]) => {
+    const p = P(x, y, zz); if (p[0] < V.x0 - 100 || p[0] > V.x1 + 100 || p[1] < V.y0 - 100 || p[1] > V.y1 + 100) return;
+    const k = labelScale(); g.save(); g.translate(p[0], p[1]); g.scale(k, k); bar(0, 0, 64, v, c); g.restore();
+  });
+  if (S.deliveries.length) { const d = S.deliveries[0]; const p = P(14, .6, 40); bub(V, p[0], p[1], `Van in ${Math.ceil(d.t)}s`, "#c8fff6", NAVY, 18); }
   // room labels
-  g.font = `600 18px ${FONT}`; g.fillStyle = "rgba(27,42,102,.45)"; g.textAlign = "center";
-  D.MAP.labels.forEach(([t, x, y]) => { const p = P(x, y); g.fillText(t, p[0], p[1]); });
+  const lk = labelScale();
+  g.font = `600 ${18 * lk}px ${FONT}`; g.fillStyle = "rgba(27,42,102,.45)"; g.textAlign = "center";
+  D.MAP.labels.forEach(([t, x, y]) => { const p = P(x, y); if (p[0] > V.x0 - 200 && p[0] < V.x1 + 200 && p[1] > V.y0 - 100 && p[1] < V.y1 + 100) g.fillText(t, p[0], p[1]); });
   // prompt
-  if (!S.ui && S.active) { const c = context(); if (c) { const [sx, sy] = P(pl.x, pl.y); bubble(sx, sy - 158 - (S.carry.length * 30), c.fn ? `E  ${c.label}` : c.label, c.fn ? "#ffe06b" : "#fff"); } }
+  if (!S.ui && S.active) { const c = context(); if (c) { const [px, py] = P(pl.x, pl.y); bub(V, px, py - 158 - S.carry.length * 30, c.fn ? `E  ${c.label}` : c.label, c.fn ? "#ffe06b" : "#fff"); } }
+  // screen-space overlays
+  g.setTransform(s, 0, 0, s, 0, 0);
   if (rt.showFps) { g.font = `700 22px ${FONT}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = "#fff"; g.strokeStyle = NAVY; g.lineWidth = 4; const t = `${Math.round(rt.fps)} FPS`; g.strokeText(t, 20, 150); g.fillText(t, 20, 150); g.textBaseline = "middle"; }
+  zoomHint(g);
+}
+
+function zoomHint(g) {
+  const t = `Z close · X wide: ${cam.target}`;
+  g.font = `700 20px ${FONT}`; g.textAlign = "left"; g.textBaseline = "middle";
+  const w = g.measureText(t).width + 28, x = LW - 30 - w, y = 925;
+  g.beginPath(); g.roundRect(x, y, w, 36, 18); g.fillStyle = "rgba(255,255,255,.88)"; g.fill(); g.lineWidth = 3; g.strokeStyle = NAVY; g.stroke();
+  g.fillStyle = NAVY; g.fillText(t, x + 14, y + 19);
 }

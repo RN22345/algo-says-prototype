@@ -14,7 +14,7 @@ Then open http://localhost:8765/
 
 ## Controls
 
-W A S D walk, E use, Q phone, Esc close. F1 opens the developer panel. The top-right menu has New game and Dev. The game saves to the browser (localStorage) every 10 seconds and when the page is hidden.
+W A S D walk, E use, Q phone, Esc close, Z and X (or the mouse wheel) zoom close and wide. F1 opens the developer panel. The top-right menu has New game and Dev. The game saves to the browser (localStorage) every 10 seconds and when the page is hidden.
 
 ## Folder map
 
@@ -26,6 +26,7 @@ W A S D walk, E use, Q phone, Esc close. F1 opens the developer panel. The top-r
 | `data/map.json` | Map size, tile rules, walls, furniture and zones, rider slots, yard drop spots, street positions |
 | `js/main.js` | Boot, fixed-timestep loop, `window.__game` |
 | `js/state.js` | Shared state, loaded data, event bus |
+| `js/camera.js`, `js/npcs.js`, `js/interact.js` | Camera (follow, clamp, zoom, pointer helpers), neighbour NPCs, E-key context that adds map spots (sari-sari store) |
 | `js/iso.js`, `js/world.js`, `js/render.js`, `js/entities.js` | Projection and draw helpers, map and collision, rendering, player, riders, van, jeepney |
 | `js/sim/post.js`, `js/sim/shop.js` | Post model; orders, packing, riders, deliveries, chats, interaction |
 | `js/ui/*.js` | HUD, windows, studio, running post, restock, inbox, Mr. Algo |
