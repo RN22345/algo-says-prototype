@@ -7,14 +7,12 @@ import { updateShop, updateDeliveries, checkMilestone } from "./sim/shop.js";
 import { updateRiders, updateVan, updateJeep, updatePlayer } from "./entities.js";
 import { initWindows, $ } from "./ui/windows.js";
 import { renderHud, initHud } from "./ui/hud.js";
-import { initStudio } from "./ui/studio.js";
-import { initRunning, renderRunning } from "./ui/running.js";
-import { initRestock } from "./ui/restock.js";
 import { initInbox, renderInbox } from "./ui/inbox.js";
 import { initAlgo } from "./ui/algo.js";
 import { initInput } from "./input.js";
 import { initSave, loadGame, saveGame, newGame } from "./save.js";
 import { initDev, devTick } from "./dev.js";
+import { initDesktop, refreshDesktop, pcApi } from "./pc/desktop.js";
 
 const DT = 1 / 60;       // fixed simulation step (seconds)
 const MAX_STEPS = 15;    // catch-up limit per frame
@@ -35,7 +33,7 @@ function update(dt) {
 
 function refreshUI() {
   renderHud();
-  if (S.ui === "running") renderRunning();
+  refreshDesktop();
   if (S.ui === "phone") renderInbox(false);
   devTick();
 }
@@ -74,12 +72,13 @@ async function boot() {
   resetState();
   loadGame();
   initRender($("#iso"));
-  initWindows(); initHud(); initStudio(); initRunning(); initRestock(); initInbox(); initAlgo();
+  initWindows(); initHud(); initInbox(); initAlgo();
+  try { await initDesktop(); } catch (e) { console.error(e); }
   initDev({ step });
   initInput();
   initSave();
   on("refresh", refreshUI);
-  window.__game = { state: S, player: pl, step, render, refresh: refreshUI, save: saveGame, newGame, data: D };
+  window.__game = { state: S, player: pl, step, render, refresh: refreshUI, save: saveGame, newGame, data: D, pc: pcApi };
   refreshUI();
   last = performance.now();
   requestAnimationFrame(frame);

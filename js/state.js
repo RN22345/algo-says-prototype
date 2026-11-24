@@ -1,7 +1,7 @@
 /* Shared game state, loaded data, tiny event bus. One module so every system sees the same objects. */
 
 /* Loaded data. Filled by loadData() at boot. */
-export const D = { PR: {}, CLIPS: {}, MAP: null, T: null };
+export const D = { PR: {}, CLIPS: {}, MAP: null, T: null, PC: null };
 
 export async function loadData(base = "data/") {
   const get = async f => {
@@ -35,6 +35,7 @@ export function newState() {
     stock: { ...T.start.stock },
     orders: [], table: [], carry: [], box: null, riders: [], deliveries: [], yard: [], posts: [], post: null, last: null,
     chats: [], missed: 0, nextId: T.start.nextOrderId, busy: null,
+    clock: 0, ledger: [], notes: "", stickers: [],
     algoUnread: false, rank: 1, van: null, vanQ: [], jeep: { y: T.jeep.startY, t: T.jeep.firstDelay },
     ui: null, active: false, flash: {}, milestoneDone: false, algoMet: false
   };
