@@ -1,0 +1,9 @@
+{
+  "close":   ["Close-up",   "clip_close_up"],
+  "use":     ["In use",     "clip_product_in_use"],
+  "unbox":   ["Unboxing",   "clip_unboxing"],
+  "price":   ["Price tag",  "clip_price_card"],
+  "react":   ["Reaction",   "clip_buyer_reaction"],
+  "hook":    ["Pointing",   "clip_hook"],
+  "compare": ["Compare",    "clip_before_after"]
+}

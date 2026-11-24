@@ -1,0 +1,44 @@
+{
+  "_note": "Teaching-model values for testing the feel. Every gameplay number lives here.",
+  "start": {
+    "cash": 3500, "rating": 4.6, "nextOrderId": 1024,
+    "stock": {"earbuds": 6, "case": 3, "powerbank": 0, "tint": 0}
+  },
+  "post": {
+    "duration": 75, "tau": 18,
+    "reachBase": 1600, "reachRange": 1400,
+    "hookClips": ["close", "hook"], "hookMult": 1.5, "noHookMult": 0.7,
+    "faceMult": 1.15, "repeatMult": 0.6, "firstPostMult": 0.35,
+    "convBase": 0.0022, "priceShownMult": 1.6, "priceClipMult": 1.3,
+    "ratingRef": 4.6, "convJitterMin": 0.6, "convJitterRange": 0.8,
+    "commentRate": 0.011, "maxComments": 7, "likeRate": 0.07,
+    "chatChance": 0.16, "maxOpenChats": 4,
+    "hookLeftAt": 6, "noHookLeftAt": 2,
+    "hookEndPct": [30, 12], "noHookEndPct": [9, 9],
+    "swipeWindow": 15,
+    "commentWeights": {
+      "price": {"shown": 0.06, "hidden": 0.45},
+      "cod": 0.14, "where": 0.1,
+      "what": {"hook": 0.02, "noHook": 0.22},
+      "praise": 0.3
+    }
+  },
+  "shop": {
+    "packTime": 1.1, "carryMax": 2,
+    "riderDelayMin": 3, "riderDelayRange": 4, "riderPatience": 50, "riderSpeed": 6,
+    "riderReplaceDelay": 6, "ratingLossLeave": 0.15, "ratingGainShip": 0.02,
+    "ratingMin": 1, "ratingMax": 5,
+    "handoverReach": 0.95, "handoverMinX": 12.9, "pickupRadius": 0.85,
+    "playerSpeed": 4, "playerRadius": 0.26
+  },
+  "chat": {
+    "timeout": 45, "warnAt": 30, "keepAfterDone": 75,
+    "okMatch": 0.7, "okMismatch": 0.22,
+    "names": ["Ana", "Mark", "Joy", "Kiko", "Bea", "Jen", "Paolo", "Mika", "Rico", "Lea"]
+  },
+  "restock": {"qty": 5, "wholesaleTime": 25, "expressTime": 8, "expressMult": 1.2},
+  "van": {"speed": 7, "dropWait": 1.2},
+  "jeep": {"startY": -8, "firstDelay": 10, "speed": 5, "endY": 15, "respawnMin": 18, "respawnRange": 10},
+  "milestone": {"ship": 5, "replies": 3, "rank": 2},
+  "dev": {"cash": 1000, "stock": 10, "skip": 10}
+}

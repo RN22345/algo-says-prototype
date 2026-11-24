@@ -1,0 +1,6 @@
+{
+  "earbuds":   {"n":"Earbuds",    "price":499, "cost":280, "f":1,   "icon":"icon_product_earbuds",    "col":"#9446e0", "praise":["Ang linaw ng sound?","Ganda!","Bluetooth 5.3?"]},
+  "case":      {"n":"Phone case", "price":149, "cost":60,  "f":1.5, "icon":"icon_product_phone_case", "col":"#ef3b4f", "praise":["Cute ng case!","May iPhone 13 size?","Ang ganda!"]},
+  "powerbank": {"n":"Power bank", "price":699, "cost":420, "f":0.6, "icon":"icon_product_power_bank", "col":"#2cc8b6", "praise":["Ilang mAh?","Fast charge ba?","Legit ba 'to?"]},
+  "tint":      {"n":"Lip tint",   "price":199, "cost":90,  "f":1.4, "icon":"icon_product_lip_tint",   "col":"#ff8a2a", "praise":["Ganda ng shade!","Long lasting?","May ibang kulay?"]}
+}
