@@ -124,7 +124,7 @@
   "catalogueK": 0.3
  },
  "shop": {
-  "packTime": 2.0,
+  "packTime": 1.2,
   "carryMax": 2,
   "riderDelayMin": 5,
   "riderDelayRange": 5,
@@ -139,7 +139,7 @@
   "handoverMinX": 12.9,
   "handoverMaxX": 17.2,
   "pickupRadius": 0.85,
-  "playerSpeed": 4,
+  "playerSpeed": 5.5,
   "playerRadius": 0.26,
   "shelfCap": 6,
   "lowAt": 2,

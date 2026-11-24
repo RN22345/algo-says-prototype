@@ -24,3 +24,27 @@
 .hub-n{font:700 .9em var(--display);white-space:nowrap}
 .hub-bar{height:.6em;background:#0001;border-radius:1em;overflow:hidden;margin-top:.25em}.hub-bar i{display:block;height:100%;background:linear-gradient(90deg,#7aa8f7,#3a6fd8)}
 .br-tag{display:inline-block;background:#ef3b4f;color:#fff;border-radius:999px;padding:0 .6em;font:700 .75em var(--display);vertical-align:.1em}
+
+/* Feed cards: post style, platform signals, top comment (PC and phone) */
+.fd-sig{display:flex;flex-wrap:wrap;gap:.25em .6em;align-items:center;font:700 .72em var(--body);color:#5d6690;margin-top:.3em;line-height:1.3}
+.fd-style{background:#efe8ff;color:#4a2a8c;border-radius:999px;padding:0 .55em;font-family:var(--display)}
+.fd-top{flex-basis:100%;color:#1b2a66;font-style:italic}
+/* phone tabs */
+#inbox .ph-sites{display:flex;gap:.3em;flex-wrap:wrap}
+.ph-card{background:#fff;border:.14em solid #1b2a66;border-left-width:.4em;border-radius:.8em;padding:.45em .6em}
+.ph-card.ph-tiktik{border-left-color:#9446e0}.ph-card.ph-youview{border-left-color:#ff8a2a}.ph-card.ph-facebazaar{border-left-color:#2cc8b6}
+.ph-top{display:flex;gap:.5em;align-items:center}.ph-top>img{width:2.4em}.ph-top b{font:700 .85em var(--display);display:block;line-height:1.2}
+.ph-by{display:flex;gap:.3em;align-items:center;font-size:.72em;font-weight:700;color:#6a73a0}.ph-by img{width:1.3em;border-radius:50%}
+.ph-ord{display:flex;gap:.5em;align-items:center;background:#fff;border:.14em solid #1b2a66;border-radius:.8em;padding:.4em .6em;font-size:.85em;font-weight:700}
+.ph-ord img{width:2.2em}.ph-ord b{font-family:var(--display)}
+
+/* Stats QoL: sortable headers, top-post tags, changed settings in comparisons */
+.desk .st-sort{all:unset;cursor:pointer;font:inherit;text-decoration:underline dotted;text-underline-offset:.2em}
+.desk .st-sort.on{color:#9446e0;text-decoration:none}
+.desk .st-top{display:inline-block;margin-left:.4em;border-radius:999px;padding:0 .5em;font:700 .72em var(--display);font-style:normal;color:#fff;vertical-align:.1em}
+.desk .st-top.v{background:#ff8a2a}.desk .st-top.o{background:#139180}.desk .st-top.c{background:#9446e0}
+.desk .st-row.best-o{box-shadow:inset .3em 0 0 #139180}.desk .st-row.best-v{box-shadow:inset .3em 0 0 #ff8a2a}
+.desk .st-kv.diff{background:#fff1b8;border-radius:.4em;outline:.12em solid #ffc928}
+.desk .st-kv.diff .lbl{color:#b36b00}
+.desk .st-tags{grid-column:3/-1;display:flex;gap:.3em;margin-top:.1em}
+.desk .st-tags .st-top{margin-left:0}

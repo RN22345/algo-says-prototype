@@ -286,7 +286,7 @@
 .st-dot{display:inline-block;width:.7em;height:.7em;border-radius:50%;margin-right:.35em}
 .st-pi{width:1.6em;vertical-align:middle}
 .st-first{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.desk .st-row{grid-template-columns:1.6em 2.2em minmax(0,1fr) minmax(0,1.3fr) minmax(0,.8fr) minmax(0,.7fr) minmax(0,.7fr) minmax(0,1.3fr)}
+.desk .st-row{grid-template-columns:1.6em 2.4em minmax(0,1fr) minmax(0,1.3fr) minmax(0,.8fr) minmax(0,.7fr) minmax(0,.7fr) minmax(0,.7fr) minmax(0,1.5fr)}
 .desk .st-row.on{background:#fff4b8}
 .bk-side{display:grid;gap:1em;align-content:start;overflow:auto;min-height:0}
 .bk-missed{padding:.6em .8em;display:grid;gap:.25em;align-content:start}
