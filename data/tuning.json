@@ -1,47 +1,214 @@
 {
-  "_note": "Teaching-model values for testing the feel. Every gameplay number lives here.",
-  "start": {
-    "cash": 3500, "rating": 4.6, "nextOrderId": 1024,
-    "stock": {"earbuds": 6, "case": 3, "powerbank": 0, "tint": 0}
+ "_note": "Teaching-model values for testing the feel. Every gameplay number lives here. Paced slower on 2026-11-24 (Rnwn: first post ~1k views was too much, too fast).",
+ "start": {
+  "cash": 3500,
+  "rating": 4.6,
+  "nextOrderId": 1024,
+  "stock": {
+   "earbuds": 4,
+   "case": 3,
+   "powerbank": 0,
+   "tint": 0
   },
-  "post": {
-    "duration": 75, "tau": 18,
-    "reachBase": 1600, "reachRange": 1400,
-    "hookClips": ["close", "hook"], "hookMult": 1.5, "noHookMult": 0.7,
-    "faceMult": 1.15, "repeatMult": 0.6, "firstPostMult": 0.35,
-    "convBase": 0.0022, "priceShownMult": 1.6, "priceClipMult": 1.3,
-    "ratingRef": 4.6, "convJitterMin": 0.6, "convJitterRange": 0.8,
-    "commentRate": 0.011, "maxComments": 7, "likeRate": 0.07,
-    "chatChance": 0.16, "maxOpenChats": 4,
-    "hookLeftAt": 6, "noHookLeftAt": 2,
-    "hookEndPct": [30, 12], "noHookEndPct": [9, 9],
-    "swipeWindow": 15,
-    "commentWeights": {
-      "price": {"shown": 0.06, "hidden": 0.45},
-      "cod": 0.14, "where": 0.1,
-      "what": {"hook": 0.02, "noHook": 0.22},
-      "praise": 0.3
-    }
+  "shelves": [
+   {
+    "p": "earbuds",
+    "n": 4
+   },
+   {
+    "p": "case",
+    "n": 3
+   },
+   {
+    "p": null,
+    "n": 0
+   },
+   {
+    "p": null,
+    "n": 0
+   }
+  ],
+  "back": {
+   "earbuds": 2,
+   "case": 2,
+   "powerbank": 0,
+   "tint": 0
+  }
+ },
+ "post": {
+  "hookClips": [
+   "close",
+   "hook"
+  ],
+  "hookMult": 1.5,
+  "noHookMult": 0.7,
+  "faceMult": 1.15,
+  "repeatMult": 0.6,
+  "firstPostMult": 0.6,
+  "convBase": 0.012,
+  "priceShownMult": 1.6,
+  "ratingRef": 4.6,
+  "convJitterMin": 0.6,
+  "convJitterRange": 0.8,
+  "commentRate": 0.04,
+  "maxComments": 7,
+  "likeRate": 0.07,
+  "chatChance": 0.16,
+  "maxOpenChats": 4,
+  "hookLeftAt": 6,
+  "noHookLeftAt": 2,
+  "hookEndPct": [
+   30,
+   12
+  ],
+  "noHookEndPct": [
+   9,
+   9
+  ],
+  "swipeWindow": 15,
+  "commentWeights": {
+   "price": {
+    "shown": 0.06,
+    "hidden": 0.45
+   },
+   "cod": 0.14,
+   "where": 0.1,
+   "what": {
+    "hook": 0.02,
+    "noHook": 0.22
+   },
+   "praise": 0.3
   },
-  "shop": {
-    "packTime": 1.1, "carryMax": 2,
-    "riderDelayMin": 3, "riderDelayRange": 4, "riderPatience": 50, "riderSpeed": 6,
-    "riderReplaceDelay": 6, "ratingLossLeave": 0.15, "ratingGainShip": 0.02,
-    "ratingMin": 1, "ratingMax": 5,
-    "handoverReach": 0.95, "handoverMinX": 12.9, "handoverMaxX": 17.2, "pickupRadius": 0.85,
-    "playerSpeed": 4, "playerRadius": 0.26
+  "sites": {
+   "tiktik": {
+    "reachBase": 150,
+    "reachRange": 150,
+    "tau": 40,
+    "duration": 180,
+    "convMult": 1
+   },
+   "youview": {
+    "reachBase": 240,
+    "reachRange": 200,
+    "tau": 110,
+    "duration": 480,
+    "convMult": 1.8
+   }
   },
-  "chat": {
-    "timeout": 45, "warnAt": 30, "keepAfterDone": 75,
-    "okMatch": 0.7, "okMismatch": 0.22,
-    "names": ["Ana", "Mark", "Joy", "Kiko", "Bea", "Jen", "Paolo", "Mika", "Rico", "Lea"]
-  },
-  "restock": {"qty": 5, "wholesaleTime": 25, "expressTime": 8, "expressMult": 1.2},
-  "van": {"speed": 7, "dropWait": 1.2},
-  "jeep": {"startY": -8, "firstDelay": 10, "speed": 5, "endY": 28, "respawnMin": 18, "respawnRange": 10},
-  "sarisari": {"qty": 2, "mult": 1.5},
-  "camera": {"follow": 9, "zoomClose": 1, "zoomWide": 0.5, "zoomRate": 10, "snapDist": 1500, "anchorZ": 60},
-  "npc": {"pauseMin": 1.5, "pauseMax": 4, "stopChance": 0.1, "stopMin": 1, "stopMax": 3},
-  "milestone": {"ship": 5, "replies": 3, "rank": 2},
-  "dev": {"cash": 1000, "stock": 10, "skip": 10}
+  "followerSeed": 0.5,
+  "followRate": 0.03,
+  "sampleEvery": 2,
+  "repeatWindow": 240,
+  "searchMult": 1.5,
+  "fewSegsMult": 0.7,
+  "boldThumbReach": 1.3,
+  "boldThumbConv": 0.75,
+  "trickle": 0.0008,
+  "catalogueK": 0.3
+ },
+ "shop": {
+  "packTime": 2.0,
+  "carryMax": 2,
+  "riderDelayMin": 5,
+  "riderDelayRange": 5,
+  "riderPatience": 90,
+  "riderSpeed": 6,
+  "riderReplaceDelay": 8,
+  "ratingLossLeave": 0.15,
+  "ratingGainShip": 0.02,
+  "ratingMin": 1,
+  "ratingMax": 5,
+  "handoverReach": 0.95,
+  "handoverMinX": 12.9,
+  "handoverMaxX": 17.2,
+  "pickupRadius": 0.85,
+  "playerSpeed": 4,
+  "playerRadius": 0.26,
+  "shelfCap": 6,
+  "lowAt": 2,
+  "boxMax": 6
+ },
+ "chat": {
+  "timeout": 80,
+  "warnAt": 55,
+  "keepAfterDone": 90,
+  "okMatch": 0.7,
+  "okMismatch": 0.22,
+  "names": [
+   "Ana",
+   "Mark",
+   "Joy",
+   "Kiko",
+   "Bea",
+   "Jen",
+   "Paolo",
+   "Mika",
+   "Rico",
+   "Lea"
+  ]
+ },
+ "restock": {
+  "qty": 6,
+  "wholesaleTime": 60,
+  "expressTime": 20,
+  "expressMult": 1.2
+ },
+ "van": {
+  "speed": 7,
+  "dropWait": 1.2
+ },
+ "jeep": {
+  "startY": -8,
+  "firstDelay": 10,
+  "speed": 5,
+  "endY": 38,
+  "respawnMin": 18,
+  "respawnRange": 10
+ },
+ "camera": {
+  "follow": 9,
+  "zoomClose": 1,
+  "zoomWide": 0.5,
+  "zoomRate": 10,
+  "snapDist": 1500,
+  "anchorZ": 60
+ },
+ "npc": {
+  "pauseMin": 1.5,
+  "pauseMax": 4,
+  "stopChance": 0.1,
+  "stopMin": 1,
+  "stopMax": 3
+ },
+ "milestone": {
+  "ship": 5,
+  "replies": 3,
+  "rank": 2
+ },
+ "dev": {
+  "cash": 1000,
+  "stock": 10,
+  "skip": 10
+ },
+ "mall": {
+  "qty": 3,
+  "mult": 1.5
+ },
+ "warehouse": {
+  "qty": 6,
+  "mult": 0.9
+ },
+ "edit": {
+  "tiktik": 22,
+  "youview": 45,
+  "_note": "Seconds of play at base gear. Gear makes it shorter."
+ },
+ "live": {
+  "duration": 75,
+  "viewersBase": 12,
+  "claimEvery": 2.2,
+  "joyChance": 0.18,
+  "hypeDrain": 0.07,
+  "payRate": 0.8
+ }
 }

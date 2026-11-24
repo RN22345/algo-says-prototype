@@ -1,6 +1,6 @@
 # Algo Says: web prototype
 
-Stage 0. A playable corner-isometric draft of the game: post a video, pack orders, hand parcels to riders, restock, answer buyers. Plain ES modules. No build tool, no npm. It runs as static files (for example on GitHub Pages).
+A playable corner-isometric draft of the game: post short and long videos, go live, pack orders, hand parcels to riders or the courier, buy stock at the mall or the warehouse, shelve it, answer buyers. Plain ES modules. No build tool, no npm. It runs as static files (for example on GitHub Pages).
 
 ## Run locally
 
@@ -29,7 +29,10 @@ W A S D walk, E use, Q phone, Esc close, Z and X (or the mouse wheel) zoom close
 | `js/camera.js`, `js/npcs.js`, `js/interact.js` | Camera (follow, clamp, zoom, pointer helpers), neighbour NPCs, E-key context that adds map spots (sari-sari store) |
 | `js/sprites.js`, `data/sprites.json`, `img/sprites/` | Blender-rendered furniture sprites, placed by footprint centre. The old drawn shapes are the fallback |
 | `js/iso.js`, `js/world.js`, `js/render.js`, `js/entities.js` | Projection and draw helpers, map and collision, rendering, player, riders, van, jeepney |
-| `js/sim/post.js`, `js/sim/shop.js` | Post model; orders, packing, riders, deliveries, chats, interaction |
+| `js/sim/post.js`, `js/sim/shop.js`, `js/sim/gear.js` | Post model (several posts at once, TikTik and YouView curves, YouView search trickle); shelves, storage, orders, packing, riders, deliveries, chats, stock warnings, missed-sales log; equipment that opens features |
+| `js/mini/edit.js`, `js/mini/live.js` | Editing minigame (cut on the beat) and FaceBazaar live minigame (confirm "Mine" claims) |
+| `js/ui/places.js` | Plaza Mall, Bodega Supply warehouse, courier drop-off |
+| `data/gear.json` | Equipment, prices, and what each opens |
 | `js/ui/*.js` | HUD, window dispatcher, inbox, Mr. Algo |
 | `js/pc/desktop.js`, `js/pc/apps/*.js` | The PC desktop (E at the computer): draggable windows, taskbar, in-game clock, and one module per app (TikTik Studio, Stats, Supplier, Shop Books, Notes, Feeds, Paint, Parcel Catch, Music, Settings, locked apps) |
 | `js/pc/audio.js`, `js/pc/prefs.js` | WebAudio loops and sound effects (start only after a click); PC settings kept in their own storage key |
@@ -49,3 +52,7 @@ The numbers are teaching-model values for testing the feel. Art is placeholder. 
 ## PC desktop (stage 4)
 
 Press E at the desk to open the desktop. The game keeps running underneath. Click an icon to open an app. Drag a window by its title bar. Esc closes the top window, then the desktop. "Shut down" closes everything. Saved in the save file: ledger, notes, stickers, in-game clock. Saved in `algosays.prefs`: text size, reduce motion, volume, Parcel Catch best score. Pressing E at the empty shelves opens the Supplier.
+
+## Shop loop (2026-11-24)
+
+Stock only sells from the shelves. Each of the 4 shelves holds one product (6 items); an empty shelf takes any product. Stand in front of a shelf with a box and press E to stock it; extra items go into the stockroom crates (storage), where E also takes a box back out. Buy stock from the Supplier site (the van brings a box to the gate), the warehouse (cheaper, carry it), or the mall (retail price, carry it). Posting or going live with no stock shows a warning and never blocks. The HUD shows missed sales, and the last two minutes by product.

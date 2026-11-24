@@ -82,7 +82,7 @@ const onKey = (e, down) => {
 const kd = e => onKey(e, true), ku = e => onKey(e, false);
 
 export default {
-  id: "catch", title: "Parcel Catch", icon: "📦", color: "p", w: 36, h: 88,
+  id: "catch", title: "Parcel Catch", icon: "📦", color: "p", cat: "games", w: 36, h: 88,
   api: { G, update, draw, reset, keys },
   mount(el, w) {
     win = w; w.setTitle("Parcel Catch", "Break time"); el.className = "dw-body pc-game";

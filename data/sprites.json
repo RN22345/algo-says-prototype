@@ -1,4 +1,74 @@
 {
+ "tv": {
+  "src": "img/sprites/tv.png",
+  "dx": -50.19999999999999,
+  "dy": -104.40000000000003,
+  "w": 101,
+  "h": 133
+ },
+ "bed": {
+  "src": "img/sprites/bed.png",
+  "dx": -103.5,
+  "dy": -125.05000000000001,
+  "w": 208,
+  "h": 180
+ },
+ "wardrobe": {
+  "src": "img/sprites/wardrobe.png",
+  "dx": -60.09999999999991,
+  "dy": -183.34999999999997,
+  "w": 120,
+  "h": 216
+ },
+ "nightstand": {
+  "src": "img/sprites/nightstand.png",
+  "dx": -29.800000000000068,
+  "dy": -75.59999999999997,
+  "w": 60,
+  "h": 94
+ },
+ "counter": {
+  "src": "img/sprites/counter.png",
+  "dx": -67.10000000000004,
+  "dy": -99.94999999999999,
+  "w": 135,
+  "h": 137
+ },
+ "fridge": {
+  "src": "img/sprites/fridge.png",
+  "dx": -44.0,
+  "dy": -165.0,
+  "w": 87,
+  "h": 190
+ },
+ "dining": {
+  "src": "img/sprites/dining.png",
+  "dx": -77.0,
+  "dy": -100.0,
+  "w": 164,
+  "h": 147
+ },
+ "toilet": {
+  "src": "img/sprites/toilet.png",
+  "dx": -27.69999999999989,
+  "dy": -75.94999999999993,
+  "w": 67,
+  "h": 87
+ },
+ "sink": {
+  "src": "img/sprites/sink.png",
+  "dx": -42.59999999999994,
+  "dy": -145.89999999999998,
+  "w": 88,
+  "h": 171
+ },
+ "shower": {
+  "src": "img/sprites/shower.png",
+  "dx": -64.90000000000015,
+  "dy": -184.25,
+  "w": 130,
+  "h": 220
+ },
  "desk": {
   "src": "img/sprites/desk.png",
   "dx": -102.27999999999999,
@@ -43,9 +113,9 @@
  },
  "table": {
   "src": "img/sprites/table.png",
-  "dx": -105.4,
-  "dy": -117.39999999999998,
-  "w": 211,
+  "dx": -105.0,
+  "dy": -118.0,
+  "w": 210,
   "h": 171
  },
  "sofa": {

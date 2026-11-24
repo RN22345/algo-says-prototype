@@ -1,12 +1,14 @@
-/* PC preferences (text size, reduce motion, volume, arcade high score). Kept apart from the save file so New game does not reset them. */
+/* PC preferences (text size, reduce motion, volume, arcade high score, monitor or full-frame mode, desktop icon places). Kept apart from the save file so New game does not reset them. */
 import { setLevels } from "./audio.js";
 
 const KEY = "algosays.prefs";
-export const prefs = { textSize: "normal", reduceMotion: false, volume: 0.7, musicVol: 0.8, catchHigh: 0 };
+export const prefs = { textSize: "normal", reduceMotion: false, volume: 0.7, musicVol: 0.8, catchHigh: 0, pcFull: false, iconPos: {} };
 
 export function applyPrefs() {
   const f = document.getElementById("frame");
-  if (f) { f.classList.toggle("tl", prefs.textSize === "large"); f.classList.toggle("rm", !!prefs.reduceMotion); }
+  if (f) { f.classList.toggle("tl", prefs.textSize === "large"); f.classList.toggle("rm", !!prefs.reduceMotion); f.classList.toggle("pcfull", !!prefs.pcFull); }
+  const d = document.getElementById("w-desktop");
+  if (d) d.classList.toggle("full", !!prefs.pcFull);
   setLevels(prefs.volume, prefs.musicVol);
 }
 

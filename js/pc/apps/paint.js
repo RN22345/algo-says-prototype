@@ -1,4 +1,4 @@
-/* Paint app: doodle, then save up to 3 stickers. TikTik Studio offers them on the cover. */
+/* Paint app: doodle, then save up to 3 stickers. TikTik (Create page) offers them on the cover. */
 import { D, S } from "../../state.js";
 import { registerActions } from "../../ui/windows.js";
 import { saveGame } from "../../save.js";
@@ -38,12 +38,12 @@ registerActions({
     if (S.stickers.length >= D.PC.stickerMax) { msg = "All 3 sticker slots are full. Delete one first."; return sync(); }
     if (empty()) { msg = "Draw something first."; return sync(); }
     const t = document.createElement("canvas"); t.width = t.height = 96; t.getContext("2d").drawImage(cv, 0, 0, 96, 96);
-    S.stickers.push(t.toDataURL("image/png")); msg = `Saved as sticker ${S.stickers.length}. Find it in TikTik Studio under Sticker.`; saveGame(); sync();
+    S.stickers.push(t.toDataURL("image/png")); msg = `Saved as sticker ${S.stickers.length}. Find it on TikTik under Create, then Sticker.`; saveGame(); sync();
   }
 });
 
 export default {
-  id: "paint", title: "Paint", icon: "🎨", color: "r", w: 56, h: 82,
+  id: "paint", title: "Paint", icon: "🎨", color: "r", cat: "games", w: 56, h: 82,
   mount(el, win) {
     root = el; win.setTitle("Paint", "Draw a sticker"); el.className = "dw-body pt";
     el.innerHTML = `<div class="pt-tools">

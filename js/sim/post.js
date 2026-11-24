@@ -1,26 +1,57 @@
-/* Post model (teaching model, values in data/tuning.json). */
+/* Post model (teaching model, values in data/tuning.json).
+   Several posts can run at once (S.running). Each site has its own curve:
+   TikTik  - fast spike, fades fast.
+   YouView - slow start, long run, then a small search trickle (catalogue).
+   Followers only seed the start of a post (FOUNDATION §5). */
 import { D, S, toast } from "../state.js";
 import { makeOrder } from "./shop.js";
 
 const R = Math.random;
 
-export function startPost(sel) {
-  const T = D.T.post, PR = D.PR;
-  const hook = T.hookClips.includes(sel.clips[0]);
-  const priceCover = sel.text === "price", priceCap = /₱|\d{2,}/.test(sel.caption), priceClip = sel.clips.includes("price");
-  const priceShown = priceCover || priceCap;
-  const last = S.posts[S.posts.length - 1];
-  const fat = last && last.p === sel.p && last.clips[0] === sel.clips[0] ? T.repeatMult : 1;
-  const first = S.posts.length === 0 ? T.firstPostMult : 1;
-  const reach = (T.reachBase + R() * T.reachRange) * (hook ? T.hookMult : T.noHookMult) * (sel.shot === "face" ? T.faceMult : 1) * fat * first;
-  const conv = T.convBase * (priceShown ? T.priceShownMult : priceClip ? T.priceClipMult : 1) * PR[sel.p].f;
+export const SITE_NAME = { tiktik: "TikTik", youview: "YouView", facebazaar: "FaceBazaar" };
+export const activePosts = site => S.running.filter(p => !site || p.site === site);
+export const lastPost = site => [...S.posts].reverse().find(p => !site || p.site === site) || null;
+export const sitePosts = site => S.posts.filter(p => p.site === site);
+
+/* Views per second at time t for a post (shape only, scaled by reach). */
+function rate(p, t) {
+  if (p.site === "youview") { const k = p.tau; return p.reach * (t / (k * k)) * Math.exp(-t / k); }
+  return p.reach / p.tau * Math.exp(-t / p.tau);
+}
+
+/* sel: { p, clips, shot, text, sticker, caption } for TikTik;
+        { p, title, segs: [ids], thumb: "honest"|"bold" } for YouView. */
+export function startPost(sel, site = "tiktik") {
+  const T = D.T.post, S2 = T.sites[site], PR = D.PR;
+  const prev = sitePosts(site), last = prev[prev.length - 1];
+  let quality = 1, priceShown = false, hook = true;
+  if (site === "tiktik") {
+    hook = T.hookClips.includes(sel.clips[0]);
+    priceShown = sel.text === "price" || /₱|\d{2,}/.test(sel.caption || "");
+    quality = (hook ? T.hookMult : T.noHookMult) * (sel.shot === "face" ? T.faceMult : 1);
+    if (!priceShown && sel.clips.includes("price")) priceShown = true;
+  } else if (site === "youview") {
+    const title = (sel.title || "").toLowerCase(), name = PR[sel.p].n.toLowerCase();
+    const searchable = title.includes(name.split(" ")[0]) || /review|unbox|sulit|legit|test/.test(title);
+    quality = (searchable ? T.searchMult : 1) * (sel.segs && sel.segs.length >= 3 ? 1 : T.fewSegsMult) * (sel.thumb === "bold" ? T.boldThumbReach : 1);
+    priceShown = sel.segs && sel.segs.includes("price");
+  }
+  const fat = last && last.p === sel.p && S.clock - last.at < T.repeatWindow ? T.repeatMult : 1;
+  const first = prev.length === 0 ? T.firstPostMult : 1;
+  const fol = S.followers[site] || 0;
+  const reach = (S2.reachBase + R() * S2.reachRange + fol * T.followerSeed) * quality * fat * first;
+  const conv = T.convBase * S2.convMult * (priceShown ? T.priceShownMult : 1) * PR[sel.p].f * (sel.thumb === "bold" ? T.boldThumbConv : 1);
   const [eb, er] = hook ? T.hookEndPct : T.noHookEndPct;
-  S.post = {
-    p: sel.p, clips: [...sel.clips], shot: sel.shot, text: sel.text, sticker: sel.sticker, caption: sel.caption, reach, conv, hook, priceShown,
+  const p = {
+    site, p: sel.p, clips: [...(sel.clips || [])], shot: sel.shot, text: sel.text, sticker: sel.sticker, caption: sel.caption || "",
+    title: sel.title || "", segs: [...(sel.segs || [])], thumb: sel.thumb || "",
+    reach, conv, hook, priceShown, tau: S2.tau, dur: S2.duration, at: S.clock,
     t: 0, views: 0, orders: 0, missed: 0, acc: 0, cacc: 0, comments: [], counts: {}, samples: [0],
-    leftAt: hook ? T.hookLeftAt : T.noHookLeftAt, endPct: eb + R() * er, first: S.posts.length === 0
+    leftAt: hook ? T.hookLeftAt : T.noHookLeftAt, endPct: eb + R() * er, first: prev.length === 0, done: false
   };
-  S.posted = true; toast("Posted on TikTik");
+  S.running.push(p);
+  S.posted = true; toast(`Posted on ${SITE_NAME[site]}`);
+  return p;
 }
 
 function commentFor(p) {
@@ -31,26 +62,49 @@ function commentFor(p) {
   return { type, text: T[type][Math.floor(R() * T[type].length)], av: Math.floor(R() * 6) };
 }
 
-export function updatePost(dt) {
-  const p = S.post; if (!p) return;
-  const T = D.T.post, PR = D.PR, TAU = T.tau, DUR = T.duration;
-  const t0 = p.t; p.t = Math.min(DUR, p.t + dt);
-  const dv = p.reach * (Math.exp(-t0 / TAU) - Math.exp(-p.t / TAU)); p.views += dv;
-  p.acc += dv * p.conv * (S.rating / T.ratingRef) * (T.convJitterMin + R() * T.convJitterRange); while (p.acc >= 1) { p.acc--; makeOrder(p.p); }
+function addViews(p, dv) {
+  const T = D.T.post, PR = D.PR;
+  p.views += dv;
+  p.acc += dv * p.conv * (S.rating / T.ratingRef) * (T.convJitterMin + R() * T.convJitterRange);
+  while (p.acc >= 1) { p.acc--; makeOrder(p.p, false, p); }
   p.cacc += dv * T.commentRate; while (p.cacc >= 1) {
     p.cacc--; const c = commentFor(p); p.comments.unshift(c); p.comments.length = Math.min(p.comments.length, T.maxComments); p.counts[c.text] = (p.counts[c.text] || 0) + 1;
     if (c.type !== "what" && R() < T.chatChance && S.chats.filter(x => !x.done).length < T.maxOpenChats) {
       const name = D.T.chat.names[Math.floor(R() * D.T.chat.names.length)];
       const ask = { price: "Hi! How much po yung " + PR[p.p].n.toLowerCase() + "?", cod: "Pwede po COD?", where: "Saan po kayo located?", praise: "Available pa po?" }[c.type];
-      S.chats.push({ name, av: c.av, type: c.type === "praise" ? "avail" : c.type, p: p.p, t: 0, done: false, log: [["in", ask]] });
+      S.chats.push({ name, av: c.av, site: SITE_NAME[p.site], type: c.type === "praise" ? "avail" : c.type, p: p.p, t: 0, done: false, log: [["in", ask]] });
     }
   }
-  if (Math.floor(p.t) > p.samples.length - 1) p.samples.push(p.reach / TAU * Math.exp(-p.t / TAU));
-  if (p.t >= DUR) { S.posts.push(p); S.last = p; S.post = null; S.algoUnread = true; toast(`TikTik post ended: ${Math.round(p.views).toLocaleString()} views. Mr. Algo has notes.`, "img/algo_unit_happy.png"); }
 }
 
-/* Developer helper: run the current post to its end. */
+export function updatePost(dt) {
+  const T = D.T.post;
+  for (const p of S.running) {
+    const t0 = p.t; p.t = Math.min(p.dur, p.t + dt);
+    // integrate the rate with two half steps (smooth enough for both curve shapes)
+    const dv = (rate(p, t0) + rate(p, p.t)) / 2 * (p.t - t0);
+    addViews(p, dv);
+    if (Math.floor(p.t / T.sampleEvery) > p.samples.length - 1) p.samples.push(rate(p, p.t));
+    if (p.t >= p.dur) {
+      p.done = true; p.base = p.views;
+      const gain = Math.round(p.views * T.followRate);
+      S.followers[p.site] = (S.followers[p.site] || 0) + gain;
+      S.posts.push(p); S.last = p; S.algoUnread = true;
+      toast(`${SITE_NAME[p.site]} post ended: ${Math.round(p.views).toLocaleString()} views, ${p.orders} orders, +${gain} followers. Mr. Algo has notes.`, "img/algo_unit_happy.png");
+    }
+  }
+  S.running = S.running.filter(p => !p.done);
+  // Back catalogue: finished YouView posts keep a small search trickle while stock lasts.
+  S.trickleAcc = (S.trickleAcc || 0) + dt;
+  if (S.trickleAcc >= 5) {
+    const step = S.trickleAcc; S.trickleAcc = 0;
+    const yv = sitePosts("youview"), cap = 1 + T.catalogueK * yv.length;
+    yv.forEach(p => { if (S.stock[p.p] > 0) addViews(p, (p.base || p.views) * T.trickle * step / cap); });
+  }
+}
+
+/* Developer helper: run every running post to its end. */
 export function finishPostNow() {
   let guard = 0;
-  while (S.post && guard++ < 200) updatePost(1);
+  while (S.running.length && guard++ < 2000) updatePost(1);
 }

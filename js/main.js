@@ -5,13 +5,13 @@ import { initRender, render } from "./render.js";
 import { updateCamera, snapCamera, cam, setZoom, screenToTile, tileToScreen } from "./camera.js";
 import { initNpcs, updateNpcs, npcs } from "./npcs.js";
 import { updatePost } from "./sim/post.js";
-import { updateShop, updateDeliveries, checkMilestone } from "./sim/shop.js";
+import { updateShop, updateDeliveries, checkMilestone, syncStock } from "./sim/shop.js";
 import { updateRiders, updateVan, updateJeep, updatePlayer } from "./entities.js";
 import { initWindows, $ } from "./ui/windows.js";
 import { renderHud, initHud } from "./ui/hud.js";
 import { initInbox, renderInbox } from "./ui/inbox.js";
 import { initAlgo } from "./ui/algo.js";
-import { initSariSari } from "./ui/sarisari.js";
+import { initPlaces, refreshPlaces } from "./ui/places.js";
 import { initInput } from "./input.js";
 import { initSave, loadGame, saveGame, newGame } from "./save.js";
 import { initDev, devTick } from "./dev.js";
@@ -41,6 +41,7 @@ function refreshUI() {
   renderHud();
   refreshDesktop();
   if (S.ui === "phone") renderInbox(false);
+  refreshPlaces();
   devTick();
 }
 
@@ -78,10 +79,11 @@ async function boot() {
   initWorld(D.MAP);
   resetState();
   loadGame();
+  syncStock();
   initNpcs();
   snapCamera();
   initRender($("#iso"));
-  initWindows(); initHud(); initInbox(); initAlgo(); initSariSari();
+  initWindows(); initHud(); initInbox(); initAlgo(); initPlaces();
   try { await initDesktop(); } catch (e) { console.error(e); }
   initDev({ step });
   initInput();

@@ -1,6 +1,6 @@
 /* Home: placeholder for build mode. */
 export default {
-  id: "home", title: "Home", icon: "🏠", color: "o", w: 38, h: 46,
+  id: "home", title: "Home", icon: "🏠", color: "o", cat: "business", w: 38, h: 46,
   mount(el, win) {
     win.setTitle("Home", "Decorate your shop");
     el.className = "dw-body";

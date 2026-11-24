@@ -77,8 +77,8 @@ function buildBg() {
   for (let i = 0; i < 12; i++) { const x = i / 2 + .05; poly([P(x, 0, WALLH - 4), P(x + .4, 0, WALLH - 4), P(x + .2, 0, WALLH - 34)], bc[i % 5], 2); }
   for (let i = 0; i < 10; i++) { const y = i / 2 + .05; poly([P(0, y, WALLH - 4), P(0, y + .4, WALLH - 4), P(0, y + .2, WALLH - 34)], bc[(i + 2) % 5], 2); }
   // wall top edges
-  g.lineWidth = 5; g.strokeStyle = NAVY; g.beginPath(); g.moveTo(...P(0, 9, WALLH)); g.lineTo(...P(0, 0, WALLH)); g.lineTo(...P(11, 0, WALLH)); g.moveTo(...P(0, 0, 0)); g.lineTo(...P(0, 0, WALLH));
-  g.moveTo(...P(0, 9, 0)); g.lineTo(...P(0, 9, WALLH)); g.moveTo(...P(11, 0, 0)); g.lineTo(...P(11, 0, WALLH)); g.moveTo(...P(0, 5, 0)); g.lineTo(...P(0, 5, WALLH)); g.moveTo(...P(6, 0, 0)); g.lineTo(...P(6, 0, WALLH)); g.stroke();
+  g.lineWidth = 5; g.strokeStyle = NAVY; g.beginPath(); g.moveTo(...P(0, 15, WALLH)); g.lineTo(...P(0, 0, WALLH)); g.lineTo(...P(11, 0, WALLH)); g.moveTo(...P(0, 0, 0)); g.lineTo(...P(0, 0, WALLH));
+  g.moveTo(...P(0, 9, 0)); g.lineTo(...P(0, 9, WALLH)); g.moveTo(...P(0, 15, 0)); g.lineTo(...P(0, 15, WALLH)); g.moveTo(...P(11, 0, 0)); g.lineTo(...P(11, 0, WALLH)); g.moveTo(...P(0, 5, 0)); g.lineTo(...P(0, 5, WALLH)); g.moveTo(...P(6, 0, 0)); g.lineTo(...P(6, 0, WALLH)); g.stroke();
   // hedges at the back of the yard and along the lot
   M.hedges.forEach(([x0, y0, x1, y1]) => box(x0, y0, x1, y1, 0, 36, "#5fbf55", "#4aa842", "#3b9135"));
   // house number sign by the door
@@ -103,7 +103,7 @@ function debugOverlay(g) {
   const rect = (b, col, fill) => { const [x0, y0, x1, y1] = b; poly([P(x0, y0), P(x1, y0), P(x1, y1), P(x0, y1)], fill, 2, col); };
   world.solids.forEach(b => rect(b, "#ef3b4f", "rgba(239,59,79,.25)"));
   world.furn.forEach(f => { if (f.zone) rect(f.zone, "#139180", "rgba(44,200,182,.25)"); });
-  if (world.sarisariZone) rect(world.sarisariZone, "#139180", "rgba(44,200,182,.25)");
+  (world.places || []).forEach(o => rect(o.zone, "#139180", "rgba(44,200,182,.25)"));
   rect(world.shelfZone, "#139180", "rgba(44,200,182,.25)");
   const T = D.T.shop;
   rect([T.handoverMinX, 0, T.handoverMaxX, world.MH], "#cf5e00", "rgba(255,138,42,.18)");
@@ -143,8 +143,8 @@ export function render() {
   list.sort((a, b) => a.k - b.k).forEach(o => o.d());
   if (rt.showZones) debugOverlay(g);
   // world labels
-  if (S.post) { const p = P(2.8, .3, 175); bub(V, p[0], p[1], `TikTik: ${Math.round(S.post.views).toLocaleString()} views`, "#efe1ff"); }
-  if (S.orders.length || S.table.length) { const p = P(6.3, 7.1, 110); bub(V, p[0], p[1], [S.orders.length ? `${S.orders.length} to pack` : "", S.table.length ? `${S.table.length} ready` : ""].filter(Boolean).join(" · "), "#fff"); }
+  if (S.running.length) { const p = P(2.8, .3, 175); bub(V, p[0], p[1], S.running.map(r => `${r.site === "youview" ? "YouView" : "TikTik"}: ${Math.round(r.views).toLocaleString()}`).join(" · ") + " views", "#efe1ff"); }
+  if (S.orders.length || S.table.length) { const p = P(8.5, 7.0, 110); bub(V, p[0], p[1], [S.orders.length ? `${S.orders.length} to pack` : "", S.table.length ? `${S.table.length} ready` : ""].filter(Boolean).join(" · "), "#fff"); }
   if (S.algoUnread && !S.ui) { const p = P(.6, 2.65, 170); bub(V, p[0], p[1], "!", "#ffe06b"); }
   if (!S.algoMet && !S.ui) { const p = P(.6, 2.65, 170); bub(V, p[0], p[1], "Hi!", "#c8fff6"); }
   overlay.bubbles.forEach(([x, y, zz, t, c]) => { const p = P(x, y, zz); bub(V, p[0], p[1], t, c, NAVY, 18); });

@@ -1,7 +1,7 @@
 /* Developer panel (testing only). Toggle with F1 or the Dev menu item. */
 import { D, S, rt, emit } from "./state.js";
 import { $, registerActions } from "./ui/windows.js";
-import { makeOrder } from "./sim/shop.js";
+import { makeOrder, syncStock } from "./sim/shop.js";
 import { finishPostNow } from "./sim/post.js";
 import { record } from "./sim/ledger.js";
 
@@ -25,7 +25,8 @@ export function initDev({ step }) {
     "dev-toggle": () => toggleDev(),
     "dev-cash": () => { S.cash += D.T.dev.cash; record("in", D.T.dev.cash, { note: "Developer cash" }); emit("refresh"); },
     "dev-orders": () => { Object.keys(D.PR).forEach(p => makeOrder(p, true)); emit("refresh"); },
-    "dev-stock": () => { Object.keys(D.PR).forEach(p => { S.stock[p] = D.T.dev.stock; }); emit("refresh"); },
+    "dev-stock": () => { Object.keys(D.PR).forEach((p, i) => { if (S.shelves[i]) S.shelves[i] = { p, n: D.T.shop.shelfCap }; S.back[p] = D.T.dev.stock; }); syncStock(); emit("refresh"); },
+    "dev-gear": () => { Object.keys(D.GEAR).forEach(k => { S.gear[k] = true; }); emit("refresh"); },
     "dev-skip": () => { stepFn(D.T.dev.skip); },
     "dev-finish": () => { finishPostNow(); emit("refresh"); },
     "dev-zones": (t) => { rt.showZones = !rt.showZones; t.setAttribute("aria-pressed", String(rt.showZones)); },

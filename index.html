@@ -6,14 +6,15 @@
 <title>Algo Says</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&family=Nunito:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/pc.css">
 </head>
 <body>
 <div class="page">
   <header class="bar">
     <h1>Algo Says</h1>
-    <span class="controls">W A S D walk, E use, Q phone, Esc close. Prototype stage 4.</span>
+    <span class="controls">W A S D walk, E use, Q phone, Esc close, Space and 1 to 4 in minigames.</span>
     <nav class="menu keepactive" aria-label="Game menu">
       <button class="cap y sm" type="button" data-act="menu-new">New game</button>
       <button class="cap t sm" type="button" data-act="dev-toggle" id="devBtn" aria-expanded="false" aria-controls="dev">Dev</button>
@@ -33,12 +34,6 @@
 
     <!-- PC DESKTOP (built by js/pc/desktop.js) -->
     <div class="ov desk" id="w-desktop" hidden></div>
-
-    <!-- SARI-SARI STORE -->
-    <div class="ov" id="w-sarisari" hidden><div class="win" style="inset:14% 24% 14%">
-      <div class="wbar t">🏪 Sari-sari store <small>Quick stock, higher price</small><span class="sp"></span><button class="x" data-act="close" type="button" aria-label="Close">✕</button></div>
-      <div class="wbody" id="sarisari" style="align-content:start"></div>
-    </div></div>
 
     <!-- PHONE -->
     <div class="ov" id="w-phone" hidden style="background:rgba(20,26,60,.4)">
@@ -74,9 +69,10 @@
   <small>F1 toggles this panel.</small>
   <button class="cap t sm" type="button" data-act="dev-cash">Add ₱1,000</button>
   <button class="cap t sm" type="button" data-act="dev-orders">Spawn an order for each product</button>
-  <button class="cap t sm" type="button" data-act="dev-stock">Set all stock to 10</button>
+  <button class="cap t sm" type="button" data-act="dev-stock">Fill every shelf, 10 of each in storage</button>
+  <button class="cap t sm" type="button" data-act="dev-gear">Own all equipment</button>
   <button class="cap t sm" type="button" data-act="dev-skip">Skip 10 s of game time</button>
-  <button class="cap t sm" type="button" data-act="dev-finish">Finish the running post now</button>
+  <button class="cap t sm" type="button" data-act="dev-finish">Finish all running posts now</button>
   <button class="cap y sm" type="button" data-act="dev-zones" aria-pressed="false">Show walk zones and solids</button>
   <button class="cap y sm" type="button" data-act="dev-fps" aria-pressed="false">Show FPS</button>
   <div class="fps" id="devFps" aria-live="off"></div>

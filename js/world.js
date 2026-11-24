@@ -13,8 +13,7 @@ export function initWorld(M) {
   world.shelfProducts = M.shelfProducts;
   world.shelfZone = M.shelfZone;
   world.scenery = M.scenery || [];
-  const store = world.scenery.find(o => o.kind === "store");
-  world.sarisariZone = store ? store.zone : null;
+  world.places = world.scenery.filter(o => o.zone);
   world.solids = [...M.walls, ...M.furniture.map(f => f.b), ...world.scenery.filter(o => o.solid !== false).map(o => o.b)];
 }
 
@@ -42,14 +41,14 @@ export function drawFurn(f) {
   const [x0, y0, x1, y1] = f.b;
   switch (f.id) {
     case "desk":
-      if (sprite("desk", f.b)) poly([P(2.2, .45, 88), P(3.4, .45, 88), P(3.4, .45, 140), P(2.2, .45, 140)], S.post ? "#d4b2ff" : "#c3cbe8", 2);
+      if (sprite("desk", f.b)) poly([P(2.2, .45, 88), P(3.4, .45, 88), P(3.4, .45, 140), P(2.2, .45, 140)], S.running.length ? "#d4b2ff" : "#c3cbe8", 2);
       else {
       box(x0, y0, x1, y1, 0, 70, "#e8b77d", "#c48a4b", "#a8723a");
       box(2.1, .2, 3.5, .45, 70, 76, "#3a4a8c", "#3a4a8c", NAVY);
-      poly([P(2.2, .45, 80), P(3.4, .45, 80), P(3.4, .45, 140), P(2.2, .45, 140)], S.post ? "#d4b2ff" : "#c3cbe8", 2);
+      poly([P(2.2, .45, 80), P(3.4, .45, 80), P(3.4, .45, 140), P(2.2, .45, 140)], S.running.length ? "#d4b2ff" : "#c3cbe8", 2);
       box(2.3, .65, 3.3, .9, 70, 5, "#eef1ff", "#c9cde6", "#aab0d6", 2);
       box(3.6, .3, 3.95, .7, 70, 40, "#2cc8b6", "#139180", "#0f7266", 2); }
-      if (S.post) { const p = P(2.8, .45, 114); g.fillStyle = "#6224a8"; g.font = `700 20px ${FONT}`; g.textAlign = "center"; g.fillText("tt", p[0], p[1] + 6); }
+      if (S.running.length) { const p = P(2.8, .45, 114); g.fillStyle = "#6224a8"; g.font = `700 20px ${FONT}`; g.textAlign = "center"; g.fillText("tt", p[0], p[1] + 6); }
       break;
     case "light": {
       if (sprite("light", f.b)) break;
@@ -71,15 +70,16 @@ export function drawFurn(f) {
     case "crates": if (sprite("crates", f.b)) break; box(x0, y0, x1, y1, 0, 44, "#d9a066", "#c08445", "#a26c33"); box(9.6, 3.5, 10.3, 4.2, 44, 36, "#e2ae74", "#c08445", "#a26c33", 2); break;
     case "table":
       if (!sprite("table", f.b)) box(x0, y0, x1, y1, 0, 62, "#f3d7a8", "#d6ad6c", "#bb9152");
-      S.orders.slice(0, 4).forEach((o, i) => { const bx = 5.2 + i * .5; box(bx, 6.7, bx + .38, 7.1, 62, 22, "#fff8e8", PR[o.p].col, "#d9c9a6", 2); });
-      S.table.slice(0, 6).forEach((o, i) => { const bx = 6.9 + (i % 2) * .32, bz = 62 + Math.floor(i / 2) * 22; box(bx, 6.9, bx + .3, 7.4, bz, 22, "#e2ae74", "#c08445", "#a26c33", 2); });
+      S.orders.slice(0, 4).forEach((o, i) => { const bx = x0 + .2 + i * .5; box(bx, y0 + .2, bx + .38, y0 + .6, 62, 22, "#fff8e8", PR[o.p].col, "#d9c9a6", 2); });
+      S.table.slice(0, 6).forEach((o, i) => { const bx = x1 - .75 + (i % 2) * .32, bz = 62 + Math.floor(i / 2) * 22; box(bx, y0 + .4, bx + .3, y0 + .9, bz, 22, "#e2ae74", "#c08445", "#a26c33", 2); });
       break;
     case "sofa": if (sprite("sofa", f.b)) break; box(x0, y0, x1, y1, 0, 34, "#5b8def", "#4673c9", "#3a62ad"); box(x0, y0, x0 + .3, y1, 34, 40, "#6c9bf5", "#4673c9", "#3a62ad"); break;
     case "lamp": { if (sprite("lamp", f.b)) break; const b = P(13.37, 5.42), t = P(13.37, 5.42, 160); g.lineWidth = 6; g.strokeStyle = NAVY; g.beginPath(); g.moveTo(...b); g.lineTo(...t); g.stroke(); circ(t[0], t[1], 12, "#ffe06b"); break; }
     default:
       if (f.id.startsWith("tree")) drawTree(f.b);
+      else if (!f.id.startsWith("shelf")) { if (!sprite(f.id, f.b)) box(x0, y0, x1, y1, 0, 40, "#e2ae74", "#c08445", "#a26c33"); }
       else if (f.id.startsWith("shelf")) {
-        const k = +f.id[5], p = world.shelfProducts[k], n = Math.min(6, S.stock[p]);
+        const k = +f.id[5], sh = S.shelves[k] || { p: null, n: 0 }, p = sh.p, n = Math.min(6, sh.n);
         const shelfSpr = sprite("shelf", f.b);
         if (!shelfSpr) box(x0, y0, x1, y1, 0, 150, "#d9a066", "#b97a3d", "#9a6230");
         [10, 58, 106].forEach((z, r) => {
@@ -87,7 +87,7 @@ export function drawFurn(f) {
           for (let c = 0; c < 2; c++) { const idx = r * 2 + c; if (idx >= n) continue; const xa = x0 + .12 + c * .42; poly([P(xa, y1, z + 3), P(xa + .34, y1, z + 3), P(xa + .34, y1, z + 38), P(xa, y1, z + 38)], PR[p].col, 2); }
         });
         if (!shelfSpr) poly([P(x0, y1, 0), P(x1, y1, 0), P(x1, y1, 150), P(x0, y1, 150)], null, 3);
-        if (S.stock[p] === 0) { g.globalAlpha = .85; overlay.bubbles.push([(x0 + x1) / 2, (y0 + y1) / 2, k % 2 ? 205 : 165, `${PR[p].n}: 0`, (S.flash[p] || 0) > 0 ? "#ff9aa8" : "#fff4b8"]); g.globalAlpha = 1; }
+        const lowN = D.T.shop.lowAt; if (!p) overlay.bubbles.push([(x0 + x1) / 2, (y0 + y1) / 2, k % 2 ? 205 : 165, `Shelf ${k + 1}: empty`, "#ffffff"]); else if (sh.n <= lowN) overlay.bubbles.push([(x0 + x1) / 2, (y0 + y1) / 2, k % 2 ? 205 : 165, `${PR[p].n}: ${sh.n}`, (S.flash[p] || 0) > 0 ? "#ff9aa8" : "#fff4b8"]);
       }
   }
 }
@@ -136,6 +136,34 @@ export function drawScenery(s) {
       faceText("x", x1 + .02, cy, 114, "SARI-SARI STORE", y1 - y0 - .6, 26, "#ffe06b");
       wallQuad("y", y1, x0 + 1, x0 + 2.4, 40, 78, "#cfeeff");
       wallQuad("y", y1, x0 + 2.8, x0 + 3.6, 0, 62, "#8a5a2b");
+      break;
+    }
+    case "mall": {
+      const h = s.h;
+      box(x0, y0, x1, y1, 0, h, "#f4f1ff", "#e9e4fb", "#d6cff2");
+      wallQuad("x", x1, y0 + .7, y1 - .7, 8, 104, "#9fd8f0", 3);
+      for (let y = y0 + 1.6; y < y1 - .8; y += 1.1) wallQuad("x", x1, y, y + .06, 8, 104, "#1b2a66", 0);
+      wallQuad("x", x1, cy - .8, cy + .8, 0, 84, "#e6f7ff", 3);
+      wallQuad("x", x1, cy - .03, cy + .03, 0, 84, NAVY, 0);
+      const n = 12, step = (y1 - y0 - 1) / n;
+      for (let k = 0; k < n; k++) { const ya = y0 + .5 + k * step; poly([P(x1, ya, 120), P(x1, ya + step, 120), P(x1 + .6, ya + step, 100), P(x1 + .6, ya, 100)], k % 2 ? "#fff" : "#9446e0", 2); }
+      wallQuad("x", x1 + .02, y0 + .5, y1 - .5, 128, 168, "#2b1450", 3);
+      faceText("x", x1 + .02, cy, 148, "PLAZA MALL", y1 - y0 - 1.2, 34, "#ffd34e");
+      wallQuad("y", y1, x0 + .8, x0 + 4.2, 70, 104, "#ff8a2a", 3); faceText("y", y1, x0 + 2.5, 87, "GADGETS", 3.2, 22, "#fff");
+      wallQuad("y", y1, x0 + 5.2, x0 + 9.2, 70, 104, "#2cc8b6", 3); faceText("y", y1, x0 + 7.2, 87, "DEPT. STORE", 3.8, 22, NAVY);
+      wallQuad("y", y1, x0 + 1, x0 + 4, 8, 62, "#9fd8f0"); wallQuad("y", y1, x0 + 5.6, x0 + 8.8, 8, 62, "#9fd8f0");
+      break;
+    }
+    case "warehouse": {
+      const h = s.h;
+      box(x0, y0, x1, y1, 0, h, "#b8c4de", "#9fb0d2", "#8396bf");
+      for (let x = x0 + .3; x < x1; x += .45) wallQuad("y", y1, x, x + .02, 4, h - 4, "#7f8fb8", 0);
+      wallQuad("y", y1, x0 + 1.2, x1 - 1.2, 0, 104, "#e3e6f2", 3);
+      for (let zz = 12; zz < 104; zz += 12) wallQuad("y", y1, x0 + 1.2, x1 - 1.2, zz, zz + 1.5, "#aab0d6", 0);
+      box(x0 + 1, y1, x1 - 1, y1 + .5, 0, 22, "#c9cde6", "#aab0d6", "#8f96c4", 2);
+      wallQuad("x", x1 + .02, y0 + .4, y1 - .4, 100, 138, "#ff8a2a", 3);
+      faceText("x", x1 + .02, cy, 119, "BODEGA SUPPLY", y1 - y0 - 1, 28, NAVY);
+      faceText("y", y1, (x0 + x1) / 2, 120, "WHOLESALE / WALK-IN", x1 - x0 - 1, 20, NAVY);
       break;
     }
     case "booth": {

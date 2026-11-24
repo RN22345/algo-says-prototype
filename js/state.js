@@ -1,7 +1,7 @@
 /* Shared game state, loaded data, tiny event bus. One module so every system sees the same objects. */
 
 /* Loaded data. Filled by loadData() at boot. */
-export const D = { PR: {}, CLIPS: {}, MAP: null, T: null, PC: null };
+export const D = { PR: {}, CLIPS: {}, MAP: null, T: null, PC: null, GEAR: {} };
 
 export async function loadData(base = "data/") {
   const get = async f => {
@@ -9,8 +9,9 @@ export async function loadData(base = "data/") {
     if (!r.ok) throw new Error(`Could not load ${f} (${r.status})`);
     return r.json();
   };
-  const [PR, CLIPS, MAP, T] = await Promise.all([get("products.json"), get("clips.json"), get("map.json"), get("tuning.json")]);
-  D.PR = PR; D.CLIPS = CLIPS; D.MAP = MAP; D.T = T;
+  const [PR, CLIPS, MAP, T, GEAR] = await Promise.all([get("products.json"), get("clips.json"), get("map.json"), get("tuning.json"), get("gear.json")]);
+  delete GEAR._note;
+  D.PR = PR; D.CLIPS = CLIPS; D.MAP = MAP; D.T = T; D.GEAR = GEAR;
 }
 
 /* Event bus: systems emit, UI listens. Keeps sim code free of DOM calls. */
@@ -33,8 +34,9 @@ export function newState() {
   return {
     cash: T.start.cash, rating: T.start.rating, shipped: 0, replies: 0, stocked: false, posted: false,
     stock: { ...T.start.stock },
-    orders: [], table: [], carry: [], box: null, riders: [], deliveries: [], yard: [], posts: [], post: null, last: null,
-    chats: [], missed: 0, nextId: T.start.nextOrderId, busy: null,
+    orders: [], table: [], carry: [], box: null, riders: [], deliveries: [], yard: [], posts: [], running: [], last: null,
+    gear: {}, followers: { tiktik: 0, youview: 0, facebazaar: 0 }, shelves: T.start.shelves.map(s => ({ ...s })), back: { ...T.start.back }, missedLog: [], lows: {},
+    chats: [], missed: 0, edit: null, nextId: T.start.nextOrderId, busy: null,
     clock: 0, ledger: [], notes: "", stickers: [],
     algoUnread: false, rank: 1, van: null, vanQ: [], jeep: { y: T.jeep.startY, t: T.jeep.firstDelay },
     ui: null, active: false, flash: {}, milestoneDone: false, algoMet: false
@@ -53,4 +55,5 @@ export function resetState(saved = null, keepActive = false) {
   pl.moving = false;
   replace(sel, { p: Object.keys(D.PR)[0], clips: [], shot: "product", text: "none", sticker: "none", caption: "" });
   keys.clear();
+  emit("newgame");
 }

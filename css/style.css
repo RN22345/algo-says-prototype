@@ -251,3 +251,67 @@ textarea.cap-in:focus{outline:.15em solid var(--purple)}
 .se-opts{display:grid;gap:1em}
 .se-row{display:grid;gap:.4em}
 .se-row>div{display:flex;gap:.4em}
+
+/* ---------- reference look (group mockup): dark purple, gold, Lilita One titles ---------- */
+:root{--gold:#ffd34e;--goldD:#c4530c;--plum:#2a1650;--plum2:#1d0e3a;--title:"Lilita One","Fredoka",system-ui,sans-serif}
+.note h3,.wbar,.confirm h2{font-family:var(--title);font-weight:400;letter-spacing:.03em}
+.hud .pill{background:linear-gradient(#ffffff,#f3eeff);box-shadow:0 .2em 0 var(--navy),inset 0 .15em 0 #fff}
+.pill.miss{background:#fff1f3;color:var(--redD)}
+.pill.miss.hot{background:linear-gradient(#ff8a9a,#ef3b4f);color:#fff;animation:mp 1.4s ease-in-out infinite}
+@keyframes mp{50%{transform:scale(1.04)}}
+/* place windows (mall, warehouse) */
+.win.place{inset:9% 20% 9%;background:linear-gradient(180deg,#3a2070,var(--plum));border:.35em solid var(--gold);border-radius:1.6em;box-shadow:0 0 0 .25em #12082b,0 1.5em 3em #000a;color:#fff;animation:mpop .22s}
+@keyframes mpop{from{transform:scale(.94)}}
+.win.place .wbar{background:none;border:0;padding:.9em 1.2em .2em}
+.win.place .wt{display:inline-block;background:linear-gradient(#feC913,#fd6b09);border:.18em solid #fff;border-radius:999px;padding:.15em 1em;box-shadow:0 .3em 0 #0006;text-shadow:0 .12em 0 #0008;transform:rotate(-1.5deg);font-size:1.15em}
+.win.place.t-mall .wt{background:linear-gradient(#a06bff,#5b2aa8)}
+.win.place.t-ware .wt{background:linear-gradient(#ffb347,#c25a08)}
+.win.place small{color:#cdb8ff}
+.win.place .wbody{align-content:start;overflow:auto}
+.win.place .lbl{color:#cdb8ff}
+.win.place .tabs{display:flex;gap:.5em}
+.prow{display:grid;grid-template-columns:3em 1fr auto;gap:.8em;align-items:center;padding:.55em .9em;background:linear-gradient(160deg,#4a2a8c,#3a2070);border-color:#ffd34e88;box-shadow:0 .25em 0 #0006,inset 0 .12em 0 #fff2;color:#fff}
+.prow img{width:3em}.prow b{font-family:var(--display)}.prow .sub{font-size:.85em;font-weight:700;color:#cdb8ff}
+.prow .gi{font-size:2.2em;text-align:center}.prow .owned{font:700 .9em var(--display);color:#3ddc84}
+/* ---------- minigames (edit, live) ---------- */
+.mini{position:absolute;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(10,4,28,.62)}
+.mini-card{width:72%;background:linear-gradient(180deg,#34195f,var(--plum2));border:.35em solid var(--gold);border-radius:1.6em;box-shadow:0 0 0 .25em #12082b,0 1.5em 3em #000a;color:#fff;padding:1.2em 1.4em;display:grid;gap:.9em}
+.mini-head{display:flex;align-items:center;gap:1em;flex-wrap:wrap}
+.mini-pill{display:inline-block;background:linear-gradient(#feC913,#fd6b09);border:.18em solid #fff;border-radius:999px;padding:.15em 1em;font:400 1.4em var(--title);text-shadow:0 .12em 0 #0008;transform:rotate(-1.5deg);box-shadow:0 .3em 0 #0006}
+.mini-pill.fb{background:linear-gradient(#5fe3d3,#139180)}
+.mini-sub{font-weight:700;color:#cdb8ff}
+.mini-foot{font-weight:700;color:#cdb8ff;font-size:.95em}
+.mini.shake .mini-card{animation:shk .18s}
+@keyframes shk{25%{transform:translateX(-.4em)}75%{transform:translateX(.4em)}}
+.mini.done .mini-card{border-color:#3ddc84}
+.ed-track{position:relative;height:7em;background:#0b0620;border-radius:1em;overflow:hidden;cursor:pointer;border:.15em solid #ffffff22}
+.ed-strip{position:absolute;left:30%;top:1em;bottom:1em;will-change:transform}
+.ed-seg{position:absolute;top:0;bottom:0;border-radius:.6em;border:.15em solid var(--navy);color:var(--navy);font:700 .95em var(--display);display:flex;align-items:center;justify-content:center;text-align:center;padding:0 .3em;box-shadow:inset 0 .3em 0 #fff6}
+.ed-mark{position:absolute;top:-.6em;width:1.1em;height:1.1em;margin-left:-.55em;background:#fff;border:.15em solid var(--navy);transform:rotate(45deg)}
+.ed-mark.hit{background:#3ddc84}.ed-mark.miss{background:#ef3b4f;opacity:.6}
+.ed-line{position:absolute;left:30%;top:0;bottom:0;width:.35em;margin-left:-.17em;background:var(--gold);box-shadow:0 0 1em var(--gold)}
+.ed-info{display:flex;align-items:center;gap:1em}
+.ed-bar{flex:1;height:1.1em;background:#0006;border-radius:1em;overflow:hidden}
+.ed-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#1ae5d5,#7c5cff)}
+.ed-pct{font:400 1.4em var(--title);min-width:3em}
+.ed-combo{font:700 1em var(--display);color:var(--gold);min-width:9em}
+.lv{width:78%}
+.lv-view,.lv-time{font:400 1.3em var(--title)}.lv-time{margin-left:auto;color:var(--gold)}
+.lv-hype{display:flex;align-items:center;gap:.8em;font-weight:800;color:#cdb8ff}
+.lv-hbar{flex:1;height:1em;background:#0006;border-radius:1em;overflow:hidden}.lv-hbar i{display:block;height:100%;width:60%;transition:width .2s}
+.lv-stage{display:grid;gap:.6em;height:24em}
+.lv-lane{position:relative;background:linear-gradient(#123a6e,#0b1a3a);border:.15em solid #7cc0ff55;border-radius:1em;overflow:hidden;cursor:pointer}
+.lv-lane.tap{background:linear-gradient(#1b5aa8,#0b1a3a)}
+.lv-lane.out{opacity:.45}
+.lv-notes{position:absolute;inset:0 0 4.2em}
+.lv-line{position:absolute;left:0;right:0;bottom:calc(4.2em + 12%);height:.3em;background:var(--gold);box-shadow:0 0 .8em var(--gold)}
+.lv-foot{position:absolute;left:0;right:0;bottom:0;height:4.2em;display:flex;align-items:center;gap:.4em;padding:0 .6em;background:#0008;font-weight:800}
+.lv-foot img{width:2.4em}.lv-foot b{font-family:var(--display)}.lv-foot .lv-stock{margin-left:auto;color:#cdb8ff;font-size:.85em}
+.lv-note{position:absolute;left:6%;right:6%;top:0;display:flex;gap:.4em;align-items:center;background:#fff;color:var(--navy);border:.15em solid var(--navy);border-radius:.8em;padding:.25em .5em;font-size:.85em;font-weight:700;line-height:1.15;box-shadow:0 .2em 0 #0006}
+.lv-note b{display:block;font-family:var(--display)}.lv-note small{display:block;color:var(--mute);font-size:.8em}
+.lv-note .av{flex:none;width:1.8em;height:1.8em;border-radius:50%;display:grid;place-items:center;font:700 .9em var(--display);border:.12em solid var(--navy)}
+.lv-note .av.q{background:#d8dbe8;color:#8a90a8}
+.lv-note.joy{background:#f1f1f6}
+.lv-note.cf{background:#3ddc84;transform:scale(1.08);transition:.2s}
+.lv-note.cfjoy{background:#ffd34e;transition:.2s}
+.lv-note.gone{opacity:.25;transition:.3s}

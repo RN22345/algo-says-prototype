@@ -12,7 +12,7 @@ export function lockedApp(id, title, icon, color) {
              : `<div class="card lk-pill">Unlocks at <b>Seller Rank ${L.rank}</b>. You are Rank ${S.rank}.</div><small>Finish missions and ship orders to rank up.</small>`}</div>`);
   };
   return {
-    id, title, icon, color, w: 38, h: 56,
+    id, title, icon, color, cat: "business", w: 38, h: 56,
     get rank() { return D.PC.locks[id].rank; },
     mount(el, win) { root = el; el.className = "dw-body"; win.setTitle(title, "Locked"); render(); },
     refresh: render,

@@ -17,7 +17,7 @@ registerActions({
 });
 
 export default {
-  id: "settings", title: "Settings", icon: "⚙️", color: "y", w: 34, h: 50,
+  id: "settings", title: "Settings", icon: "⚙️", color: "y", cat: "misc", w: 34, h: 50,
   mount(el, win) {
     root = el; win.setTitle("Settings", "Saved on this device"); el.className = "dw-body se";
     el.innerHTML = `<div class="se-opts"></div><div class="se-row"><label class="lbl" for="se-vol">Master volume</label><input id="se-vol" type="range" min="0" max="1" step="0.05" value="${prefs.volume}"></div>`;

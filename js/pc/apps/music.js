@@ -18,7 +18,7 @@ registerActions({
 });
 
 export default {
-  id: "music", title: "Music", icon: "🎵", color: "t", w: 36, h: 62,
+  id: "music", title: "Music", icon: "🎵", color: "t", cat: "games", w: 36, h: 62,
   mount(el, win) {
     root = el; win.setTitle("Music", "Three loops"); el.className = "dw-body mu";
     el.innerHTML = `<div class="mu-bars" aria-hidden="true">${Array.from({ length: 9 }, (_, i) => `<i style="--d:${(i * 0.13).toFixed(2)}s"></i>`).join("")}</div>

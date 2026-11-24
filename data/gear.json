@@ -1,0 +1,9 @@
+{
+  "_note": "Equipment opens features (D-70). Prices are teaching-model values.",
+  "phone":      {"n": "Old phone",        "price": 0,    "icon": "📱", "owned": true,  "does": "Film and post TikTik videos"},
+  "tripod":     {"n": "Phone tripod",     "price": 900,  "icon": "🗼", "does": "Opens FaceBazaar live selling (with 4+ items on your shelves)"},
+  "ringlight":  {"n": "Ring light",       "price": 1400, "icon": "💡", "does": "Filming and editing go faster"},
+  "camera":     {"n": "Second-hand camera","price": 6500, "icon": "📷", "does": "Opens YouView long videos"},
+  "editpc":     {"n": "Faster PC parts",  "price": 9000, "icon": "🖥️", "does": "Editing takes less time"},
+  "packstation":{"n": "Packing station",  "price": 4000, "icon": "📦", "does": "Packing takes less time. A helper can work here later"}
+}

@@ -3,7 +3,7 @@ import { S } from "../../state.js";
 import { saveGame } from "../../save.js";
 
 export default {
-  id: "notes", title: "Notes", icon: "📝", color: "y", w: 34, h: 56,
+  id: "notes", title: "Notes", icon: "📝", color: "y", cat: "misc", w: 34, h: 56,
   mount(el, win) {
     win.setTitle("Notes", "Saved with your game");
     el.className = "dw-body nt-body";

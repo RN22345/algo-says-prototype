@@ -9,7 +9,7 @@ version FINAL: the wrong one got posted
 (This file will not come back. It knows what it did.)`;
 
 export default {
-  id: "bin", title: "Recycle Bin", icon: "🗑️", color: "r", w: 40, h: 54,
+  id: "bin", title: "Recycle Bin", icon: "🗑️", color: "r", cat: "misc", w: 40, h: 54,
   mount(el, win) {
     win.setTitle("Recycle Bin", "1 item");
     el.className = "dw-body";
