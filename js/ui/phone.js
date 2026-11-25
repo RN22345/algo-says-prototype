@@ -20,6 +20,7 @@ export function initPhone() {
   tabsEl = h("div", { class: "ph-tabs" }); body = h("div", { class: "ph-body" });
   ph.append(h("div", { class: "ph-top" }, "📱 My phone", h("button", { class: "x", style: { width: "44px", height: "44px", borderRadius: "50%", border: "3px solid #fff", background: "var(--red)", color: "#fff", font: "400 26px var(--lil)", cursor: "pointer" }, type: "button", onClick: () => toggle(false) }, "×")), tabsEl, body);
   root.append(ph, h("div", { class: "peek", onClick: () => toggle() }, "📱"));
+  on("modal:open", () => { if (open) toggle(false); });
   on("phone:toggle", () => toggle()); on("phone:open", ({ tab: t }) => { if (t) tab = t; toggle(true); });
   for (const ev of ["inbox:changed", "order:paid", "order:packed", "order:shipped", "order:new", "order:returned", "lesson:new", "cash:changed", "post:created", "newgame"]) on(ev, () => { if (open) render(); });
 }

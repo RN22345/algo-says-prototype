@@ -1,0 +1,39 @@
+{
+ "img": [
+  "st_algo",
+  "st_bed",
+  "st_desk",
+  "st_filming",
+  "st_packing",
+  "st_shelves"
+ ],
+ "ph": [
+  "algo_happy",
+  "algo_neutral",
+  "algo_shocked",
+  "algo_talk",
+  "algo_unsure",
+  "icon_case",
+  "icon_earbuds",
+  "icon_fan",
+  "icon_plush",
+  "icon_powerbank",
+  "icon_tint",
+  "icon_tote",
+  "icon_tumbler",
+  "product_case",
+  "product_earbuds",
+  "product_fan",
+  "product_plush",
+  "product_powerbank",
+  "product_tint",
+  "product_tote",
+  "product_tumbler",
+  "viewer_01",
+  "viewer_02",
+  "viewer_03",
+  "viewer_04",
+  "viewer_05",
+  "viewer_06"
+ ]
+}

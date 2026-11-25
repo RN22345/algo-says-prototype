@@ -31,7 +31,12 @@ export function sceneEl(clip, product, opts = {}) {
     case "inuse": sc.append(pos(44, 52, base, prodArt), img("hand_open", { left: "50%", top: "44%", width: "46%", height: "auto", aspectRatio: "1" })); break;
     case "unbox": sc.append(img("parcel", { left: "26%", top: "40%", width: "50%", height: "auto", aspectRatio: "1", objectFit: "contain" }), pos(50, 40, base * 0.85, prodArt, { animation: "wiggle 2s ease-in-out infinite" }), img("hand_open", { left: "30%", top: "56%", width: "44%", height: "auto", aspectRatio: "1" })); break;
     case "talk": sc.append(img("player_bust", { left: "16%", top: "30%", width: "68%", height: "auto", aspectRatio: "1", objectFit: "contain" }), pos(78, 78, base, prodArt)); break;
-    case "price": sc.append(pos(26, 28, base, prodArt), h("div", { class: "pricecard", style: { fontSize: "inherit" } }, "₱" + product.price)); break;
+    case "price": sc.append(
+      h("div", { style: { position: "absolute", left: "8%", top: "7%", width: "84%", height: "36%", background: "#ffc61a", border: "0.25em solid #1c2452", borderRadius: "0.8em", display: "grid", placeItems: "center", transform: "rotate(-2deg)", boxShadow: "0 0.2em 0 rgba(0,0,0,.3)" } },
+        h("span", { style: { font: "400 3.6em/1 'Lilita One',var(--lil)", color: "#1c2452" } }, "₱" + product.price)),
+      pos(27, 72, 38, prodArt),
+      h("div", { style: { position: "absolute", left: "50%", top: "54%", width: "44%", height: "36%", background: "#1c2452", color: "#fff", borderRadius: "0.8em", border: "0.15em solid #fff", display: "grid", placeItems: "center", textAlign: "center", font: "400 2em/1.15 'Lilita One',var(--lil)", padding: "0.2em" } },
+        h("span", {}, "🛒 Tap the cart", h("br"), h("span", { style: { fontSize: ".75em", color: "#ffc61a" } }, "Link in bio")))); break;
     default: sc.append(pos(50, 50, base, prodArt));
   }
   // light

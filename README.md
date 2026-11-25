@@ -12,7 +12,7 @@ python -m http.server 8769
 Open http://localhost:8769/index.html. It must come from a static server (modules and `fetch` do not work from `file://`). It also runs on GitHub Pages.
 The page is a 1920x1080 stage scaled to the window (landscape phones too). Touch and mouse both work.
 While developing, use a server that sends `Cache-Control: no-store`, or hard reload. Browsers cache ES modules.
-Missing art files show up as 404 lines in the console. That is expected: the game draws a placeholder for each (see Art).
+The game reads `img/_have.json` (a list of the PNGs that exist) so it does not probe for missing art. After adding or removing art, run `python tools/make_have.py`. Open the page with `?probe=1` to probe every file instead (no list needed, but missing files show as 404 lines).
 
 Saves go to `localStorage` (key and version in `data/config.json`). A bad or old save resets cleanly.
 Dev panel: press the backtick key, or the small purple "D" button at the bottom right.
@@ -55,6 +55,7 @@ img/                  artist PNGs go here, named by art id (st_desk.png, product
 img/ph/               stand-in art (old product icons, Mr. Algo, avatars)
 js/core/              bus, data, state, clock, save, assets, fit, sound, actions
 js/sim/               viewerModel (pure), market, rivals, events, posts, orders, stock, money, energy, inbox, lessons, algo3, updates
+tools/make_have.py    writes img/_have.json
 js/ui/                room, hud, algo, phone, browser (+ sites/), studio, scene, editor, results, cards, door, bed, shelves, packing, stations, dev, ui
 PROGRESS.md           build log
 ```
@@ -89,7 +90,7 @@ PROGRESS.md           build log
 
 ## Art
 
-`js/core/assets.js` loads `img/<id>.png`, then `img/ph/<id>.png`, then draws a labelled placeholder. The artist drops PNGs into `img/` with the same names as `../05_ART/Artist_Asset_List.md`. No code change. `img/st_*.png` are the old iso sprites; `st_filming.png` is a composite of the old light and table. The door and window are drawn on the room walls and skewed to fit. The shoot preview is a flat camera image.
+`js/core/assets.js` loads `img/<id>.png` (if `_have.json` lists it), then `img/ph/<id>.png`, then draws a labelled placeholder. The artist drops PNGs into `img/` with the same names as `../05_ART/Artist_Asset_List.md`, then runs `python tools/make_have.py`. No code change. `img/st_*.png` are the old iso sprites; `st_filming.png` is a composite of the old light and table. The door and window are drawn on the room walls and skewed to fit. The shoot preview is a flat camera image.
 
 ## Market events (D-95 style, ON by default)
 

@@ -1,7 +1,7 @@
 /* UI helpers: h() builds DOM, modal() opens a card on the modal layer, toasts and floating text from bus events.
    Modals can pause the game clock (pause:true). Esc closes the top modal. */
 import { artEl } from "../core/assets.js";
-import { on } from "../core/bus.js";
+import { on, emit } from "../core/bus.js";
 import { pause, resume } from "../core/clock.js";
 import { getScale } from "../core/fit.js";
 
@@ -44,9 +44,9 @@ export function modal({ title, body, cls = "", pause: p = false, onClose, noClos
     el: card, body: bodyEl, back,
     setTitle: t => { card.querySelector(".card-t").textContent = t; },
     setBody: n => { clear(bodyEl); bodyEl.append(n); },
-    close: () => { if (!back.isConnected) return; back.remove(); resume(key); const i = stack.indexOf(api); if (i >= 0) stack.splice(i, 1); if (onClose) onClose(); }
+    close: () => { if (!back.isConnected) return; back.remove(); resume(key); const i = stack.indexOf(api); if (i >= 0) stack.splice(i, 1); if (onClose) onClose(); emit("modal:close", key); }
   };
-  stack.push(api); return api;
+  stack.push(api); emit("modal:open", key); return api;
 }
 export const topModal = () => stack[stack.length - 1];
 export function closeAll() { while (stack.length) stack[stack.length - 1].close(); }
@@ -56,12 +56,12 @@ function toast(msg, kind = "") {
   const box = document.getElementById("toasts"); if (!box) return;
   const el = h("div", { class: "toast " + kind }, msg); box.append(el);
   while (box.children.length > 4) box.firstChild.remove();
-  setTimeout(() => el.classList.add("out"), 2800); setTimeout(() => el.remove(), 3300);
+  setTimeout(() => el.classList.add("out"), 2800); setTimeout(() => { el.hidden = true; el.remove(); }, 3400);
 }
 function floatText({ text, kind = "gold", x = 300, y = 150 }) {
   const fx = document.getElementById("fx"); if (!fx) return;
   const el = h("div", { class: "float " + kind, style: { left: x + "px", top: y + "px" } }, text); fx.append(el);
-  setTimeout(() => el.remove(), 1500);
+  el.addEventListener("animationend", () => el.remove()); setTimeout(() => el.remove(), 1700);
 }
 export function initUI() {
   on("toast", toast); on("fx:float", floatText);

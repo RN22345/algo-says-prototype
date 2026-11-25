@@ -12,3 +12,4 @@
 - Step 8 done: dev panel, README.
 - Tested with all feature flags off and editorMode auto: no console errors.
 - Left: real touch test on a phone, audio check by ear, more art swaps when the artist delivers, longer balance playtest.
+- Round 2 fixes: Algo bubble never blocks clicks and auto-hides; spotlight follows the open PC to the Request sample button; PC opens on Affiliate at the start; phone closes when a window opens; fixed-height shot slots; clear price card; editor Play with playhead, overlays and full-width timeline; advice names locked gear; img/_have.json removes 404 noise.

@@ -1,7 +1,7 @@
 /* MR. ALGO'S 3 THINGS: one thing that worked, one that did not, one to try next, plus how sure he is, and any market event that explains the result.
    Pure read of a post (no state changes). Text comes from data/viewers.json "reasons". */
 import { D } from "../core/data.js";
-import { clamp } from "../core/state.js";
+import { clamp, siteOpen, hasGear } from "../core/state.js";
 
 const R = () => D.viewers.reasons;
 
@@ -32,7 +32,7 @@ export function three(post) {
   return {
     worked: best ? { id: best.id, label: R()[best.id].goodLabel || R()[best.id].label, text: R()[best.id].good } : { id: "none", label: "You posted", text: "You made a real video and posted it. Every seller starts here." },
     notWorked: worst ? { id: worst.id, label: R()[worst.id].label, text: R()[worst.id].bad } : { id: "none", label: "Nothing big", text: "No big problem showed up this time." },
-    tryNext: worst ? R()[worst.id].next : "Try a different product or the other site, and compare.",
+    tryNext: tryNext(post, worst),
     sure: sureness(post), context
   };
 }
@@ -40,4 +40,16 @@ export function three(post) {
 export function sureness(post) {
   const v = post.views;
   return Math.round(clamp(25 + 55 * v / (v + 250) + (post.done ? 12 : 0), 20, 95));
+}
+
+/* Advice that needs gear the player lacks says so. */
+function tryNext(post, worst) {
+  let t = worst ? R()[worst.id].next : "Try a different product or the other site, and compare.";
+  const other = Object.keys(D.SITE).find(s => s !== post.site);
+  if ((!worst || worst.id === "site") && other && !siteOpen(other)) {
+    const g = D.SITE[other].needsGear;
+    t = `The other site may fit better. ${D.SITE[other].name} needs a ${D.G[g].name.toLowerCase()} from the Tool Shop first.`;
+  }
+  if (worst && worst.id === "colour" && !hasGear("ringlight")) t += " A ring light from the Tool Shop gives true colour at any hour.";
+  return t;
 }

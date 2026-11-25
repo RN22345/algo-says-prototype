@@ -74,7 +74,7 @@ function slotBox(s) {
   const box = h("div", { class: "bslot" + (d.sel === s ? " sel" : ""), "data-slot": s, onClick: () => { d.sel = s; board2(); } },
     h("h4", {}, slotLabel(s)), h("div", { class: "hint" }, (D.sites.slotInfo[s] || {}).hint || ""));
   if (a) {
-    const th = h("div", { class: "thumb", style: { width: tt ? "120px" : "200px", height: tt ? "170px" : "112px", marginTop: ".2em" } }, (() => { const sc = sceneEl({ action: a.id, angle: "medium", light: "window", hour: 600 }, D.P[d.pid]); sc.style.fontSize = tt ? "5.5px" : "9px"; return sc; })());
+    const th = h("div", { class: "thumb", style: { width: tt ? "84px" : "200px", height: tt ? "150px" : "112px", marginTop: ".2em" } }, (() => { const sc = sceneEl({ action: a.id, angle: "medium", light: "window", hour: 600 }, D.P[d.pid]); sc.style.fontSize = tt ? "5.5px" : "9px"; return sc; })());
     box.append(th, h("b", { class: "lil", style: { fontSize: ".8em" } }, a.label), h("button", { class: "chip sm", type: "button", style: { fontSize: ".6em" }, onClick: e => { e.stopPropagation(); delete d.slots[s]; delete d.clips[s]; board2(); } }, "Clear"));
   } else box.append(h("div", { style: { margin: "auto", opacity: ".6", fontSize: ".7em" } }, "Drop a card here"));
   return box;

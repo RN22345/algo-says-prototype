@@ -3,7 +3,7 @@
    Events in: open:browser {tab}. Events out: open:studio. */
 import { D } from "../core/data.js";
 import { S, flag } from "../core/state.js";
-import { on } from "../core/bus.js";
+import { on, emit } from "../core/bus.js";
 import { h, clear, modal } from "./ui.js";
 import * as social from "./sites/social.js";
 import * as affiliate from "./sites/affiliate.js";
@@ -21,7 +21,7 @@ export function openBrowser(t) {
   tabsEl = h("div", { class: "btabs" }); view = h("div", { class: "bview" });
   win = modal({ title: "🖥️  Desk PC", cls: "pcwin", body: [tabsEl, view], onClose: () => { off.forEach(f => f()); off = []; win = null; } });
   off = EVS.map(ev => on(ev, () => { if (win) render(true); }));
-  render();
+  render(); emit("browser:opened", tab);
 }
 function render(keepScroll) {
   const sc = view.scrollTop;

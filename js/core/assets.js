@@ -7,15 +7,21 @@ const PAL = { navy: "#1c2452", card: "#26307a", gold: "#ffc61a", teal: "#2fd9cf"
 
 const tryImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 
+let have = null;   // { img:Set, ph:Set } from img/_have.json (tools/make_have.py). null = probe every file.
+async function loadManifest() {
+  if (/[?&]probe=1/.test(location.search)) return;
+  try { const r = await fetch("img/_have.json", { cache: "no-cache" }); if (r.ok) { const j = await r.json(); have = { img: new Set(j.img), ph: new Set(j.ph) }; } } catch (e) { have = null; }
+}
+
 async function load(id) {
-  let i = await tryImg(`img/${id}.png`);
+  let i = (!have || have.img.has(id)) ? await tryImg(`img/${id}.png`) : null;
   if (i) { urls[id] = i.src; imgs[id] = i; isPh[id] = false; return; }
-  i = await tryImg(`img/ph/${id}.png`);
+  i = (!have || have.ph.has(id)) ? await tryImg(`img/ph/${id}.png`) : null;
   if (i) { urls[id] = i.src; imgs[id] = i; isPh[id] = true; return; }
   urls[id] = paint(id); isPh[id] = true; imgs[id] = await tryImg(urls[id]);
 }
 
-export async function preload() { await Promise.all(Object.keys(D.assets).map(load)); }
+export async function preload() { await loadManifest(); await Promise.all(Object.keys(D.assets).map(load)); }
 export const artUrl = id => urls[id] || (urls[id] = paint(id));
 export const artImg = id => imgs[id] || null;
 export const isPlaceholder = id => isPh[id] !== false;
