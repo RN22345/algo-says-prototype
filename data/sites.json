@@ -1,0 +1,235 @@
+{
+  "_note": "The two fictional sites. patience and refill are seconds of viewer attention. waves are minutes after posting. Platform updates add deltas to these values at run time (key path = site.field).",
+  "sites": {
+    "tiktik": {
+      "name": "TikTik",
+      "format": "Short video",
+      "accent": "#2fd9cf",
+      "accent2": "#e8344f",
+      "logo": "site_tiktik",
+      "slots": [
+        "hook",
+        "show",
+        "proof",
+        "price"
+      ],
+      "titleMode": "caption",
+      "needsGear": null,
+      "patience": 2.4,
+      "refill": 1.7,
+      "novelty": 0.4,
+      "maxLen": 40,
+      "reach": {
+        "followRate": 0.5,
+        "seed": 14,
+        "strangers": 130,
+        "heatBase": 0.55,
+        "heatK": 2.0,
+        "perfBase": 0.4,
+        "perfK": 1.7,
+        "crowdK": 0.12
+      },
+      "waves": [
+        {
+          "id": "followers",
+          "at": 0,
+          "dur": 40,
+          "tau": 15
+        },
+        {
+          "id": "strangers",
+          "at": 30,
+          "dur": 240,
+          "tau": 70
+        }
+      ],
+      "doneAfter": 300,
+      "search": null,
+      "convMult": 1.0
+    },
+    "youview": {
+      "name": "YouView",
+      "format": "Long video",
+      "accent": "#ff7a1a",
+      "accent2": "#3a7bf0",
+      "logo": "site_youview",
+      "slots": [
+        "hook",
+        "show",
+        "demo",
+        "proof",
+        "price",
+        "outro"
+      ],
+      "titleMode": "search",
+      "needsGear": "camera",
+      "patience": 7.0,
+      "refill": 3.2,
+      "novelty": 0.8,
+      "maxLen": 90,
+      "reach": {
+        "followRate": 0.3,
+        "seed": 6,
+        "strangers": 110,
+        "heatBase": 0.45,
+        "heatK": 1.2,
+        "perfBase": 0.3,
+        "perfK": 1.9,
+        "crowdK": 0.06
+      },
+      "waves": [
+        {
+          "id": "subs",
+          "at": 90,
+          "dur": 420,
+          "tau": 200
+        },
+        {
+          "id": "recs",
+          "at": 150,
+          "dur": 900,
+          "tau": 400
+        }
+      ],
+      "doneAfter": 720,
+      "search": {
+        "base": 3.0,
+        "floor": 0.12,
+        "days": 6
+      },
+      "convMult": 0.7
+    }
+  },
+  "slotInfo": {
+    "hook": {
+      "label": "Hook",
+      "hint": "The first seconds. Say what this is."
+    },
+    "show": {
+      "label": "Show",
+      "hint": "Show the product."
+    },
+    "demo": {
+      "label": "Demo",
+      "hint": "Use it on camera."
+    },
+    "proof": {
+      "label": "Proof",
+      "hint": "Give a reason to trust it."
+    },
+    "price": {
+      "label": "Price",
+      "hint": "Say the price and how to get it."
+    },
+    "outro": {
+      "label": "Wrap-up",
+      "hint": "Close the video."
+    }
+  },
+  "stickers": [
+    {
+      "id": "none",
+      "label": "No sticker"
+    },
+    {
+      "id": "only2",
+      "label": "Only 2 left!",
+      "trap": true
+    }
+  ],
+  "filters": [
+    {
+      "id": "none",
+      "label": "No filter"
+    },
+    {
+      "id": "bright",
+      "label": "Bright"
+    },
+    {
+      "id": "vivid",
+      "label": "Vivid",
+      "trap": true
+    }
+  ],
+  "sounds": [
+    {
+      "id": "none",
+      "label": "No sound"
+    },
+    {
+      "id": "trending",
+      "label": "Trending beat"
+    },
+    {
+      "id": "calm",
+      "label": "Calm music"
+    }
+  ],
+  "browser": [
+    {
+      "id": "tiktik",
+      "label": "TikTik",
+      "kind": "site",
+      "site": "tiktik"
+    },
+    {
+      "id": "youview",
+      "label": "YouView",
+      "kind": "site",
+      "site": "youview"
+    },
+    {
+      "id": "affiliate",
+      "label": "Affiliate",
+      "kind": "affiliate"
+    },
+    {
+      "id": "hub",
+      "label": "Seller Hub",
+      "kind": "hub"
+    },
+    {
+      "id": "toolshop",
+      "label": "Tool Shop",
+      "kind": "toolshop"
+    },
+    {
+      "id": "supplier",
+      "label": "Supplier",
+      "kind": "supplier",
+      "flag": "tier2"
+    }
+  ],
+  "updates": [
+    {
+      "id": "tiktik_short",
+      "day": 2,
+      "hour": 14,
+      "rumourBeforeMin": 480,
+      "rumour": "Heard TikTik is changing how it shows new videos. Some creators say people swipe faster now.",
+      "news": "TikTik update: videos now get less time to hold viewers. The first seconds matter even more.",
+      "set": {
+        "tiktik.patience": -0.8
+      },
+      "outdates": [
+        "hook_flop",
+        "site_timing"
+      ]
+    },
+    {
+      "id": "youview_search",
+      "day": 4,
+      "hour": 10,
+      "rumourBeforeMin": 480,
+      "rumour": "Creators say YouView search is pushing videos with clear titles. Vague titles sink.",
+      "news": "YouView update: search now favours clear, specific titles.",
+      "set": {
+        "youview.search.base": 0.8
+      },
+      "outdates": [
+        "match_site"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "_note": "All times are game minutes unless a name says Hour. Clock values are minutes since midnight.",
+  "minPerRealSec": 1.5,
+  "simStep": 5,
+  "dayStart": 360,
+  "dayEnd": 1440,
+  "daylight": [420, 1020],
+  "napMinutes": 120,
+  "napEnergy": 35,
+  "passoutEnergy": 60,
+  "supplierCutoff": 1080,
+  "supplierArrive": 540,
+  "courierTimes": [660, 1020],
+  "codDelayMin": 720,
+  "orderExpireMin": 2880,
+  "rent": { "days": 7, "amount": 700, "lateFee": 150, "remindDaysBefore": 1 },
+  "energy": { "max": 100, "edit": 10, "post": 2, "pack": 3 },
+  "editMinutes": 40,
+  "postMinutes": 5,
+  "packMinutes": 10,
+  "returnDelayMin": [1500, 3000],
+  "analysisDelayMin": 30
+}

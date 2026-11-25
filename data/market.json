@@ -1,0 +1,38 @@
+{
+  "_note": "Hidden trend lifecycles, fizzles, virtual rivals and the signals they leave in the feeds. Times are game minutes. Rates are per game hour. The player never sees stages.",
+  "trends": {
+    "maxActive": 3,
+    "startEvery": [120, 300],
+    "fizzle": 0.4,
+    "stages": { "whisper": [150, 240], "rising": [210, 330], "peak": [150, 240], "crowded": [210, 330], "afterglow": [240, 420] },
+    "heat": { "calm": 0.12, "evergreen": 0.3, "whisper": 0.25, "rising": [0.3, 1.0], "peak": 1.0, "crowded": [1.0, 0.45], "afterglow": 0.2 },
+    "crowdWindow": 180,
+    "costHeat": 0.35,
+    "askPerHour": 0.9,
+    "rivalStage": { "calm": 0.15, "whisper": 0.35, "rising": 0.55, "peak": 1.2, "crowded": 1.5, "afterglow": 0.3 },
+    "ambientPerHour": 2.2,
+    "siteFit": {
+      "tiktik":  { "calm": 0.2, "whisper": 0.5, "rising": 0.75, "peak": 1.0, "crowded": 0.5, "afterglow": 0.15 },
+      "youview": { "calm": 0.3, "whisper": 0.45, "rising": 1.0, "peak": 0.75, "crowded": 0.55, "afterglow": 0.7 }
+    }
+  },
+  "rivals": [
+    { "id": "kiko",  "n": "Kiko's Cart",       "habit": "Jumps on new items early",        "stages": ["whisper", "rising"],       "site": "tiktik",  "rate": 0.8, "fol": 900 },
+    { "id": "tess",  "n": "Trendy Tess",       "habit": "Posts what is rising",            "stages": ["rising", "peak"],          "site": "tiktik",  "rate": 0.8, "fol": 2400 },
+    { "id": "mura",  "n": "Mura Lang PH",      "habit": "Copies hot items, cheaper",       "stages": ["peak", "crowded"],         "site": "tiktik",  "rate": 1.1, "fol": 1500 },
+    { "id": "big",   "n": "BigBox Bazaar",     "habit": "Floods the feed at the peak",     "stages": ["peak", "crowded"],         "site": "tiktik",  "rate": 0.8, "fol": 6000 },
+    { "id": "ate",   "n": "Ate Rina Reviews",  "habit": "Careful reviews people search for", "stages": ["rising", "afterglow"],   "site": "youview", "rate": 0.4, "fol": 3200 },
+    { "id": "budol", "n": "Budol Finds",       "habit": "Posts everything, all the time",  "stages": ["crowded", "afterglow", "calm"], "site": "tiktik", "rate": 0.5, "fol": 700 }
+  ],
+  "creators": ["Ana Reyes", "Mark.finds", "Joy Shops", "Kiko_PH", "Bea Bargains", "Jen's Corner", "Paolo Picks", "Mika Haul", "Rico Reviews", "Lea Loves", "Trish Tips", "Jomar Deals"],
+  "styles": ["Review", "Unboxing", "Before and after", "Hands-on", "Haul", "Try-on"],
+  "askNames": ["Ana", "Mark", "Joy", "Kiko", "Bea", "Jen", "Paolo", "Mika", "Rico", "Lea"],
+  "asks": ["Hi po! May {n} po kayo?", "Saan po makakabili ng {n}?", "Meron pa po ba kayong {n}?", "Nakita ko yung {n} sa feed, available po?"],
+  "topComments": {
+    "real":    ["where to buy??", "link po?", "ordered mine!", "everyone is asking where to get this"],
+    "peak":    ["so many sellers have this now", "saw this three times today", "everyone has this lol"],
+    "crowded": ["same video again", "saw this already", "too many of these now"],
+    "fizzle":  ["same video again?", "why is this only here?", "only one account posts this"],
+    "calm":    ["nice", "cute", "ok po"]
+  }
+}

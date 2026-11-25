@@ -1,0 +1,11 @@
+{
+  "_note": "Equipment opens features (D-70). unlocks.light, unlocks.site, unlocks.tier2. effects.shootMult scales shoot minutes and energy.",
+  "gear": [
+    { "id": "ringlight", "name": "Ring light", "price": 1200, "art": "gear_ringlight", "emoji": "💡",
+      "does": "True colour at any hour. Faster shooting.", "unlocks": { "light": "ring" }, "effects": { "shootMult": 0.8 } },
+    { "id": "camera", "name": "Second-hand camera", "price": 4500, "art": "gear_camera", "emoji": "📷",
+      "does": "Opens YouView long videos.", "unlocks": { "site": "youview" } },
+    { "id": "shelves", "name": "Shelves and packing table", "price": 3500, "art": "st_shelves", "emoji": "📦",
+      "does": "Opens reselling: buy stock, shelve it, pack orders.", "unlocks": { "tier2": true } }
+  ]
+}

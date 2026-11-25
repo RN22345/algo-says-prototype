@@ -1,0 +1,335 @@
+{
+ "_note": "Every art id from 05_ART/Artist_Asset_List.md. The game loads img/<id>.png, then img/ph/<id>.png, then draws a labelled placeholder. Drop real PNGs into img/ with the same name.",
+ "assets": {
+  "product_earbuds": {
+   "w": 512,
+   "h": 512,
+   "label": "product_earbuds",
+   "kind": "product"
+  },
+  "icon_earbuds": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_earbuds",
+   "kind": "icon"
+  },
+  "product_case": {
+   "w": 512,
+   "h": 512,
+   "label": "product_case",
+   "kind": "product"
+  },
+  "icon_case": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_case",
+   "kind": "icon"
+  },
+  "product_powerbank": {
+   "w": 512,
+   "h": 512,
+   "label": "product_powerbank",
+   "kind": "product"
+  },
+  "icon_powerbank": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_powerbank",
+   "kind": "icon"
+  },
+  "product_tint": {
+   "w": 512,
+   "h": 512,
+   "label": "product_tint",
+   "kind": "product"
+  },
+  "icon_tint": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_tint",
+   "kind": "icon"
+  },
+  "product_fan": {
+   "w": 512,
+   "h": 512,
+   "label": "product_fan",
+   "kind": "product"
+  },
+  "icon_fan": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_fan",
+   "kind": "icon"
+  },
+  "product_tote": {
+   "w": 512,
+   "h": 512,
+   "label": "product_tote",
+   "kind": "product"
+  },
+  "icon_tote": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_tote",
+   "kind": "icon"
+  },
+  "product_tumbler": {
+   "w": 512,
+   "h": 512,
+   "label": "product_tumbler",
+   "kind": "product"
+  },
+  "icon_tumbler": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_tumbler",
+   "kind": "icon"
+  },
+  "product_plush": {
+   "w": 512,
+   "h": 512,
+   "label": "product_plush",
+   "kind": "product"
+  },
+  "icon_plush": {
+   "w": 128,
+   "h": 128,
+   "label": "icon_plush",
+   "kind": "icon"
+  },
+  "product_tint_before": {
+   "w": 512,
+   "h": 512,
+   "label": "product_tint_before",
+   "kind": "product"
+  },
+  "product_tint_after": {
+   "w": 512,
+   "h": 512,
+   "label": "product_tint_after",
+   "kind": "product"
+  },
+  "algo_neutral": {
+   "w": 512,
+   "h": 512,
+   "label": "algo_neutral",
+   "kind": "algo"
+  },
+  "algo_talk": {
+   "w": 512,
+   "h": 512,
+   "label": "algo_talk",
+   "kind": "algo"
+  },
+  "algo_happy": {
+   "w": 512,
+   "h": 512,
+   "label": "algo_happy",
+   "kind": "algo"
+  },
+  "algo_unsure": {
+   "w": 512,
+   "h": 512,
+   "label": "algo_unsure",
+   "kind": "algo"
+  },
+  "algo_shocked": {
+   "w": 512,
+   "h": 512,
+   "label": "algo_shocked",
+   "kind": "algo"
+  },
+  "room_bg": {
+   "w": 1920,
+   "h": 1080,
+   "label": "room_bg",
+   "kind": "room"
+  },
+  "room_window_day": {
+   "w": 340,
+   "h": 320,
+   "label": "room_window_day",
+   "kind": "window"
+  },
+  "room_window_night": {
+   "w": 340,
+   "h": 320,
+   "label": "room_window_night",
+   "kind": "window"
+  },
+  "st_desk": {
+   "w": 520,
+   "h": 420,
+   "label": "st_desk",
+   "kind": "station"
+  },
+  "st_filming": {
+   "w": 420,
+   "h": 480,
+   "label": "st_filming",
+   "kind": "station"
+  },
+  "st_shelves": {
+   "w": 380,
+   "h": 520,
+   "label": "st_shelves",
+   "kind": "station"
+  },
+  "st_packing": {
+   "w": 420,
+   "h": 320,
+   "label": "st_packing",
+   "kind": "station"
+  },
+  "st_door": {
+   "w": 260,
+   "h": 520,
+   "label": "st_door",
+   "kind": "station"
+  },
+  "st_bed": {
+   "w": 520,
+   "h": 300,
+   "label": "st_bed",
+   "kind": "station"
+  },
+  "st_algo": {
+   "w": 220,
+   "h": 260,
+   "label": "st_algo",
+   "kind": "station"
+  },
+  "bg_wall": {
+   "w": 960,
+   "h": 540,
+   "label": "bg_wall",
+   "kind": "bg"
+  },
+  "bg_desk_top": {
+   "w": 960,
+   "h": 540,
+   "label": "bg_desk_top",
+   "kind": "bg"
+  },
+  "bg_bedroom": {
+   "w": 960,
+   "h": 540,
+   "label": "bg_bedroom",
+   "kind": "bg"
+  },
+  "hand_hold": {
+   "w": 400,
+   "h": 400,
+   "label": "hand_hold",
+   "kind": "hand"
+  },
+  "hand_pinch": {
+   "w": 400,
+   "h": 400,
+   "label": "hand_pinch",
+   "kind": "hand"
+  },
+  "hand_point": {
+   "w": 400,
+   "h": 400,
+   "label": "hand_point",
+   "kind": "hand"
+  },
+  "hand_open": {
+   "w": 400,
+   "h": 400,
+   "label": "hand_open",
+   "kind": "hand"
+  },
+  "player_bust": {
+   "w": 512,
+   "h": 512,
+   "label": "player_bust",
+   "kind": "bust"
+  },
+  "logo": {
+   "w": 1200,
+   "h": 500,
+   "label": "logo",
+   "kind": "logo"
+  },
+  "gear_ringlight": {
+   "w": 256,
+   "h": 256,
+   "label": "gear_ringlight",
+   "kind": "gear"
+  },
+  "gear_camera": {
+   "w": 256,
+   "h": 256,
+   "label": "gear_camera",
+   "kind": "gear"
+  },
+  "parcel": {
+   "w": 256,
+   "h": 256,
+   "label": "parcel",
+   "kind": "item"
+  },
+  "stock_box": {
+   "w": 256,
+   "h": 256,
+   "label": "stock_box",
+   "kind": "item"
+  },
+  "courier": {
+   "w": 256,
+   "h": 384,
+   "label": "courier",
+   "kind": "item"
+  },
+  "site_tiktik": {
+   "w": 400,
+   "h": 120,
+   "label": "site_tiktik",
+   "kind": "site"
+  },
+  "site_youview": {
+   "w": 400,
+   "h": 120,
+   "label": "site_youview",
+   "kind": "site"
+  },
+  "viewer_01": {
+   "w": 128,
+   "h": 128,
+   "label": "viewer_01",
+   "kind": "avatar"
+  },
+  "viewer_02": {
+   "w": 128,
+   "h": 128,
+   "label": "viewer_02",
+   "kind": "avatar"
+  },
+  "viewer_03": {
+   "w": 128,
+   "h": 128,
+   "label": "viewer_03",
+   "kind": "avatar"
+  },
+  "viewer_04": {
+   "w": 128,
+   "h": 128,
+   "label": "viewer_04",
+   "kind": "avatar"
+  },
+  "viewer_05": {
+   "w": 128,
+   "h": 128,
+   "label": "viewer_05",
+   "kind": "avatar"
+  },
+  "viewer_06": {
+   "w": 128,
+   "h": 128,
+   "label": "viewer_06",
+   "kind": "avatar"
+  }
+ }
+}

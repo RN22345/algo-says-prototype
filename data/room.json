@@ -1,0 +1,16 @@
+{
+  "_note": "The room is placed only from this file. Stage is 1920x1080. view.type iso draws a floor diamond and two back walls from iso (grid N, tile half-size tw/th, origin ox/oy, wall height). A station is placed by tile [gx,gy,fw,fd] (iso) or by explicit x,y (anchor = bottom centre of the sprite, room pixels). hit is optional: {type:rect,x,y,w,h} or {type:poly,points:[[x,y]...]}; if missing, an iso diamond of the footprint (or the art box) is used. mount puts art on a wall face: {face:'x'|'y', t:[from,to] along the wall in tiles, z:[bottom,top] in tiles of height}. face x = left wall, face y = right wall. z orders drawing (low first).",
+  "view": { "type": "iso", "N": 6, "tw": 100, "th": 50, "ox": 1000, "oy": 370, "wallH": 270, "zUnit": 110 },
+  "colors": { "floorA": "#f1d9a8", "floorB": "#ebcf98", "wallL": "#bcd4f5", "wallR": "#d7e5fb", "wallTop": "#ffffff", "floorEdge": "#c9a76a", "base": "#8aa6d6" },
+  "bg": { "art": "room_bg", "x": 0, "y": 0, "w": 1920, "h": 1080 },
+  "window": { "mount": { "face": "x", "t": [2.5, 4.3], "z": [1.0, 2.5] }, "dayArt": "room_window_day", "nightArt": "room_window_night", "z": 1 },
+  "stations": [
+    { "id": "shelves", "label": "Shelves", "art": "st_shelves", "tile": [0.15, 0.2, 1.0, 1.8], "scale": 0.82, "dy": 6, "z": 2, "opens": "shelves", "flag": "tier2", "requiresGear": "shelves", "emoji": "📚", "color": "#d9a066" },
+    { "id": "door", "label": "Front door", "art": "st_door", "mount": { "face": "y", "t": [1.05, 2.05], "z": [0, 2.1] }, "z": 2, "opens": "door", "emoji": "🚪", "color": "#8a5a2b" },
+    { "id": "algo", "label": "Mr. Algo", "art": "st_algo", "tile": [2.25, 0.35, 0.8, 0.8], "scale": 0.52, "dy": 4, "z": 4, "opens": "algo", "emoji": "🤖", "color": "#2fd9cf" },
+    { "id": "desk", "label": "Desk PC", "art": "st_desk", "tile": [3.4, 0.15, 2.1, 1.8], "scale": 0.82, "dy": 8, "z": 3, "opens": "pc", "emoji": "🖥️", "color": "#26307a" },
+    { "id": "packing", "label": "Packing table", "art": "st_packing", "tile": [1.2, 2.2, 2.0, 1.5], "scale": 0.62, "dy": 6, "z": 5, "opens": "packing", "flag": "tier2", "requiresGear": "shelves", "emoji": "📦", "color": "#ff7a1a" },
+    { "id": "filming", "label": "Filming corner", "art": "st_filming", "tile": [3.6, 3.2, 1.8, 1.8], "scale": 0.7, "dy": 6, "z": 7, "opens": "studio", "emoji": "🎬", "color": "#b744c9" },
+    { "id": "bed", "label": "Bed", "art": "st_bed", "tile": [0.2, 3.9, 2.0, 2.0], "scale": 0.74, "dy": 6, "z": 8, "opens": "bed", "emoji": "🛏️", "color": "#3a7bf0" }
+  ]
+}

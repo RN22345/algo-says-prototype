@@ -1,0 +1,51 @@
+{
+  "_note": "Feature flags and start values. Turning a flag off must leave a working game. The dev panel can override flags at run time.",
+  "saveVersion": 1,
+  "storageKey": "algosays.proto7",
+  "features": {
+    "energy": true,
+    "rent": true,
+    "honestyTrap": true,
+    "tier2": true,
+    "platformUpdates": true,
+    "playbook": true,
+    "algoSays": true,
+    "intro": true,
+    "sound": true,
+    "calendarEvents": true,
+    "randomEvents": true
+  },
+  "editorMode": "blocks",
+  "editorModes": [
+    "blocks",
+    "auto"
+  ],
+  "start": {
+    "cash": 1500,
+    "energy": 100,
+    "trust": 50,
+    "followers": {
+      "tiktik": 12,
+      "youview": 3
+    },
+    "seedTrends": [
+      {
+        "p": "tote",
+        "stage": "rising",
+        "t": 0.35
+      },
+      {
+        "p": "tint",
+        "stage": "whisper",
+        "t": 0.5,
+        "fz": false
+      },
+      {
+        "p": "plush",
+        "stage": "whisper",
+        "t": 0.2,
+        "fz": true
+      }
+    ]
+  }
+}

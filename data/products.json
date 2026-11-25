@@ -1,0 +1,30 @@
+{
+  "_note": "Add a product here and it appears in the catalogue, supplier, sims and shoot preview. art and icon are asset ids (data/assets.json).",
+  "products": [
+    { "id": "earbuds", "name": "Wireless earbuds", "short": "Earbuds", "traits": ["function", "scale"], "price": 499, "cost": 280, "commission": 0.12, "sampleDelay": 180,
+      "art": "product_earbuds", "icon": "icon_earbuds", "color": "#9446e0", "emoji": "🎧", "shiny": true, "evergreen": true,
+      "searchWords": ["earbuds", "wireless", "bluetooth", "review"], "tags": ["#tech", "#review", "#gadgets"], "sizeNote": "Case fits a palm",
+      "pack": 6 },
+    { "id": "case", "name": "Phone case", "short": "Phone case", "traits": ["colour"], "price": 149, "cost": 60, "commission": 0.2, "sampleDelay": 150,
+      "art": "product_case", "icon": "icon_case", "color": "#ef3b4f", "emoji": "📱", "shiny": false, "evergreen": true,
+      "colourLook": ["red", "pink"], "searchWords": ["phone", "case", "cover", "cute"], "tags": ["#ootd", "#cute", "#phonecase"], "pack": 12 },
+    { "id": "powerbank", "name": "Power bank", "short": "Power bank", "traits": ["function"], "price": 699, "cost": 420, "commission": 0.1, "sampleDelay": 210,
+      "art": "product_powerbank", "icon": "icon_powerbank", "color": "#2cc8b6", "emoji": "🔋", "shiny": true,
+      "searchWords": ["power", "bank", "powerbank", "charger", "review"], "tags": ["#tech", "#commute", "#review"], "pack": 4 },
+    { "id": "tint", "name": "Lip tint", "short": "Lip tint", "traits": ["colour", "transformation"], "price": 199, "cost": 90, "commission": 0.22, "sampleDelay": 150,
+      "art": "product_tint", "artBefore": "product_tint_before", "artAfter": "product_tint_after", "icon": "icon_tint", "color": "#ff8a2a", "emoji": "💄", "shiny": false,
+      "colourLook": ["brown", "orange"], "searchWords": ["lip", "tint", "lipstick", "shade", "review"], "tags": ["#beauty", "#ootd", "#lips"], "pack": 12 },
+    { "id": "fan", "name": "Mini handheld fan", "short": "Mini fan", "traits": ["function"], "price": 299, "cost": 140, "commission": 0.15, "sampleDelay": 180,
+      "art": "product_fan", "icon": "icon_fan", "color": "#5fe3d3", "emoji": "🌀", "shiny": false,
+      "searchWords": ["mini", "fan", "handheld", "portable", "review"], "tags": ["#commute", "#summer", "#gadgets"], "pack": 6 },
+    { "id": "tote", "name": "Tote bag", "short": "Tote bag", "traits": ["colour", "scale"], "price": 249, "cost": 100, "commission": 0.18, "sampleDelay": 180,
+      "art": "product_tote", "icon": "icon_tote", "color": "#ffc928", "emoji": "👜", "shiny": false,
+      "colourLook": ["yellow", "orange"], "searchWords": ["tote", "bag", "canvas", "school"], "tags": ["#ootd", "#school", "#bag"], "sizeNote": "Fits a laptop", "pack": 6 },
+    { "id": "tumbler", "name": "Tumbler", "short": "Tumbler", "traits": ["mood", "function"], "price": 399, "cost": 180, "commission": 0.15, "sampleDelay": 210,
+      "art": "product_tumbler", "icon": "icon_tumbler", "color": "#ef3b4f", "emoji": "🥤", "shiny": true,
+      "searchWords": ["tumbler", "bottle", "cold", "hot", "review"], "tags": ["#aesthetic", "#school", "#review"], "pack": 6 },
+    { "id": "plush", "name": "Plush keychain", "short": "Plush", "traits": ["mood", "scale"], "price": 129, "cost": 45, "commission": 0.25, "sampleDelay": 150,
+      "art": "product_plush", "icon": "icon_plush", "color": "#b97a3d", "emoji": "🧸", "shiny": false,
+      "searchWords": ["plush", "keychain", "cute", "gift"], "tags": ["#cute", "#gift", "#aesthetic"], "sizeNote": "Palm sized", "pack": 12 }
+  ]
+}

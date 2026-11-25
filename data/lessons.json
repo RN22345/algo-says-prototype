@@ -1,0 +1,21 @@
+{
+  "_note": "ALGO SAYS cards. A lesson fires the first time its conditions hold at the moment named by when (analysis = first results, done = the post ended, return = a return came in, update = after a platform update). if = all conditions [fact, op, value]. any = a list of condition lists, one must hold. Facts are built in js/sim/lessons.js.",
+  "lessons": [
+    { "id": "reach_low", "title": "Posting is not enough", "text": "Posting is not enough. Timing and fit decide reach.", "when": "done",
+      "if": [["views", "<", 260]], "mood": "unsure" },
+    { "id": "site_timing", "title": "Each site pays differently", "text": "Short videos pay fast and fade. Long videos pay slow and last.", "when": "done",
+      "if": [["views", ">=", 1]], "mood": "talk" },
+    { "id": "match_site", "title": "Match the moment", "text": "Match the site to the moment.", "when": "done",
+      "any": [[["siteFit", "<", 0.5]], [["bothSites", "==", true]]], "mood": "talk" },
+    { "id": "views_not_sales", "title": "Views are not sales", "text": "Views are attention. Sales need answers, trust, and stock.", "when": "done",
+      "any": [[["views", ">=", 300], ["conv", "<", 0.012]], [["missed", ">=", 2]]], "mood": "unsure" },
+    { "id": "adapt", "title": "Algorithms change", "text": "Algorithms change. Test, do not trust blindly.", "when": "analysis",
+      "if": [["afterUpdate", "==", true]], "mood": "talk" },
+    { "id": "hook_flop", "title": "The first seconds", "text": "The first seconds must say what this is.", "when": "analysis",
+      "if": [["hookLeft", ">=", 0.3]], "mood": "shocked" },
+    { "id": "light_colour", "title": "True light", "text": "Colour products need true light.", "when": "analysis",
+      "if": [["colourDoubt", "==", true]], "mood": "unsure" },
+    { "id": "honesty", "title": "Honesty", "text": "Misleading content wins clicks and loses buyers.", "when": "return",
+      "if": [["returns", ">=", 1], ["misleading", "==", true]], "mood": "shocked" }
+  ]
+}

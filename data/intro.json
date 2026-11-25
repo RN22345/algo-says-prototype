@@ -1,0 +1,20 @@
+{
+  "_note": "Guided start and Mr. Algo hints. Each step: say = lines, spot = station id to spotlight, wait = event that ends the step (stationOpen:<id>, sample:requested, sample:taken, studio:open). Hints are checked top to bottom; the first whose conditions all hold is shown when you ask Mr. Algo.",
+  "steps": [
+    { "say": ["Hi. I am Mr. Algo. I used to be a smart speaker.", "I know exactly how the algorithm works. Trust me.", "You have 1,500 pesos and a phone. Let's sell something."], "mood": "talk" },
+    { "say": ["Go to the desk PC. Open the Affiliate site.", "Pick a product and request a free sample."], "spot": "desk", "wait": "sample:requested", "mood": "neutral" },
+    { "say": ["Good. Samples take a few hours to arrive. Time keeps moving.", "Check the feeds on the PC or phone while you wait. Watch what sellers post."], "mood": "happy" },
+    { "say": ["The sample is at the door. Take it in."], "spot": "door", "wait": "sample:taken", "when": "doorSample", "mood": "talk" },
+    { "say": ["Now film it at the filming corner. Plan your shots, shoot them, edit, and post."], "spot": "filming", "wait": "studio:open", "mood": "talk" }
+  ],
+  "hints": [
+    { "if": ["!hasSampleEver", "!samplePending"], "text": "Open the desk PC. Go to the Affiliate site. Request a sample.", "mood": "talk" },
+    { "if": ["samplePending"], "text": "Your sample is on its way. Check the feeds while you wait, or nap to pass time.", "mood": "neutral" },
+    { "if": ["doorItems"], "text": "Something is waiting at the door. Take it in.", "mood": "talk" },
+    { "if": ["!hasPost", "hasProduct"], "text": "Film your product at the filming corner. Four short clips, then edit and post.", "mood": "talk" },
+    { "if": ["livePost"], "text": "Your post is live. Open the PC, then a site, then My posts to watch it.", "mood": "neutral" },
+    { "if": ["donePost"], "text": "Open the results of your last post. I have three things to tell you.", "mood": "happy" },
+    { "if": ["lowEnergy"], "text": "You are tired. Nap or sleep at the bed.", "mood": "unsure" },
+    { "if": [], "text": "Read the feeds. Look for products many people are asking about.", "mood": "neutral" }
+  ]
+}

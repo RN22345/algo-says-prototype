@@ -1,0 +1,283 @@
+{
+  "_note": "Viewer types, who comes from where, comment words, sound effects and the reason table used by Mr. Algo (3 Things). Add a type or a reason here.",
+  "types": {
+    "deal": {
+      "label": "Deal hunter",
+      "w": {
+        "what": 0.12,
+        "why": 0.12,
+        "works": 0.14,
+        "trust": 0.14,
+        "get": 0.48
+      },
+      "patience": 1.0,
+      "buy": 1.25
+    },
+    "scroll": {
+      "label": "Scroller",
+      "w": {
+        "what": 0.36,
+        "why": 0.34,
+        "works": 0.08,
+        "trust": 0.06,
+        "get": 0.16
+      },
+      "patience": 0.8,
+      "buy": 0.65
+    },
+    "skeptic": {
+      "label": "Skeptic",
+      "w": {
+        "what": 0.1,
+        "why": 0.1,
+        "works": 0.34,
+        "trust": 0.36,
+        "get": 0.1
+      },
+      "patience": 1.25,
+      "buy": 0.9
+    },
+    "fan": {
+      "label": "Trend fan",
+      "w": {
+        "what": 0.2,
+        "why": 0.4,
+        "works": 0.08,
+        "trust": 0.1,
+        "get": 0.22
+      },
+      "patience": 0.95,
+      "buy": 1.1
+    }
+  },
+  "mix": {
+    "followers": {
+      "deal": 0.15,
+      "scroll": 0.15,
+      "skeptic": 0.1,
+      "fan": 0.6
+    },
+    "tiktik": {
+      "deal": 0.2,
+      "scroll": 0.4,
+      "skeptic": 0.1,
+      "fan": 0.3
+    },
+    "youview": {
+      "deal": 0.2,
+      "scroll": 0.1,
+      "skeptic": 0.45,
+      "fan": 0.25
+    },
+    "search": {
+      "deal": 0.3,
+      "scroll": 0.0,
+      "skeptic": 0.5,
+      "fan": 0.2
+    }
+  },
+  "soundMods": {
+    "trending": {
+      "fan": 1.3,
+      "scroll": 1.05
+    },
+    "calm": {
+      "skeptic": 1.15
+    },
+    "none": {
+      "scroll": 0.9,
+      "fan": 0.9
+    }
+  },
+  "model": {
+    "step": 0.25,
+    "drain": 1.0,
+    "refillScale": 1.0,
+    "repeatAnswer": 0.25,
+    "buyBase": 0.12,
+    "buyPower": 1.5,
+    "noPriceMult": 0.15,
+    "captionBoost": 0.1,
+    "brightBoost": 1.06,
+    "vividWhy": 1.2,
+    "vividConv": 1.25,
+    "stickerWhy": 1.12,
+    "stickerConv": 1.2,
+    "priceOverlay": 0.6,
+    "answerLostMult": 0.15,
+    "answerEdgeMult": 0.65,
+    "answerEdge": 0.4,
+    "convHeat": 0.55,
+    "convHeatBase": 0.65,
+    "trustBase": 0.7,
+    "trustSpan": 0.6,
+    "returnBase": 0.02,
+    "returnColour": 0.22,
+    "returnSticker": 0.12,
+    "returnCap": 0.6,
+    "cohortFollowers": 120,
+    "cohortStrangers": 240,
+    "cohortSearch": 120,
+    "followersPatience": 1.25,
+    "tagBonus": 0.05,
+    "tagCap": 2,
+    "commentMinShare": 0.06,
+    "maxComments": 10,
+    "refillBase": 0.15,
+    "refillW": 1.2,
+    "leaveWeightMin": 0.18,
+    "interestMin": 0.45,
+    "interestMax": 1.6,
+    "drainCommitted": 0.55,
+    "patJitterMin": 0.35,
+    "patJitterMax": 1.65,
+    "answerMin": 0.2,
+    "noWhatMult": 0.1
+  },
+  "askText": {
+    "what": [
+      "what is this?",
+      "wait, what is this?",
+      "what am I looking at?"
+    ],
+    "why": [
+      "why would I need this?",
+      "ok but why?",
+      "not sure I need this"
+    ],
+    "works": [
+      "does it actually work?",
+      "does it really work??",
+      "how well does it work?"
+    ],
+    "trust": [
+      "legit ba?",
+      "is this legit?",
+      "is it real?"
+    ],
+    "get": [
+      "how much??",
+      "price po?",
+      "where to buy?",
+      "link?"
+    ],
+    "deadair": [
+      "hello? anything?",
+      "nothing is happening",
+      "so slow"
+    ],
+    "size": [
+      "how big is it?",
+      "what size is it?"
+    ],
+    "colour": [
+      "is it {a} or {b}?",
+      "what colour is it really?",
+      "looks {a} here, is it {b}?"
+    ],
+    "thanks": [
+      "mine! ordered",
+      "just ordered!",
+      "need this",
+      "ordered na po"
+    ]
+  },
+  "reviewText": {
+    "colour": "Not the colour in the video.",
+    "sticker": "It said only 2 left. It was not true.",
+    "plain": "Changed my mind."
+  },
+  "reasons": {
+    "deadair": {
+      "label": "Left in dead air",
+      "bad": "People left while nothing happened on screen.",
+      "good": "You cut the dead air. People stayed.",
+      "next": "Trim the quiet start and end of each clip. Keep the answer.",
+      "goodLabel": "Tight editing"
+    },
+    "what": {
+      "label": "Did not know what it was",
+      "bad": "People left without knowing what the product was.",
+      "good": "The first seconds said what it was.",
+      "next": "Open with a clear shot of the product. Use a hold-up or close-up as the hook.",
+      "goodLabel": "Clear opening"
+    },
+    "why": {
+      "label": "No reason to care",
+      "bad": "People saw it but did not see why they would want it.",
+      "good": "People saw why they would want it.",
+      "next": "Show a result or a feeling. Try before and after, or in use.",
+      "goodLabel": "A reason to care"
+    },
+    "works": {
+      "label": "Not sure it works",
+      "bad": "People wanted to see it work and did not.",
+      "good": "The demo showed that it works.",
+      "next": "Add a demo in hands for function products. Show size with a hand.",
+      "goodLabel": "Showed it works"
+    },
+    "trust": {
+      "label": "Did not trust it",
+      "bad": "People did not trust what they saw.",
+      "good": "People trusted the video.",
+      "next": "Show the real product in clear light. Unbox it or talk to camera.",
+      "goodLabel": "Built trust"
+    },
+    "get": {
+      "label": "No price, no link",
+      "bad": "People wanted to buy but never saw the price.",
+      "good": "The price was easy to find.",
+      "next": "Add a price card, or show the price on the first or last clip.",
+      "goodLabel": "Price was easy to find"
+    },
+    "length": {
+      "label": "Moved on",
+      "bad": "Some viewers had what they came for and moved on.",
+      "good": "Most people watched to the end.",
+      "next": "Keep it tight. Cut clips that repeat the same answer.",
+      "goodLabel": "Held attention"
+    },
+    "colour": {
+      "label": "Colour looked wrong",
+      "bad": "The colour looked different from the real product.",
+      "good": "The colour looked true.",
+      "next": "Use window light in the day, or a ring light. Skip the vivid filter.",
+      "goodLabel": "True colour"
+    },
+    "market": {
+      "label": "Hard timing",
+      "bad": "The topic was cold or crowded when you posted.",
+      "good": "You posted when buyers were looking.",
+      "next": "Check the feeds and the Seller Hub. Post when buyers are asking, before rivals flood in.",
+      "goodLabel": "Good timing"
+    },
+    "site": {
+      "label": "Site did not fit the moment",
+      "bad": "This site did not suit the topic at that moment.",
+      "good": "This site suited the moment.",
+      "next": "Try the other site. Short video wins at the peak. Long video wins before it and after it.",
+      "goodLabel": "Right site"
+    },
+    "stock": {
+      "label": "No stock",
+      "bad": "People wanted to buy and you had nothing on the shelf.",
+      "good": "Stock was ready.",
+      "next": "Order stock before you post. Check the shelves.",
+      "goodLabel": "Stock ready"
+    },
+    "honest": {
+      "label": "Misleading",
+      "bad": "Buyers returned the product. The video promised more than the product gave.",
+      "good": "The video matched the product.",
+      "next": "Show the real colour. Skip fake stickers.",
+      "goodLabel": "Honest video"
+    },
+    "sales": {
+      "label": "Sales",
+      "bad": "Views came, but few people bought.",
+      "good": "Many viewers bought.",
+      "next": "Check the price shot and the trust shot.",
+      "goodLabel": "Strong sales"
+    }
+  }
+}
