@@ -31,7 +31,7 @@ const ICON = [
   { id: "affiliate", label: "Affiliate", emoji: "🤝", grad: ["#2fd9cf", "#1d8c82"], show: () => flag("affiliate"), open: () => openBrowser("affiliate") },
   { id: "hub", label: "Seller Hub", emoji: "📊", grad: ["#b744c9", "#6a2ab0"], open: () => openBrowser("hub") },
   { id: "supplier", label: "Supplier", emoji: "🚚", grad: ["#3ec45a", "#26923b"], show: () => flag("tier2"), open: () => openBrowser("supplier") },
-  { id: "shop", label: "MarketPlaza", emoji: "🛍️", grad: ["#ff5fa2", "#e8344f"], show: () => tier2On(), open: () => openBrowser("shop") },
+  { id: "shop", label: "Shofi", emoji: "🛍️", grad: ["#ff5fa2", "#e8344f"], show: () => tier2On(), open: () => openBrowser("shop") },
   { id: "toolshop", label: "Tool Shop", emoji: "🛠️", grad: ["#ffa23a", "#e8601a"], open: () => openBrowser("toolshop") },
   { id: "property", label: "Property", emoji: "🏠", grad: ["#ffd84a", "#e8a010"], show: () => propList().length > 0, open: () => openBrowser("property") },
   { id: "stock", label: "Stock Sheet", emoji: "📋", grad: ["#9be85a", "#3ec45a"], open: () => openStock() }

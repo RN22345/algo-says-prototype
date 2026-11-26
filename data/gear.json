@@ -18,7 +18,7 @@
   {
    "id": "camera",
    "name": "Second-hand camera",
-   "price": 4500,
+   "price": 2500,
    "art": "gear_camera",
    "emoji": "📷",
    "does": "Opens YouView long videos.",

@@ -312,18 +312,10 @@
 .ph-ico.gpulse{border-radius:22px}
 .ph-ico.gpulse .itile{transform:scale(1.06)}
 
-/* ---------- MarketPlaza (shopview.js) ---------- */
+/* ---------- Shofi (shopview.js) ---------- */
 .mp-em{font-size:30px;flex:none}
 .mp-pk.here{box-shadow:inset 0 0 0 2px var(--orange,#ff7a1a)}
 .mp-pk .btn{flex:none}
-.mp-row{align-items:flex-start}
-.mp-row.on{box-shadow:inset 0 0 0 2px var(--teal,#2fd9cf)}
-.mp-row .mp-list{flex:none;align-self:center}
-.mp-prs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.mp-pr{display:flex;flex-direction:column;align-items:center;border:2px solid #d9def2;background:#fff;border-radius:12px;padding:2px 10px;font:600 13px var(--body);color:var(--ink2);cursor:pointer;line-height:1.15}
-.mp-pr b{font:700 15px var(--body);color:#1c2452}
-.mp-pr.on{border-color:#e8344f;background:#ffeef3}
-.mp-note{font-size:13px;color:var(--ink2);padding:2px 6px 8px}
 .mp-late{color:#e8344f!important}
 .mp-st{color:#ffb400;font-size:18px;letter-spacing:1px}
 .mp-site .mp-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}

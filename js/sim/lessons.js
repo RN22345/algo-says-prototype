@@ -1,5 +1,5 @@
 /* LESSONS. The first time a lesson in data/lessons.json holds, it fires an ALGO SAYS card and is saved to the Playbook with the post as evidence.
-   Conditions are data: [fact, op, value]. Facts are built here from a post. when = analysis | done | return.
+   Conditions are data: [fact, op, value]; "==" and "!=" also compare strings (site). Facts are built here from a post. when = analysis | done | return.
    Events in: post:analysed, post:done, order:returned. Events out: lesson:new {lesson, post}. Flags: algoSays (cards), playbook (saving). */
 import { D } from "../core/data.js";
 import { S, flag } from "../core/state.js";
@@ -13,7 +13,9 @@ export function facts(post) {
     views: post.views, orders: post.orders, conv: post.views ? post.orders / post.views : 0, missed: post.missed, returns: post.returns,
     hookLeft: f.hookLeft, colourDoubt: f.colourDoubt, misleading: f.misleading, siteFit: post.ctx.siteFit ?? 1,
     bothSites: S.posts.some(o => o.pid === post.pid && o.site !== post.site), afterUpdate: !!post.afterUpdate,
-    heat: post.ctx.heat, crowd: post.ctx.crowd, finish: f.finish
+    heat: post.ctx.heat, crowd: post.ctx.crowd, finish: f.finish,
+    site: post.site, doneCount: S.posts.filter(o => o.done).length,                          // the post's site id; finished posts so far (this one included at "done")
+    viewsPerFollower: post.views / Math.max(1, post.ctx.followers ?? 0), strangerViews: r.viewers.strangers   // views against followers at posting time; planned stranger views (the model has no shares stat)
   };
 }
 const check = (c, fa) => OPS[c[1]](fa[c[0]], c[2]);

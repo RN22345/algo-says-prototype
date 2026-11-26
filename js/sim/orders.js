@@ -1,11 +1,11 @@
-/* ORDERS. Affiliate orders pay commission at once. Own-stock orders (tier 2) need a MarketPlaza listing: a buyer from a video who finds
-   no listing is a missed sale. A listed order reserves a unit from the shelves at the listing price, waits to be packed, is handed to the
-   courier at a booked pickup (shop.js) and pays cash on delivery. Orders not shipped by their ship-by time are cancelled.
+/* ORDERS. Affiliate orders pay commission at once. Own-stock orders (tier 2) come from videos only (there is no shop search and no listing step).
+   An order reserves a unit from the shelves at the product's usual price, waits to be packed, is handed to the
+   courier at a booked pickup (shop.js, Shofi) and pays cash on delivery. Orders not shipped by their ship-by time are cancelled.
    No stock = missed sale. Returns come later and reverse the money.
    Events in: order:new {postId,pid,mode,site}, order:pack {id,ok}, tick. Events out: order:missed, order:packed, order:paid, order:returned, order:cancelled,
    money:earn, shelf:take, shelf:giveback, inbox:add, summary:add. Shipping (packed to shipped) happens in shop.js at the courier handover. */
 import { D } from "../core/data.js";
-import { S, flag, tier2On, uid, rand, rr, clamp, fmtMoney, isListed, priceOf } from "../core/state.js";
+import { S, flag, tier2On, uid, rand, rr, clamp, fmtMoney, priceOf } from "../core/state.js";
 import { on, emit } from "../core/bus.js";
 import { fmtDay } from "../core/clock.js";
 
@@ -20,11 +20,6 @@ export function init() {
 
 function onNew({ postId, pid, mode, site }) {
   const p = D.P[pid], post = postOf(postId);
-  if (mode !== "affiliate" && site !== "shop" && !isListed(pid)) {      // a buyer came from the video but found no listing
-    S.stats.missed++; if (post) post.missed++; emit("order:missed", { postId, pid, why: "unlisted" });
-    if (post && post.missed === 1) emit("inbox:add", { kind: "system", title: "Buyers could not find it", text: `People asked where to buy ${p.name}, but it is not listed on ${D.shop.name}. List it on the phone.`, pid });
-    return;
-  }
   S.stats.nextNo = (S.stats.nextNo || 1000) + 1;
   const o = { id: uid("o"), no: S.stats.nextNo, pid, postId, mode, site: site || "", price: mode === "affiliate" ? p.price : priceOf(pid), comm: Math.round(p.price * p.commission), status: "new", at: S.t };
   if (post) post.orders++;
@@ -43,7 +38,7 @@ function onNew({ postId, pid, mode, site }) {
       return;
     }
     o.status = "toPack"; o.shipBy = S.t + D.shop.shipByMin; S.stats.ownOrders = (S.stats.ownOrders || 0) + 1;
-    emit("toast", `New order #${o.no}${site === "shop" ? " from shop search" : ""}: pack ${p.short}. Ship by ${fmtDay(o.shipBy)}.`); emit("sfx", "pop");
+    emit("toast", `New order #${o.no}: pack ${p.short}. Ship by ${fmtDay(o.shipBy)}.`); emit("sfx", "pop");
   }
   S.orders.push(o);
   if (S.orders.length > 200) S.orders = S.orders.filter(x => x.status !== "paid" || S.t - x.at < 4000).slice(-200);

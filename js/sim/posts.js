@@ -3,7 +3,7 @@
    Events in: post:submit {video, post}, tick. Events out: post:created, post:analysed, post:done, order:new, inbox:add, summary:add, followers:changed.
    Reads S.market, S.mods, S.followers, S.trust, S.shelves. Uses the pure viewerModel. */
 import { D } from "../core/data.js";
-import { S, uid, hashStr, clamp, priceConv } from "../core/state.js";
+import { S, uid, hashStr, clamp } from "../core/state.js";
 import { on, emit } from "../core/bus.js";
 import { simulate, waveCum } from "./viewerModel.js";
 
@@ -38,7 +38,7 @@ function create(video) {
   for (const e of S.events.list) if (S.t >= e.start && S.t < e.end && (e.affects.products.includes(video.pid) || e.affects.sites.includes(video.site))) evs.push({ id: e.id, name: e.name, explain: e.explain });
   const post = {
     id, site: video.site, pid: video.pid, mode: video.mode, title: video.title || "", tags: video.tags || [], at: S.t, seed, video, res,
-    ctx: { heat: +ctx.heat.toFixed(2), crowd: ctx.crowd, stage: S.market.stage[video.pid], siteFit: S.market.siteFit[video.site][video.pid], titleMatch: ctx.titleMatch, ownCount: S.posts.length },
+    ctx: { heat: +ctx.heat.toFixed(2), crowd: ctx.crowd, followers: ctx.followers, stage: S.market.stage[video.pid], siteFit: S.market.siteFit[video.site][video.pid], titleMatch: ctx.titleMatch, ownCount: S.posts.length },
     vf: 0, of: 0, ff: 0, views: 0, orders: 0, missed: 0, returns: 0, revenue: 0, profit: 0, folGained: 0,
     status: "live", analysed: false, done: false, events: evs, afterUpdate: S.updatesApplied.length > 0, searchViews: 0
   };
@@ -57,7 +57,6 @@ function onTick({ t0, t1, dt }) {
       const rate = res.search.base * Math.max(res.search.floor, S.market.heat[post.pid] ?? 0.2) / 60 * dt;
       dv += rate; dor += rate * res.search.conv; post.searchViews += rate;
     }
-    if (post.mode === "own") dor *= priceConv(post.pid);   // the listing price shifts how many viewers buy (MarketPlaza)
     post.vf += dv; post.of += dor;
     post.views = Math.floor(post.vf);
     if (res.viewers.total > 0) { post.ff += dv * res.followGain / res.viewers.total; const g = Math.floor(post.ff) - post.folGained; if (g > 0) { post.folGained += g; S.followers[post.site] = (S.followers[post.site] || 0) + g; emit("followers:changed", post.site); } }

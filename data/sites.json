@@ -209,8 +209,8 @@
     },
     {
       "id": "shop",
-      "addr": "marketplaza.ph/seller",
-      "label": "MarketPlaza",
+      "addr": "shofi.ph/seller",
+      "label": "Shofi",
       "kind": "shop",
       "flag": "tier2"
     },

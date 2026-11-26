@@ -8,7 +8,7 @@
    Unity: TutorialStep ScriptableObjects (same fields) and a TutorialRunner MonoBehaviour that polls a condition registry
    (Dictionary<string, Func<bool>>) and toggles a Highlight component on the target. */
 import { D } from "../core/data.js";
-import { S, flag, tier2On, isListed } from "../core/state.js";
+import { S, flag, tier2On } from "../core/state.js";
 import { on, emit } from "../core/bus.js";
 import { fmt } from "../core/clock.js";
 import { courierHere } from "../sim/shop.js";
@@ -33,7 +33,6 @@ export const COND = {
   stockHereOrIn: () => S.doorBoxes.length > 0 || anyBox() || shelfAny(),
   stockIn: () => anyBox() || shelfAny(),
   shelfStocked: () => shelfAny(),
-  listed: () => Object.values(S.shop.listings).some(l => l.on),
   orderWaiting: () => toPack(),
   packedEver: () => (S.stats.packed || 0) > 0,
   bookedEver: () => (S.stats.booked || 0) > 0,
@@ -47,15 +46,14 @@ export const COND = {
   hasProduct: () => Object.keys(S.samples).length > 0 || anyBox() || shelfAny(),
   livePost: () => S.posts.some(p => !p.done),
   donePost: () => S.posts.some(p => p.done && !p.looked),
-  lowEnergy: () => flag("energy") && S.energy < 25,
-  unlistedStock: () => S.shelves.some(sh => sh.some(pid => pid && !isListed(pid)))
+  lowEnergy: () => flag("energy") && S.energy < 25
 };
 const test = c => c.startsWith("!") ? !COND[c.slice(1)]() : COND[c]();
 
 /* Where a button lives inside the PC sites and phone apps. */
 const UI = {
   "supplier.order": ".bview .sp-order", "affiliate.request": ".bview .aff-req", "toolshop.shelves": ".bview .ts-shelves",
-  "shop.list": ".mp-list", "shop.pickup": ".mp-book"
+  "shop.pickup": ".mp-book"
 };
 const OUTDOOR = new Set(["door"]);
 

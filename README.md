@@ -51,7 +51,7 @@ data/                 EVERYTHING tunable (JSON)
   events.json         calendar events and random events (see below)
   assets.json         every art id from the artist list, with size and kind
   guide.json          first-run guide steps (affiliate, reseller) and Mr. Algo hints
-  shop.json           MarketPlaza: price levels, search orders, courier pickup window, ship-by, reviews
+  shop.json           Shofi: courier pickup window, ship-by, cash on delivery delay, review chance and words
 img/                  artist PNGs go here, named by art id (st_desk.png, product_tote.png ...)
 img/ph/               stand-in art (old product icons, Mr. Algo, avatars)
 js/core/              bus, data, state, clock, save, assets, fit, sound, actions
@@ -75,7 +75,7 @@ PROGRESS.md           build log
 
 **Add a shot option.** Add an entry to `actions`, `angles` or `lights` in `data/shots.json`. For an action give `answers` (what, why, works, trust, get), `fits` per trait, `dur`, `minutes`, `energy`, `ansAt` and `hands` (hold, pinch, open or none). The Studio chips and the model pick it up. A new action also needs a drawing case in `js/ui/scene.js` (the `switch`); without one it shows the product only.
 
-**Add a lesson.** Add an object to `lessons` in `data/lessons.json`: `id`, `title`, `text`, `when` (analysis, done or return), `if` (all of [fact, op, value]) or `any` (a list of such lists). Facts are listed in `js/sim/lessons.js` (`facts()`): views, orders, conv, missed, returns, hookLeft, colourDoubt, misleading, siteFit, bothSites, afterUpdate, heat, crowd, finish. A new fact is one line in `facts()`.
+**Add a lesson.** Add an object to `lessons` in `data/lessons.json`: `id`, `title`, `text`, `when` (analysis, done or return), `if` (all of [fact, op, value]) or `any` (a list of such lists). Facts are listed in `js/sim/lessons.js` (`facts()`): views, orders, conv, missed, returns, hookLeft, colourDoubt, misleading, siteFit, bothSites, afterUpdate, heat, crowd, finish, site, doneCount, viewsPerFollower, strangerViews. A new fact is one line in `facts()`.
 
 **Add a station.** Add an object to `stations` in `data/room.json`: `id`, `label`, `art`, `tile: [gx, gy, fw, fd]` (iso) or `x, y` (anchor), `scale`, `z`, `opens`, optional `hit`, `flag`, `requiresGear`. Wall art uses `mount: {face, t, z}`. Add the art id to `data/assets.json`. `opens` is a key in `OPEN` in `js/ui/stations.js`; add one line there that imports your screen.
 
@@ -88,6 +88,8 @@ PROGRESS.md           build log
 **Add a platform update.** Add an object to `updates` in `data/sites.json`: day, hour, rumour text, news text, `set` (deltas such as `"tiktik.patience": -0.8`) and `outdates` (lesson ids to flag in the Playbook).
 
 **Tune the feel.** Retention and sales: `data/viewers.json` `model`, per-site `patience`, `refill`, `reach` in `data/sites.json`. Pace: `data/time.json`.
+
+**Pacing for a 45-minute session (D-127).** Gear prices are in `data/gear.json` (camera 2500), start cash in `data/config.json` (affiliate 1500, reseller 4000), and the seeded trends in `start.seedTrends` (`len` is an optional stage length in game minutes; the plush whisper is long so its fizzle shows after about 11 to 17 real minutes). Platform Updates are on day 2 and day 4 (`data/sites.json`).
 
 ## Art
 
@@ -113,7 +115,7 @@ Random: about 3 to 5 a week, weighted. Creator sighting, defect report, supplier
 - **HUD** (`js/ui/hud.js`, round 4): soft glass panels, no artist HUD art. Top left: one stat strip (cash, followers on each site, trust, energy) and the goal line (click to fold). Top right: clock (sun or moon, time, day, day progress) with round bell and settings buttons. Bottom right: dock with Bag (I), Phone (P), Move (M). Calm mode fades the panels while the player walks; any change wakes them. H hides the HUD down to the clock (also in Settings). Icons are one line-icon set in `js/ui/icons.js` (`ic(name)`).
 - **Inventory** (`js/ui/inventory.js`): bottom bar (in hand, stock box, parcels) and the bag (key I, Parcel button, `bag:open {tab}`): Orders, Stock, Furniture (Place emits `layout:place {id}`), Gear.
 - **Title** (`showTitle` in `js/main.js`, styles in `css/ui2.css`).
-- Styles for all of this are in `css/ui2.css`. The guide pulses buttons by class: `.sp-order`, `.aff-req`, `.ts-shelves`, `.mp-list`, `.mp-book` (map `UI` in `js/ui/guide.js`).
+- Styles for all of this are in `css/ui2.css`. The guide pulses buttons by class: `.sp-order`, `.aff-req`, `.ts-shelves`, `.mp-book` (map `UI` in `js/ui/guide.js`).
 
 ## World (Builder A, round 3: D-105 to D-106)
 
@@ -134,12 +136,12 @@ Random: about 3 to 5 a week, weighted. Creator sighting, defect report, supplier
 - **Light.** A night tint and lamp glow follow the clock (dark before 6:00, light by 6:30, dusk from 17:00).
 - **UI.** Tokens at the top of `css/ui2.css` (`--g-bg` light glass, `--d-bg` dark glass, `--ink`, `--line`, blur, shadow). Cards and site rows have hairline edges and soft shadows, not thick outlines. The PC windows have light glass title bars and a floating taskbar. The title is a blurred view of the live world.
 
-## Round 5: two scenes, guide, MarketPlaza, courier pickups (D-112 to D-117)
+## Round 5: two scenes, guide, Shofi, courier pickups (D-112 to D-117, Shofi D-123 and D-128)
 
 - **Two scenes.** `terrain.js` draws three layers: ground chunks and the building exterior (outdoor), and the interior (floors, back walls, front wall). `room.js` draws the outdoor scene or the indoor scene and crossfades between them when the player passes the door (`ia`). Outdoor items are sorted in front of or behind the house by their `at` world point. Clicking the house from outside walks to the door. Move mode always shows the inside.
 - **Guide.** `data/guide.json` has the steps; `js/ui/guide.js` has the condition registry (`COND`), the runner (checked every 400 ms, passed steps latched in `S.intro.ok`), the goal line (`guideGoal()`), the gold pulse, and the hints. Mr. Algo (`algo.js`) only speaks. Settings has Guide On or Off; the bubble has Skip guide.
-- **MarketPlaza.** `js/sim/shop.js` (listings, search orders, price levels, reviews and rating, pickups) and `js/ui/shopview.js` (the blocks), used by the phone app and the PC page `js/ui/sites/shop.js`. Own orders carry a ship-by time. The Orders phone app stays for the affiliate tier.
-- **Courier.** Book a pickup window on MarketPlaza. The courier arrives at an unknown time inside it, waits about 40 minutes, and the door dialog hands over the packed parcels. A courier delay event moves the visit later.
+- **Shofi** (was MarketPlaza; web address `shofi.ph/seller`; internal id stays `shop`). A simple sales app with no listing step, no price setting and no shop search: any stock the player owns sells at its usual price, and every order comes from a video. `js/sim/shop.js` (pickups, reviews, the sales ledger `S.shop.sales`) and `js/ui/shopview.js` (the blocks: courier pickup, orders with status and ship-by time, sales today and in total with units per product, read-only reviews), used by the phone app and the PC page `js/ui/sites/shop.js`. The Orders phone app stays for the affiliate tier.
+- **Courier.** Book a pickup window on Shofi. The courier arrives at an unknown time inside it, waits about 40 minutes, and the door dialog hands over the packed parcels. A courier delay event moves the visit later.
 
 ## Moving to Unity
 
@@ -160,5 +162,5 @@ The prototype keeps data, rules and drawing apart so each part has a Unity home.
 | Stations, `hitStation` | Prefabs with colliders and an Interactable component; outline shader on hover |
 | Outdoor and indoor layers (`terrain.js`, `room.js` two scenes) | Two layers (Exterior, Interior) on one camera; entering swaps the culling mask and eases the zoom |
 | Guide (`guide.json`, `guide.js`) | TutorialStep ScriptableObjects and a TutorialRunner that polls a condition dictionary and toggles a Highlight component |
-| MarketPlaza and pickups (`shop.json`, `sim/shop.js`) | ShopSystem plain C# class plus a ShopConfig ScriptableObject |
+| Shofi and pickups (`shop.json`, `sim/shop.js`) | ShopSystem plain C# class plus a ShopConfig ScriptableObject |
 | HUD, phone, PC, cards (`css/ui2.css` tokens) | UI Toolkit (UXML plus USS); the CSS tokens become USS variables; icons from `icons.js` as SVG or one sprite atlas |

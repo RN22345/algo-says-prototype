@@ -118,7 +118,7 @@ function drawMenu() {
 function goalText() {
   const packed = S.orders.some(o => o.status === "packed");
   if (courierHere() && packed) return "The courier is at the door. Hand over your parcels.";
-  if (packed && !openPickup()) return "Parcels are packed. Book a courier pickup on MarketPlaza.";
+  if (packed && !openPickup()) return "Parcels are packed. Book a courier pickup on Shofi.";
   if (!S.posts.length && S.mode === "reseller") {
     const shelf = S.shelves.some(sh => sh.some(Boolean)), boxes = Object.values(S.boxes).some(v => v > 0);
     if (S.doorBoxes.length) return "The supplier left boxes at the door. Take them in.";

@@ -1,30 +1,35 @@
-/* SHOP (MarketPlaza, D-114) and COURIER PICKUP (D-113).
-   Listings: S.shop.listings {pid: {on, price}}. A listed product with stock on a shelf gets a small, steady trickle of orders from shop
-   search, shaped by the trend heat, trust, the listing price and the shop rating, and thinned by how crowded the product is.
-   Videos still bring most buyers; they reach the listing through posts.js (an unlisted product loses those buyers, see orders.js).
+/* SHOFI (D-123, D-128) and COURIER PICKUP (D-113). Shofi is the in-game sales app. It has no listing step, no price setting and no shop search:
+   any product the player has in stock counts as listed, it sells at its usual price, and every order comes from a video (posts.js, orders.js).
+   Shofi shows orders, sales (S.shop.sales: total revenue, units per product, revenue per day number) and the courier pickup. Rating is read-only info.
    Pickup: one window a day (data/shop.json pickup). Book before the cutoff for today, else tomorrow. The courier comes at a time inside
    the window that the player does not know, waits waitMin minutes at the door, and takes the packed parcels the player hands over.
-   Reviews: some paid orders leave a review; returns leave a bad one. The rating feeds back into search.
-   Events in: tick, shop:list {pid, on}, shop:price {pid, price}, pickup:book {ok}, pickup:handover {ok, n}, order:paid, order:returned.
-   Events out: order:new {pid, mode:"own", site:"shop"}, pickup:booked, courier:arrived, courier:left, order:shipped, shop:changed, inbox:add, toast.
-   Unity: a ShopSystem (plain C#) holding Listing and Pickup records; the same numbers from a ShopConfig ScriptableObject. */
+   Reviews: some paid orders leave a review; returns leave a bad one. They are shown in Shofi and change nothing else.
+   Events in: tick, pickup:book {ok}, pickup:handover {ok, n}, order:paid, order:returned.
+   Events out: pickup:booked, courier:arrived, courier:left, order:shipped, shop:changed, inbox:add, toast.
+   Unity: a ShopSystem (plain C#) holding Pickup, Review and SalesLedger records; the same numbers from a ShopConfig ScriptableObject. */
 import { D } from "../core/data.js";
-import { S, rand, uid, clamp, isListed, priceConv, shelfCount, tier2On } from "../core/state.js";
+import { S, rand, uid, clamp, tier2On } from "../core/state.js";
 import { on, emit } from "../core/bus.js";
-import { tod, fmt } from "../core/clock.js";
+import { tod, fmt, dayNo } from "../core/clock.js";
 
 const C = () => D.shop;
 const dayBase = t => t - tod(t);
 
 export function init() {
   on("tick", onTick);
-  on("shop:list", ({ pid, on: v }) => { const l = S.shop.listings[pid] || (S.shop.listings[pid] = { on: false, price: "usual" }); l.on = !!v; emit("shop:changed"); });
-  on("shop:price", ({ pid, price }) => { const l = S.shop.listings[pid] || (S.shop.listings[pid] = { on: false, price: "usual" }); l.price = price; emit("shop:changed"); });
   on("pickup:book", p => { p.ok = book(); });
   on("pickup:handover", p => { const r = handover(); p.ok = r > 0; p.n = r; });
-  on("order:paid", o => { if (o.mode !== "affiliate") review(o, false); });
-  on("order:returned", r => { if (r.order && r.order.mode !== "affiliate") review(r.order, true); });
+  on("order:paid", o => { if (o.mode !== "affiliate") { review(o, false); sale(o, 1); } });
+  on("order:returned", r => { if (r.order && r.order.mode !== "affiliate") { review(r.order, true); sale(r.order, -1); } });
 }
+
+/* Sales ledger: net of returns. Revenue counts on the day the cash on delivery arrives. */
+function sale(o, sign) {
+  const L = S.shop.sales, d = dayNo();
+  L.total += sign * o.price; L.units[o.pid] = (L.units[o.pid] || 0) + sign; L.daily[d] = (L.daily[d] || 0) + sign * o.price;
+  emit("shop:changed");
+}
+export const salesToday = () => S.shop.sales.daily[dayNo()] || 0;
 
 /* ---------- pickups ---------- */
 /* The window the player can still book: today's if before the cutoff, otherwise tomorrow's. */
@@ -69,19 +74,8 @@ function review(o, bad) {
 }
 export function rating() { const r = S.shop.reviews.slice(0, 30); return r.length ? r.reduce((a, x) => a + x.stars, 0) / r.length : null; }
 
-/* ---------- tick: search orders and the courier ---------- */
+/* ---------- tick: the courier ---------- */
 function onTick({ t0, t1, dt }) {
-  const Sr = C().search, m = tod(t1);
-  if (tier2On() && m >= Sr.openFrom && m <= Sr.openTo) {
-    const rt = rating(), rf = rt == null ? Sr.newShop : 0.6 + 0.4 * rt / 5;
-    for (const [pid, l] of Object.entries(S.shop.listings)) {
-      if (!l.on || !D.P[pid] || shelfCount(pid) <= 0) continue;
-      const heat = Math.max(Sr.heatMin, S.market.heat[pid] ?? 0.2), crowd = S.market.crowd[pid] || 0;
-      const rate = Sr.perHour * (heat / 0.5) * (S.trust / Sr.trustRef) * priceConv(pid) * rf / (1 + crowd * Sr.crowdDamp);
-      S.shop.acc[pid] = (S.shop.acc[pid] || 0) + rate * dt / 60;
-      while (S.shop.acc[pid] >= 1) { S.shop.acc[pid] -= 1; emit("order:new", { postId: null, pid, mode: "own", site: "shop" }); }
-    }
-  }
   for (const pk of S.shop.pickups) {
     if (pk.status === "booked" && t1 >= pk.arrive) {
       pk.status = "here"; emit("courier:arrived", pk); emit("shop:changed"); emit("sfx", "ding");

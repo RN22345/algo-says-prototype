@@ -1,5 +1,5 @@
 {
-  "_note": "ALGO SAYS cards. A lesson fires the first time its conditions hold at the moment named by when (analysis = first results, done = the post ended, return = a return came in, update = after a platform update). if = all conditions [fact, op, value]. any = a list of condition lists, one must hold. Facts are built in js/sim/lessons.js.",
+  "_note": "ALGO SAYS cards (no source labels on screen, D-121). A lesson fires the first time its conditions hold at the moment named by when (analysis = first results, done = the post ended, return = a return came in, update = after a platform update). if = all conditions [fact, op, value]. any = a list of condition lists, one must hold. Facts are built in js/sim/lessons.js.",
   "lessons": [
     { "id": "reach_low", "title": "Posting is not enough", "text": "Posting is not enough. Timing and fit decide reach.", "when": "done",
       "if": [["views", "<", 260]], "mood": "unsure" },
@@ -16,6 +16,18 @@
     { "id": "light_colour", "title": "True light", "text": "Colour products need true light.", "when": "analysis",
       "if": [["colourDoubt", "==", true]], "mood": "unsure" },
     { "id": "honesty", "title": "Honesty", "text": "Misleading content wins clicks and loses buyers.", "when": "return",
-      "if": [["returns", ">=", 1], ["misleading", "==", true]], "mood": "shocked" }
+      "if": [["returns", ">=", 1], ["misleading", "==", true]], "mood": "shocked" },
+    { "id": "no_formula", "title": "Nobody has the formula", "text": "No one outside a site knows its exact formula. Sites share their main signals. Test the rest yourself.", "when": "done",
+      "if": [["doneCount", ">=", 2]], "mood": "talk" },
+    { "id": "past_viewing", "title": "Viewers shape their feeds", "text": "Each viewer's feed follows what they watched, liked, and followed before. Make videos for buyers who already like this kind of product.", "when": "done",
+      "if": [["site", "==", "tiktik"], ["heat", ">=", 0.4]], "mood": "talk" },
+    { "id": "followers_head_start", "title": "Followers are a head start", "text": "Followers see your post first. Strangers decide how far it goes. A small account can still reach many people.", "when": "done",
+      "if": [["doneCount", ">=", 3], ["viewsPerFollower", ">=", 3]], "mood": "happy" },
+    { "id": "shares_spread", "title": "Shares spread a post", "text": "When viewers share a video, it reaches more new people.", "when": "done",
+      "if": [["site", "==", "tiktik"], ["doneCount", ">=", 4], ["strangerViews", ">=", 150]], "mood": "happy" },
+    { "id": "two_steps", "title": "Two steps on YouView", "text": "YouView first picks a few hundred videos for each viewer, then ranks them. Your title and topic decide if you get picked.", "when": "analysis",
+      "if": [["site", "==", "youview"]], "mood": "talk" },
+    { "id": "satisfied_viewers", "title": "Satisfied viewers count", "text": "A click starts a view. Viewers who watch and like the video decide what YouView shows next.", "when": "done",
+      "if": [["site", "==", "youview"]], "mood": "talk" }
   ]
 }

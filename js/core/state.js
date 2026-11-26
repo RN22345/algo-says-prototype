@@ -22,7 +22,7 @@ export function makeState() {
     stats: { sold: 0, missed: 0, returned: 0, earned: 0, ownOrders: 0, packed: 0, booked: 0, shipped: 0, looked: 0 }, started: false, mode: "affiliate", player: null, layout: {},
     ui: { pbSeen: {} },   // Builder B: Playbook entries the player has opened (phone badge)
     property: {}, furniture: [], placed: [], shelfOwn: {},
-    shop: { listings: {}, reviews: [], pickups: [], acc: {} }   // MarketPlaza: listings {pid: {on, price}}, reviews, booked pickups, search order accumulators   // property: owned room ids. furniture: unplaced piece ids. placed: [{uid,id}] (position in layout[uid]). shelfOwn: station id -> [first shelf, count]
+    shop: { reviews: [], pickups: [], sales: { total: 0, units: {}, daily: {} } }   // Shofi: reviews, booked pickups, sales {total revenue, units per product, revenue per day number}   // property: owned room ids. furniture: unplaced piece ids. placed: [{uid,id}] (position in layout[uid]). shelfOwn: station id -> [first shelf, count]
   };
 }
 export function resetState() { for (const k of Object.keys(S)) delete S[k]; Object.assign(S, makeState()); }
@@ -43,12 +43,8 @@ export const hasGear = id => !!(S.gear && S.gear[id]);
 export const siteOpen = id => { const g = D.SITE[id].needsGear; return !g || hasGear(g); };
 export const tier2On = () => flag("tier2") && hasGear("shelves");
 export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-/* MarketPlaza listing helpers (pure reads of S and D, shared by the sims and the UI). */
-export const listing = pid => (S.shop && S.shop.listings[pid]) || null;
-export const isListed = pid => !!(listing(pid) && listing(pid).on);
-export const priceMult = pid => { const l = listing(pid), pr = D.shop.prices.find(x => x.id === (l && l.price)); return pr ? pr.mult : 1; };
-export const priceOf = pid => Math.round(D.P[pid].price * priceMult(pid));
-export const priceConv = pid => Math.pow(1 / priceMult(pid), D.shop.priceElastic);
+/* Shofi helpers (pure reads of S and D). Every product the player has in stock counts as listed; there is no price setting. */
+export const priceOf = pid => D.P[pid].price;
 export const shelfCount = pid => S.shelves.reduce((a, sh) => a + sh.filter(x => x === pid).length, 0);
 export const fmtMoney = n => "₱" + Math.round(n).toLocaleString("en-US");
 

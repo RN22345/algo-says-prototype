@@ -1,6 +1,6 @@
 /* PHONE (D-107). A phone held in the hand: rounded body, bezel, camera notch, status bar (game clock, signal, battery), home screen with app icons,
    home bar. It slides up from the bottom right. Apps open full screen inside the phone with a back arrow; the home bar goes home (and closes the phone from home).
-   Apps: Messages, TikTik, YouView, MarketPlaza (Orders before tier 2), Bank, Calendar, Playbook (js/ui/phone/*). Unread badges sit on the icons.
+   Apps: Messages, TikTik, YouView, Shofi (Orders before tier 2), Bank, Calendar, Playbook (js/ui/phone/*). Unread badges sit on the icons.
    Events in: phone:toggle, phone:open {tab|app}, modal:open (closes the phone unless keepPhone), inbox:changed, order:*, lesson:new, cash:changed, post:created, newgame, frame.
    Events out: open:results. Old tab ids map to apps: inbox, feeds, orders, wallet, playbook. */
 import { S, flag, tier2On } from "../core/state.js";

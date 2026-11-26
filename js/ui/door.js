@@ -25,7 +25,7 @@ export function openDoor() {
       box.append(h("h3", {}, "Parcels for the courier"));
       if (here) box.append(h("div", { class: "panel" }, `The courier is here until ${fmt(here.leave)}. ${n ? n + " packed parcel" + pl + " ready." : "Nothing is packed."}`),
         n ? btn(`Hand over ${n} parcel${pl}`, "b-gold", () => { const q = { ok: false }; emit("pickup:handover", q); if (q.ok) emit("sfx", "coin"); draw(); }) : null);
-      else box.append(h("div", { class: "panel" }, `${n ? n + " packed parcel" + pl + " waiting. " : "No packed parcels. "}` + (pk ? `Courier booked: ${fmt(pk.from)} to ${fmt(pk.to)}. Be here when they come.` : "No courier booked. Book a pickup on MarketPlaza (phone or PC).")));
+      else box.append(h("div", { class: "panel" }, `${n ? n + " packed parcel" + pl + " waiting. " : "No packed parcels. "}` + (pk ? `Courier booked: ${fmt(pk.from)} to ${fmt(pk.to)}. Be here when they come.` : "No courier booked. Book a pickup on Shofi (phone or PC).")));
     }
   };
   draw(); offs = ["stock:changed", "order:packed", "order:shipped", "courier:arrived", "courier:left", "tick"].map(ev => on(ev, () => { if (ev !== "tick") draw(); }));

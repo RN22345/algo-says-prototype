@@ -26,7 +26,7 @@ function seed() {
   S.trends = {}; ensure();
   for (const s of D.config.start.seedTrends || []) {
     const tr = S.trends[s.p]; if (!tr) continue;
-    tr.stage = s.stage; tr.len = seg(MK().stages[s.stage]); tr.t = tr.len * (s.t ?? 0); tr.fz = !!s.fz; tr.n++;
+    tr.stage = s.stage; tr.len = s.len ?? seg(MK().stages[s.stage]); tr.t = tr.len * (s.t ?? 0); tr.fz = !!s.fz; tr.n++;   // s.len: optional stage length in game minutes (config start.seedTrends)
     if (tr.fz) tr.src = pick(D.market.creators);
   }
   refresh();
