@@ -1,0 +1,336 @@
+{
+ "px": 2,
+ "sprites": {
+  "ch_player_front_0": {
+   "w": 126,
+   "h": 300,
+   "ax": 63.0,
+   "ay": 258.4,
+   "fw": 0.5,
+   "fd": 0.5,
+   "src": "artist"
+  },
+  "ch_algo": {
+   "w": 119,
+   "h": 280,
+   "ax": 59.5,
+   "ay": 213.5,
+   "fw": 0.8,
+   "fd": 0.8,
+   "src": "artist"
+  },
+  "ch_courier_0": {
+   "w": 108,
+   "h": 304,
+   "ax": 54.0,
+   "ay": 262.4,
+   "fw": 0.5,
+   "fd": 0.5,
+   "src": "artist"
+  },
+  "tl_grass": {
+   "w": 320,
+   "h": 259,
+   "ax": 160.0,
+   "ay": 77.0,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist",
+   "tile": true
+  },
+  "tl_rock": {
+   "w": 320,
+   "h": 233,
+   "ax": 160.0,
+   "ay": 91.6,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist",
+   "tile": true
+  },
+  "tl_floor1": {
+   "w": 320,
+   "h": 236,
+   "ax": 160.0,
+   "ay": 91.6,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist",
+   "tile": true
+  },
+  "tl_floor2": {
+   "w": 320,
+   "h": 236,
+   "ax": 160.0,
+   "ay": 91.5,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist",
+   "tile": true
+  },
+  "tl_road": {
+   "w": 320,
+   "h": 236,
+   "ax": 160.0,
+   "ay": 91.7,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist",
+   "tile": true
+  },
+  "tl_road_white": {
+   "w": 320,
+   "h": 236,
+   "ax": 160.0,
+   "ay": 91.7,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist",
+   "tile": true
+  },
+  "od_tree_round": {
+   "w": 500,
+   "h": 577,
+   "ax": 250.0,
+   "ay": 493.9,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist"
+  },
+  "od_tree_ball": {
+   "w": 460,
+   "h": 629,
+   "ax": 230.0,
+   "ay": 545.9,
+   "fw": 1,
+   "fd": 1,
+   "src": "artist"
+  },
+  "od_lamp_post": {
+   "w": 253,
+   "h": 500,
+   "ax": 126.5,
+   "ay": 466.7,
+   "fw": 0.4,
+   "fd": 0.4,
+   "src": "artist"
+  },
+  "od_lamp_old": {
+   "w": 140,
+   "h": 420,
+   "ax": 70.0,
+   "ay": 386.7,
+   "fw": 0.4,
+   "fd": 0.4,
+   "src": "artist"
+  },
+  "od_bench": {
+   "w": 380,
+   "h": 412,
+   "ax": 190.0,
+   "ay": 333.0,
+   "fw": 1.3,
+   "fd": 0.6,
+   "src": "artist"
+  },
+  "od_bin": {
+   "w": 127,
+   "h": 190,
+   "ax": 63.5,
+   "ay": 152.6,
+   "fw": 0.45,
+   "fd": 0.45,
+   "src": "artist"
+  },
+  "vh_van_p": {
+   "w": 600,
+   "h": 718,
+   "ax": 300.0,
+   "ay": 560.0,
+   "fw": 1.2,
+   "fd": 2.6,
+   "src": "artist"
+  },
+  "vh_car_green_p": {
+   "w": 500,
+   "h": 493,
+   "ax": 250.0,
+   "ay": 368.3,
+   "fw": 1.0,
+   "fd": 2.0,
+   "src": "artist"
+  },
+  "vh_car_green_n": {
+   "w": 500,
+   "h": 392,
+   "ax": 250.0,
+   "ay": 267.3,
+   "fw": 1.0,
+   "fd": 2.0,
+   "src": "artist"
+  },
+  "it_box": {
+   "w": 120,
+   "h": 127,
+   "ax": 60.0,
+   "ay": 97.9,
+   "fw": 0.35,
+   "fd": 0.35,
+   "src": "artist"
+  },
+  "it_parcel": {
+   "w": 96,
+   "h": 101,
+   "ax": 48.0,
+   "ay": 76.1,
+   "fw": 0.3,
+   "fd": 0.3,
+   "src": "artist"
+  },
+  "st_desk": {
+   "w": 520,
+   "h": 566,
+   "ax": 209.5,
+   "ay": 457.9,
+   "fw": 2.0,
+   "fd": 1.85,
+   "src": "blender"
+  },
+  "st_shelves": {
+   "w": 455,
+   "h": 639,
+   "ax": 227.7,
+   "ay": 504.7,
+   "fw": 0.9,
+   "fd": 1.8,
+   "src": "blender"
+  },
+  "st_shelf_unit": {
+   "w": 407,
+   "h": 593,
+   "ax": 203.7,
+   "ay": 472.3,
+   "fw": 0.8,
+   "fd": 1.6,
+   "src": "blender"
+  },
+  "st_packing": {
+   "w": 518,
+   "h": 523,
+   "ax": 258.8,
+   "ay": 370.4,
+   "fw": 2.0,
+   "fd": 1.2,
+   "src": "blender"
+  },
+  "st_filming": {
+   "w": 217,
+   "h": 670,
+   "ax": 108.6,
+   "ay": 504.9,
+   "fw": 1.8,
+   "fd": 1.8,
+   "src": "blender"
+  },
+  "st_studio_set": {
+   "w": 725,
+   "h": 821,
+   "ax": 306.4,
+   "ay": 668.9,
+   "fw": 3.0,
+   "fd": 2.1,
+   "src": "blender"
+  },
+  "st_bed": {
+   "w": 620,
+   "h": 513,
+   "ax": 297.8,
+   "ay": 372.2,
+   "fw": 2.0,
+   "fd": 1.9,
+   "src": "blender"
+  },
+  "st_crates": {
+   "w": 283,
+   "h": 280,
+   "ax": 139.7,
+   "ay": 218.5,
+   "fw": 1.0,
+   "fd": 1.0,
+   "src": "blender"
+  },
+  "fn_plant": {
+   "w": 188,
+   "h": 297,
+   "ax": 95.6,
+   "ay": 252.8,
+   "fw": 0.7,
+   "fd": 0.7,
+   "src": "blender"
+  },
+  "fn_sofa": {
+   "w": 480,
+   "h": 428,
+   "ax": 236.0,
+   "ay": 297.5,
+   "fw": 2.0,
+   "fd": 0.95,
+   "src": "blender"
+  },
+  "fn_lamp": {
+   "w": 136,
+   "h": 360,
+   "ax": 67.9,
+   "ay": 327.5,
+   "fw": 0.5,
+   "fd": 0.5,
+   "src": "blender"
+  },
+  "od_house_a": {
+   "w": 1142,
+   "h": 1158,
+   "ax": 538.8,
+   "ay": 853.2,
+   "fw": 3.6,
+   "fd": 3.6,
+   "src": "blender"
+  },
+  "od_house_b": {
+   "w": 1142,
+   "h": 1158,
+   "ax": 538.8,
+   "ay": 853.2,
+   "fw": 3.6,
+   "fd": 3.6,
+   "src": "blender"
+  },
+  "od_sale_sign": {
+   "w": 196,
+   "h": 272,
+   "ax": 87.9,
+   "ay": 268.1,
+   "fw": 1.3,
+   "fd": 0.6,
+   "src": "blender"
+  },
+  "od_fence_x": {
+   "w": 195,
+   "h": 225,
+   "ax": 97.4,
+   "ay": 170.3,
+   "fw": 1.0,
+   "fd": 1.0,
+   "src": "blender"
+  },
+  "od_fence_y": {
+   "w": 195,
+   "h": 225,
+   "ax": 97.4,
+   "ay": 170.3,
+   "fw": 1.0,
+   "fd": 1.0,
+   "src": "blender"
+  }
+ },
+ "_note": "Sprites in img/v/<id>.png at px x game pixels. (ax, ay) = image pixel of the footprint centre at floor level. Draw at P(gx+fw/2, gy+fd/2, 0) minus (ax, ay)/px. src artist = cut from the artist's PDF (05_ART/artist_pdf); src blender = rendered by 05_ART/blender/voxel_kit.py. Tiles: (ax, ay) is the centre of the top diamond."
+}
