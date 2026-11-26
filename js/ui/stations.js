@@ -7,7 +7,7 @@ import { toast, sfx } from "../core/actions.js";
 
 const firstTime = () => !S.posts.length && !Object.keys(S.samples).length && !S.samplePending.length && !S.doorSamples.length;
 const OPEN = {
-  pc: () => import("./browser.js").then(m => m.openBrowser(firstTime() ? "affiliate" : undefined)),
+  pc: () => import("./browser.js").then(m => m.openBrowser(firstTime() ? (S.mode === "reseller" ? (S.posts.length || Object.keys(S.boxes).length || S.deliveries.length ? undefined : "supplier") : "affiliate") : undefined)),
   studio: () => import("./studio.js").then(m => m.openStudio()),
   door: () => import("./door.js").then(m => m.openDoor()),
   bed: () => import("./bed.js").then(m => m.openBed()),

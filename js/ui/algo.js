@@ -25,13 +25,15 @@ export function initAlgo() {
   on("studio:open", () => advanceIntro("studio:open"));
   on("sample:requested", () => advanceIntro("sample:requested"));
   on("sample:taken", () => advanceIntro("sample:taken"));
+  on("stock:order", o => { if (o && o.ok) advanceIntro("stock:ordered"); });
+  on("browser:opened", () => { if (waiting === "stock:ordered") { elOverride = () => document.querySelector(".bview .btn.b-gold.sm"); setTimeout(drawSpot, 350); } });
   on("newgame", () => { setMood("neutral"); dismiss(); });
   on("post:created", () => { if (S.posts.length === 1) say(["Posted! Now time does the work. Views come in waves.", "Followers see it first. Then strangers decide how far it goes.", "Results show up on your phone in about half an hour of game time."], { mood: "happy" }); });
   on("modal:open", () => { if (!elOverride) hideSpot(); });
   on("modal:close", () => { if (modalCount() === 0) { elOverride = null; drawSpot(); } });
   on("browser:opened", () => { if (waiting === "sample:requested") { elOverride = () => document.querySelector(".bview .tile .btn.b-orange"); setTimeout(drawSpot, 350); } });
   setInterval(() => { if (elOverride) drawSpot(); }, 300);
-  on("sample:arrived", () => { if (!S.intro.done && waiting == null && S.intro.step === 3) runStep(); });
+  on("sample:arrived", () => { if (!S.intro.done && waiting == null && S.mode !== "reseller" && S.intro.step === 3) runStep(); });
 }
 export function setMood(m) { mood = m; face.src = artUrl("algo_" + m); }
 
@@ -91,7 +93,7 @@ export async function startIntro() {
   await runStep();
 }
 async function runStep() {
-  const steps = D.intro.steps, i = S.intro.step;
+  const steps = introSteps(), i = S.intro.step;
   if (S.intro.done || i >= steps.length) { S.intro.done = true; endSpotlight(); return; }
   const st = steps[i];
   if (st.when === "doorSample" && !S.doorSamples.length) { if (Object.keys(S.samples).length) { S.intro.step++; return runStep(); } waiting = null; return; }
@@ -105,6 +107,7 @@ function advanceIntro(ev) {
   waiting = null; endSpotlight(); S.intro.step++;
   setTimeout(runStep, 600);
 }
+const introSteps = () => (S.mode === "reseller" && D.intro.stepsReseller) ? D.intro.stepsReseller : D.intro.steps;
 export function skipIntro() { S.intro.done = true; waiting = null; endSpotlight(); dismiss(); }
 
 /* ---------- hints ---------- */

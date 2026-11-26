@@ -96,3 +96,10 @@ PROGRESS.md           build log
 
 Calendar: Payday (every 7 days from day 3), 5.5 Mega Sale (day 5), 11.11 Mega Sale (day 11). Supplier prices rise 1 to 2 days before a sale. Announced a day ahead.
 Random: about 3 to 5 a week, weighted. Creator sighting, defect report, supplier shortage, rival flood, before-and-after challenge, cosy haul challenge, rainy week, courier delay. Each one posts a signal first (Seller Hub headline, feed post, inbox message, buyer comments). The dev panel lists active events and can trigger any by id.
+
+## Walking, furniture, outside, start choice
+- Walk with WASD or arrows, or click the floor. Click a station to walk there and use it; E or Space uses the station in reach.
+- "Move furniture" (bottom right): click a piece to pick it up, R rotates, click to drop on a green spot. Saved in `S.layout`. `"fixed": true` in room.json stops a piece moving.
+- House size, door gap, yard, and road are in `data/room.json` (`view.Nx/Ny`, `front`, `yard`). Riders, the supplier van, and traffic are drawn by `js/ui/outside.js` from the clock and events (visual only).
+- New game asks: Affiliate or Reseller. Reseller sets the `affiliate` flag off, gives shelves and `start.reseller.cash` (config.json), and uses `stepsReseller` in intro.json.
+- Dev server without caching: `python tools/serve.py 8771`.

@@ -1,5 +1,5 @@
 {
-  "_note": "Guided start and Mr. Algo hints. Each step: say = lines, spot = station id to spotlight, wait = event that ends the step (stationOpen:<id>, sample:requested, sample:taken, studio:open). Hints are checked top to bottom; the first whose conditions all hold is shown when you ask Mr. Algo.",
+  "_note": "Guided start and Mr. Algo hints. Each step: say = lines, spot = station id to spotlight, wait = event that ends the step (stationOpen:<id>, sample:requested, sample:taken, studio:open). Hints are checked top to bottom; the first whose conditions all hold is shown when you ask Mr. Algo. stepsReseller is used when the player starts as a reseller.",
   "steps": [
     {
       "say": [
@@ -99,6 +99,31 @@
       "if": [],
       "text": "Read the feeds. Look for products many people are asking about.",
       "mood": "neutral"
+    }
+  ],
+  "stepsReseller": [
+    {
+      "say": [
+        "Hi. I am Mr. Algo. I used to be a smart speaker.",
+        "You already have shelves and a packing table. Let's sell."
+      ],
+      "mood": "talk"
+    },
+    {
+      "say": [
+        "Walk to the desk PC. It opens on the Supplier site.",
+        "Order a few items. Watch the prices: they rise when a product gets popular."
+      ],
+      "spot": "desk",
+      "wait": "stock:ordered",
+      "mood": "neutral"
+    },
+    {
+      "say": [
+        "Good. The van brings it to the door at 9:00 tomorrow morning.",
+        "Take it in, put it on the shelves, then film it at the filming corner."
+      ],
+      "mood": "happy"
     }
   ]
 }

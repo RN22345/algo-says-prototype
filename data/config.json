@@ -1,8 +1,9 @@
 {
   "_note": "Feature flags and start values. Turning a flag off must leave a working game. The dev panel can override flags at run time.",
-  "saveVersion": 1,
+  "saveVersion": 2,
   "storageKey": "algosays.proto7",
   "features": {
+    "affiliate": true,
     "energy": true,
     "rent": true,
     "honestyTrap": true,
@@ -46,6 +47,9 @@
         "t": 0.2,
         "fz": true
       }
-    ]
+    ],
+    "reseller": {
+      "cash": 3000
+    }
   }
 }

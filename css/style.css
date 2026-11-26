@@ -267,3 +267,13 @@ html.small #frame{font-size:30px}
 html.small .card{max-height:1040px}
 .timeline{position:relative}
 .playhead{position:absolute;top:0;bottom:0;width:5px;margin-left:-2px;background:var(--red);box-shadow:0 0 0 2px #fff;z-index:6;pointer-events:none;border-radius:3px}
+/* walking, floor clicks, move furniture */
+#room svg rect.floorhit{fill:transparent;pointer-events:all;cursor:pointer}
+.stag.near{background:var(--gold);transform:translate(-50%,-110%) scale(1.08)}
+#room .movebtn{position:absolute;right:120px;bottom:28px;z-index:3}
+#room .movebar{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:var(--navy);color:#fff;border:4px solid var(--gold);border-radius:22px;padding:.35em .9em;font:600 .72em var(--body);z-index:3}
+#room.editing svg polygon{stroke:rgba(47,217,207,.7)}
+#room .movebtn.sel{filter:brightness(1.15);outline:4px solid var(--gold)}
+.startrow{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.startcard{background:#fff;color:var(--navy);border:5px solid var(--gold);border-radius:26px;padding:.6em 1em 1em;width:420px;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.startcard h3{font:400 1.5em var(--lil);margin:.2em 0}.startcard p{font-size:.8em;min-height:4.2em}

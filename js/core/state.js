@@ -18,7 +18,7 @@ export function makeState() {
     rent: { due: 0, nextDay: D.time.rent.days + 1, fee: 0, warned: false },
     intro: { step: 0, done: false }, updatesApplied: [], updatesRumoured: [],
     events: { list: [], hist: [], next: null, headlines: [], created: {} }, mods: {},
-    stats: { sold: 0, missed: 0, returned: 0, earned: 0 }, started: false
+    stats: { sold: 0, missed: 0, returned: 0, earned: 0 }, started: false, mode: "affiliate", player: null, layout: {}
   };
 }
 export function resetState() { for (const k of Object.keys(S)) delete S[k]; Object.assign(S, makeState()); }

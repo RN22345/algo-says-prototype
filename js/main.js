@@ -26,6 +26,7 @@ import { initRoom } from "./ui/room.js";
 import { initHud } from "./ui/hud.js";
 import { initAlgo, startIntro, skipIntro } from "./ui/algo.js";
 import { initStations } from "./ui/stations.js";
+import { initLayout } from "./ui/layout.js";
 import { initPhone } from "./ui/phone.js";
 import { initCards } from "./ui/cards.js";
 import { initDev } from "./ui/dev.js";
@@ -41,7 +42,7 @@ async function boot() {
   for (const m of [events, market, rivals, inbox, money, energy, stock, orders, posts, lessons, updates]) m.init();
   let had = false;
   try { had = load(); } catch (e) { console.warn("save reset", e); wipe(); }
-  initRoom(); initHud(); initAlgo(); initStations(); initPhone(); initCards(); initDev(had);
+  initRoom(); initLayout(); initHud(); initAlgo(); initStations(); initPhone(); initCards(); initDev(had);
   initSave();
   showTitle(had);
   let last = performance.now(), run = false;
@@ -53,15 +54,23 @@ async function boot() {
 
 function showTitle(had) {
   const root = document.getElementById("title"); clear(root);
-  const begin = fresh => {
-    if (fresh) { newGame(); }
+  const begin = (fresh, mode) => {
+    if (fresh) { newGame(mode); }
     clear(root); emit("game:start"); emit("frame"); emit("cash:changed");
     if (fresh) startIntro(); else if (!S.intro.done) startIntro();
   };
   const logo = h("img", { class: "logo", src: artUrl("logo"), alt: "Algo Says" });
-  const play = btn(had ? "CONTINUE" : "PLAY", "b-gold big", () => begin(!had));
+  const choose = () => {       // new game: start as an affiliate, or skip straight to reselling (feature: start choice)
+    clear(root);
+    const card = (title, sub, cls, mode) => h("div", { class: "startcard" }, h("h3", {}, title), h("p", {}, sub), btn("Start", cls, () => begin(true, mode)));
+    root.append(h("div", { class: "tscreen" }, logo, h("p", {}, "How do you want to start?"),
+      h("div", { class: "startrow" },
+        card("Affiliate", "Promote other sellers' products for a commission. Free samples, no stock. Learn the sites first.", "b-gold", "affiliate"),
+        card("Reseller", "Skip ahead. You own shelves and a packing table. Buy stock, post, pack orders, ship.", "b-orange", "reseller"))));
+  };
+  const play = btn(had ? "CONTINUE" : "PLAY", "b-gold big", () => had ? begin(false) : choose());
   const items = [logo, h("p", {}, "Learn how two video sites treat products. Sell as an affiliate, then as a reseller."), play];
-  if (had) items.push(btn("New game", "b-red sm", () => { begin(true); }));
+  if (had) items.push(btn("New game", "b-red sm", choose));
   items.push(h("p", { class: "tiny", style: { opacity: ".7", fontSize: "18px" } }, "TikTik and YouView are made-up sites. Not affiliated with any real platform."));
   root.append(h("div", { class: "tscreen" }, ...items));
 }

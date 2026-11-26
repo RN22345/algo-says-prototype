@@ -33,7 +33,13 @@ export function load() {
 }
 
 export function wipe() { blocked = true; try { localStorage.removeItem(key()); } catch (e) { /* ignore */ } resetState(); resetSites(); }
-export function newGame() { blocked = false; resetState(); resetSites(); S.started = true; emit("newgame"); save(); }
+export function newGame(mode = "affiliate") {
+  blocked = false; resetState(); resetSites(); S.started = true; S.mode = mode;
+  if (mode === "reseller") {           // skip the affiliate tier: shelves owned, more cash, affiliate site off
+    const r = D.config.start.reseller || {}; S.gear.shelves = true; S.flags.affiliate = false; S.cash = r.cash ?? S.cash;
+  }
+  emit("newgame"); if (mode === "reseller") emit("gear:changed"); save();
+}
 export function initSave() {
   setInterval(save, 10000);
   window.addEventListener("beforeunload", save);

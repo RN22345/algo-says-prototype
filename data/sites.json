@@ -182,7 +182,8 @@
     {
       "id": "affiliate",
       "label": "Affiliate",
-      "kind": "affiliate"
+      "kind": "affiliate",
+      "flag": "affiliate"
     },
     {
       "id": "hub",

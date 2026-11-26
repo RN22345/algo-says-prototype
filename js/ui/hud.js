@@ -52,6 +52,14 @@ function sync() {
 }
 /* A short line about what to do next. Not a grade. */
 function goalText() {
+  if (!S.posts.length && S.mode === "reseller") {
+    const shelf = S.shelves.some(sh => sh.some(Boolean)), boxes = Object.values(S.boxes).some(v => v > 0);
+    if (S.doorBoxes.length) return "<b>Goal:</b> The supplier left boxes at the door. Take them in.";
+    if (shelf) return "<b>Goal:</b> Film a product at the filming corner and post it.";
+    if (boxes) return "<b>Goal:</b> Put your stock on the shelves.";
+    if (S.deliveries.length) return "<b>Goal:</b> Your stock arrives at 9:00. Browse the feeds meanwhile.";
+    return "<b>Goal:</b> Order stock on the Supplier site at the desk PC.";
+  }
   if (!S.posts.length) {
     if (!Object.keys(S.samples).length && !S.samplePending.length && !S.doorSamples.length) return "<b>Goal:</b> Request a free sample at the desk PC.";
     if (S.doorSamples.length) return "<b>Goal:</b> A sample is at the door. Take it in.";
