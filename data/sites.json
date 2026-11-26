@@ -208,6 +208,13 @@
       "flag": "tier2"
     },
     {
+      "id": "shop",
+      "addr": "marketplaza.ph/seller",
+      "label": "MarketPlaza",
+      "kind": "shop",
+      "flag": "tier2"
+    },
+    {
       "id": "property",
       "addr": "homes.ph/extend",
       "label": "Homes",

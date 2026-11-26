@@ -1,0 +1,21 @@
+{
+  "_note": "MarketPlaza, the in-game shop app (D-114). Your listings sell from shop search even with no video; a video sends buyers to a listing. Price is the listing price as a share of the product's usual price; a lower price sells more often (priceElastic). search.perHour is orders per game hour for one listing at heat 0.5, trust 50, usual price, no reviews. Courier (D-113): one pickup window a day. Book before the cutoff for today's window, otherwise it is tomorrow's. The courier comes at some time inside the window and waits waitMin minutes at the door; you hand over packed parcels there. Orders not handed over by shipByMin after they came are cancelled. Times are minutes after midnight.",
+  "name": "MarketPlaza",
+  "addr": "marketplaza.ph/seller",
+  "prices": [
+    { "id": "low", "mult": 0.85, "label": "Lower", "does": "more buyers, less per sale." },
+    { "id": "usual", "mult": 1.0, "label": "Usual", "does": "the supplier's suggested price." },
+    { "id": "high", "mult": 1.15, "label": "Higher", "does": "more per sale, fewer buyers." }
+  ],
+  "priceElastic": 2.2,
+  "search": { "perHour": 0.11, "heatMin": 0.2, "trustRef": 50, "crowdDamp": 0.12, "openFrom": 420, "openTo": 1410, "newShop": 0.8 },
+  "shipByMin": 1800,
+  "codDelayMin": 720,
+  "pickup": { "from": 840, "to": 960, "cutoff": 720, "waitMin": 40 },
+  "review": {
+    "chance": 0.45,
+    "good": ["Arrived fast. Same as the video!", "Legit seller. Will order again.", "Nice packing, item is good."],
+    "ok": ["Okay naman. Took a while to ship.", "Item is fine. Box was a bit crushed."],
+    "bad": ["Not like the video.", "Item is different from the photo.", "Seller shipped late."]
+  }
+}

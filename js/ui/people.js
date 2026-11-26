@@ -88,7 +88,7 @@ const next0 = p => { p.cur = null; };
 export function peopleItems() {
   return ppl.map(p => {
     const x = p.sit ? p.sit[0] : p.x, y = p.sit ? p.sit[1] + 0.02 : p.y, [sx, sy] = P(x, y), a = edgeAlpha(y);
-    return { d: x + y + (p.sit ? 0.45 : 0.3), bb: [sx - 40, sy - 170, 80, 180], f: g => drawRig(g, p.look, { x, y, ang: p.sit ? Math.PI / 2 : p.ang, phase: p.phase, move: p.move, sit: !!p.sit, blink: p.blink > 0.4 ? 1 : 0, breath: p.breath, alpha: a, z: p.sit ? 0.02 : 0, noShadow: !!p.sit }) };
+    return { at: [x, y], d: x + y + (p.sit ? 0.45 : 0.3), bb: [sx - 40, sy - 170, 80, 180], f: g => drawRig(g, p.look, { x, y, ang: p.sit ? Math.PI / 2 : p.ang, phase: p.phase, move: p.move, sit: !!p.sit, blink: p.blink > 0.4 ? 1 : 0, breath: p.breath, alpha: a, z: p.sit ? 0.02 : 0, noShadow: !!p.sit }) };
   });
 }
 export function peopleOnCross() { const s = new Set(); for (const p of ppl) { if (p.sit) continue; const k = crossAt(p.x, p.y, 0.1); if (k >= 0) s.add(k); } return s; }

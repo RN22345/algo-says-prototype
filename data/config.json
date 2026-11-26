@@ -1,6 +1,6 @@
 {
   "_note": "Feature flags and start values. Turning a flag off must leave a working game. The dev panel can override flags at run time.",
-  "saveVersion": 3,
+  "saveVersion": 4,
   "storageKey": "algosays.proto7",
   "features": {
     "affiliate": true,

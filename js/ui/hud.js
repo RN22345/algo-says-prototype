@@ -7,7 +7,9 @@
    Unity: one UI Toolkit document; the stat strip, clock and dock are VisualElements styled from the same tokens (css/ui2.css :root).
    Events in: cash/energy/followers/trust/inbox/order/stock changes, frame, modal:open, layout:mode. Events out: phone:toggle, phone:open, bag:toggle, layout:toggle. */
 import { D } from "../core/data.js";
-import { S, flag, fmtMoney } from "../core/state.js";
+import { S, flag, setFlag, fmtMoney } from "../core/state.js";
+import { guideGoal } from "./guide.js";
+import { courierHere, openPickup } from "../sim/shop.js";
 import { fmt, dayNo, tod } from "../core/clock.js";
 import { on, emit } from "../core/bus.js";
 import { h } from "./ui.js";
@@ -39,14 +41,14 @@ export function initHud() {
   el.set = rbtn("gear", "Settings", "set", () => toggleMenu());
   el.menu = h("div", { class: "hud-menu glass", hidden: true });
   el.tr = h("div", { class: "htr" }, el.clock, el.bell, el.set, el.menu);
-  const dk = (icon, label, key, fn) => h("button", { class: "dk", type: "button", "aria-label": label, title: `${label} (${key})`, onClick: fn }, ic(icon), h("span", { class: "dl" }, label), h("span", { class: "nb", hidden: true }));
+  const dk = (icon, label, key, fn) => h("button", { class: "dk " + label.toLowerCase(), type: "button", "aria-label": label, title: `${label} (${key})`, onClick: fn }, ic(icon), h("span", { class: "dl" }, label), h("span", { class: "nb", hidden: true }));
   el.bag = dk("bag", "Bag", "I", () => emit("bag:toggle"));
   el.phoneB = dk("phone", "Phone", "P", () => emit("phone:toggle"));
   el.move = dk("move", "Move", "M", () => emit("layout:toggle"));
   el.dock = h("div", { class: "hdock glass" }, el.bag, el.phoneB, el.move);
   root.append(h("div", { class: "htl" }, el.stats, el.goal), el.tr, el.dock);
   document.addEventListener("pointerdown", e => { if (menuOpen && !e.target.closest(".hud-menu") && !e.target.closest(".gbtn.set")) toggleMenu(false); });
-  for (const ev of ["cash:changed", "energy:changed", "followers:changed", "trust:changed", "inbox:changed", "flag:changed", "newgame", "stock:changed", "post:created", "sample:taken", "gear:changed", "order:new", "order:packed", "order:paid"]) on(ev, () => { sync(); wake(); });
+  for (const ev of ["cash:changed", "energy:changed", "followers:changed", "trust:changed", "inbox:changed", "flag:changed", "newgame", "stock:changed", "post:created", "sample:taken", "gear:changed", "order:new", "order:packed", "order:paid", "guide:changed", "shop:changed"]) on(ev, () => { sync(); wake(); });
   on("frame", clock);
   on("modal:open", () => toggleMenu(false));
   on("layout:mode", m => el.move.classList.toggle("on", !!m));
@@ -89,7 +91,7 @@ function sync() {
   badge(el.bell, un); badge(el.phoneB, un);
   badge(el.bag, S.orders.filter(o => o.status === "toPack" || o.status === "picked").length + S.doorBoxes.length + S.doorSamples.length);
   const rent = S.rent.due > 0 && flag("rent") ? ` Rent due: ${fmtMoney(S.rent.due)}.` : "";
-  const g = goalText() + rent;
+  const g = (guideGoal() || goalText()) + rent;
   if (g !== lastGoal) { lastGoal = g; el.goalT.textContent = g; if (goalFold) { goalFold = false; el.goal.classList.remove("fold"); } el.goal.classList.remove("new"); void el.goal.offsetWidth; el.goal.classList.add("new"); }
 }
 
@@ -104,6 +106,7 @@ function drawMenu() {
   el.menu.append(h("div", { class: "mh" }, "Settings"),
     row("sound", "Sound effects", isMuted() ? "Off" : "On", () => { setMuted(!isMuted()); drawMenu(); }),
     row("music", "Music", musicEnabled() ? "On" : "Off", () => { setMusic(!musicEnabled()); drawMenu(); }),
+    row("flag", "Guide", flag("intro") && !S.intro.done ? "On" : "Off", () => { if (S.intro.done) { S.intro.done = false; setFlag("intro", true); } else setFlag("intro", !flag("intro")); drawMenu(); }),
     row("eye", "Show HUD (H)", hidden ? "Off" : "On", () => setHidden(!hidden)),
     row("expand", "Full screen", null, () => { toggleFull(); toggleMenu(false); }),
     confirmNew ? h("div", { class: "mconf" }, h("div", {}, "Erase this game and start again?"),
@@ -113,6 +116,9 @@ function drawMenu() {
 
 /* A short line about what to do next. Not a grade. */
 function goalText() {
+  const packed = S.orders.some(o => o.status === "packed");
+  if (courierHere() && packed) return "The courier is at the door. Hand over your parcels.";
+  if (packed && !openPickup()) return "Parcels are packed. Book a courier pickup on MarketPlaza.";
   if (!S.posts.length && S.mode === "reseller") {
     const shelf = S.shelves.some(sh => sh.some(Boolean)), boxes = Object.values(S.boxes).some(v => v > 0);
     if (S.doorBoxes.length) return "The supplier left boxes at the door. Take them in.";

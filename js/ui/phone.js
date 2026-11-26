@@ -1,23 +1,24 @@
 /* PHONE (D-107). A phone held in the hand: rounded body, bezel, camera notch, status bar (game clock, signal, battery), home screen with app icons,
    home bar. It slides up from the bottom right. Apps open full screen inside the phone with a back arrow; the home bar goes home (and closes the phone from home).
-   Apps: Messages, TikTik, YouView, Orders, Bank, Calendar, Playbook (js/ui/phone/*). Unread badges sit on the icons.
+   Apps: Messages, TikTik, YouView, MarketPlaza (Orders before tier 2), Bank, Calendar, Playbook (js/ui/phone/*). Unread badges sit on the icons.
    Events in: phone:toggle, phone:open {tab|app}, modal:open (closes the phone unless keepPhone), inbox:changed, order:*, lesson:new, cash:changed, post:created, newgame, frame.
    Events out: open:results. Old tab ids map to apps: inbox, feeds, orders, wallet, playbook. */
-import { S, flag } from "../core/state.js";
+import { S, flag, tier2On } from "../core/state.js";
 import { fmt, dayNo } from "../core/clock.js";
 import { on } from "../core/bus.js";
 import { h, clear } from "./ui.js";
 import { ic } from "./icons.js";
 
-const ICON = { messages: "chat", tiktik: "play", youview: "video", orders: "box", bank: "bank", calendar: "calendar", playbook: "book" };
+const ICON = { messages: "chat", tiktik: "play", youview: "video", orders: "box", shop: "bag", bank: "bank", calendar: "calendar", playbook: "book" };
 import { messagesApp, ordersApp, bankApp, calendarApp, playbookApp } from "./phone/apps.js";
 import { tiktikApp, youviewApp, feedCard } from "./phone/feedapp.js";
+import { shopApp } from "./shopview.js";
 
 export { feedCard };
-const MAP = { inbox: "messages", feeds: "tiktik", orders: "orders", wallet: "bank", playbook: "playbook" };
+const MAP = { inbox: "messages", feeds: "tiktik", orders: "shop", wallet: "bank", playbook: "playbook" };
 let apps = [], el = {}, open = false, cur = null, backFn = null, lastClock = "";
 
-const appList = () => [messagesApp, tiktikApp(), youviewApp(), ordersApp, bankApp, calendarApp, ...(flag("playbook") ? [playbookApp] : [])];
+const appList = () => [messagesApp, tiktikApp(), youviewApp(), ...(tier2On() ? [shopApp] : [ordersApp]), bankApp, calendarApp, ...(flag("playbook") ? [playbookApp] : [])];
 export const isOpen = () => open;
 
 export function initPhone() {
@@ -36,7 +37,7 @@ export function initPhone() {
     if (id && (id !== cur || id === "messages")) goApp(id, true); else if (!open && cur === null) goApp(null, true);
     toggle(true);
   });
-  for (const ev of ["inbox:changed", "order:paid", "order:packed", "order:shipped", "order:new", "order:returned", "lesson:new", "cash:changed", "post:created", "newgame", "stock:changed", "event:signal", "feed:post"]) on(ev, () => { if (open) render(); });
+  for (const ev of ["inbox:changed", "order:paid", "order:packed", "order:shipped", "order:new", "order:returned", "order:cancelled", "shop:changed", "courier:arrived", "courier:left", "lesson:new", "cash:changed", "post:created", "newgame", "stock:changed", "event:signal", "feed:post"]) on(ev, () => { if (open) render(); });
   on("frame", () => { if (!open) return; const t = fmt(); if (t !== lastClock) { lastClock = t; el.clk.textContent = t; if (cur === null) render(); } });
 }
 function toggle(force) {
@@ -82,7 +83,7 @@ function drawHome() {
   const grid = h("div", { class: "ph-grid" });
   for (const a of apps) {
     const n = a.badge();
-    grid.append(h("button", { class: "ph-ico", type: "button", onClick: () => goApp(a.id, true) },
+    grid.append(h("button", { class: "ph-ico", type: "button", "data-app": a.id, onClick: () => goApp(a.id, true) },
       h("span", { class: "itile", style: { background: `linear-gradient(150deg,${a.grad[0]},${a.grad[1]})` } }, ic(ICON[a.id] || "box"), n ? h("span", { class: "nb" }, n) : null),
       h("span", { class: "lb" }, a.label)));
   }

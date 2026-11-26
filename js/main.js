@@ -21,11 +21,13 @@ import * as posts from "./sim/posts.js";
 import * as lessons from "./sim/lessons.js";
 import * as updates from "./sim/updates.js";
 import * as property from "./sim/property.js";
+import * as shop from "./sim/shop.js";
 
 import { initUI, h, btn, clear } from "./ui/ui.js";
 import { initRoom } from "./ui/room.js";
 import { initHud } from "./ui/hud.js";
-import { initAlgo, startIntro, skipIntro } from "./ui/algo.js";
+import { initAlgo, setPostCount } from "./ui/algo.js";
+import { initGuide, skipGuide } from "./ui/guide.js";
 import { initStations } from "./ui/stations.js";
 import { initLayout } from "./ui/layout.js";
 import { initPhone } from "./ui/phone.js";
@@ -40,17 +42,17 @@ async function boot() {
   } catch (e) { document.body.innerHTML = `<pre style="color:#fff;padding:20px">Could not load data: ${e.message}\nRun this folder from a static server (python -m http.server).</pre>`; throw e; }
   resetState(); initFit(); initUI(); initSound();
   // systems: events first (it writes S.mods), then market, rivals and the rest
-  for (const m of [events, market, rivals, inbox, money, energy, stock, orders, posts, lessons, updates, property]) m.init();
+  for (const m of [events, market, rivals, inbox, money, energy, stock, orders, posts, lessons, updates, property, shop]) m.init();
   let had = false;
   try { had = load(); } catch (e) { console.warn("save reset", e); wipe(); }
-  initRoom(); initLayout(); initHud(); initInventory(); initAlgo(); initStations(); initPhone(); initCards(); initDev(had);
+  initRoom(); initLayout(); initHud(); initInventory(); initAlgo(); setPostCount(() => S.posts.length); initGuide(); initStations(); initPhone(); initCards(); initDev(had);
   initSave();
   showTitle(had);
   let last = performance.now(), run = false;
   on("game:start", () => { run = true; });
   const loop = now => { const dt = (now - last) / 1000; last = now; if (run) frame(dt); requestAnimationFrame(loop); };
   requestAnimationFrame(loop);
-  window.__algo = { S, D, emit, on, skipIntro };
+  window.__algo = { S, D, emit, on, skipGuide };
 }
 
 function showTitle(had) {
@@ -58,7 +60,6 @@ function showTitle(had) {
   const begin = (fresh, mode) => {
     if (fresh) { newGame(mode); }
     clear(root); emit("game:start"); emit("frame"); emit("cash:changed");
-    if (fresh) startIntro(); else if (!S.intro.done) startIntro();
   };
   const logo = small => h("h1", { class: "tlogo" + (small ? " small" : ""), "data-text": "ALGO SAYS" }, "ALGO SAYS");
   const scene = (...kids) => h("div", { class: "tscreen" }, h("div", { class: "tsun" }), h("div", { class: "tcloud c1" }), h("div", { class: "tcloud c2" }), h("div", { class: "tcloud c3" }),

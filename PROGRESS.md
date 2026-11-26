@@ -73,3 +73,16 @@ Not done or uncertain:
 - Not played on a real phone. The pane was hidden, so frame rate was not measured.
 - Houses across the road face away from it.
 - The studio, editor and results screens got the soft theme through shared classes only; they were not checked one by one.
+
+## Round 5 (D-112 to D-117)
+
+Done:
+- Voxel bush, mailbox and Mr. Algo (station and five face portraits in the HUD bar).
+- Indoor and outdoor layers with the house exterior (walls, door, windows, hip roof) and a crossfade at the door.
+- Data-driven guide with gold pulse, goal line, Skip guide and a Settings switch. Old intro and spotlight removed.
+- MarketPlaza phone app and PC page: listings, price levels, shop orders, reviews. Search orders from listings.
+- Booked courier pickups with a ship-by deadline; hand over at the door.
+
+Tested in the browser pane: reseller guide from order to handover (pulse on Supplier order, door, shelves, Phone, MarketPlaza icon, List, packing, Book pickup, door hand-over); affiliate start pulse on Request sample; Skip guide; house exterior from the street; no console errors.
+
+Not tested: a full real-time play of the search trickle and missed pickups; touch; the PC MarketPlaza page inside a window (render checked alone).

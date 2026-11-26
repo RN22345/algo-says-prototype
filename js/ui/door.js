@@ -1,7 +1,8 @@
-/* DOOR. Samples and supplier boxes wait here until you take them in. Packed parcels wait here for the courier (pickups at set hours). */
+/* DOOR. Samples and supplier boxes wait here until you take them in. When the booked courier is here, hand over the packed parcels (D-113). */
 import { D } from "../core/data.js";
 import { S, flag } from "../core/state.js";
-import { nextAt, fmtDay, fmt } from "../core/clock.js";
+import { fmt } from "../core/clock.js";
+import { courierHere, openPickup } from "../sim/shop.js";
 import { on, emit } from "../core/bus.js";
 import { h, btn, art, clear, modal } from "./ui.js";
 
@@ -20,10 +21,13 @@ export function openDoor() {
     if (S.doorSamples.length + S.doorBoxes.length > 1) box.append(btn("Take everything in", "b-teal", () => { [...S.doorSamples].forEach(id => emit("door:take", { kind: "sample", id })); [...S.doorBoxes].forEach(b => emit("door:take", { kind: "box", id: b.id })); }));
     if (flag("tier2")) {
       const packed = S.orders.filter(o => o.status === "packed");
-      const times = D.time.courierTimes.map(m => fmt(nextAt(m) )).join(" and ");
-      box.append(h("h3", {}, "Parcels for the courier"), h("div", { class: "panel" }, packed.length ? `${packed.length} packed parcel${packed.length > 1 ? "s" : ""} waiting. ` : "No packed parcels. ", `The courier comes at ${D.time.courierTimes.map(m => Math.floor(m / 60) + ":00").join(" and ")}.` + (S.mods.courierDelay ? " Running late today." : "")));
+      const here = courierHere(), pk = openPickup(), n = packed.length, pl = n === 1 ? "" : "s";
+      box.append(h("h3", {}, "Parcels for the courier"));
+      if (here) box.append(h("div", { class: "panel" }, `The courier is here until ${fmt(here.leave)}. ${n ? n + " packed parcel" + pl + " ready." : "Nothing is packed."}`),
+        n ? btn(`Hand over ${n} parcel${pl}`, "b-gold", () => { const q = { ok: false }; emit("pickup:handover", q); if (q.ok) emit("sfx", "coin"); draw(); }) : null);
+      else box.append(h("div", { class: "panel" }, `${n ? n + " packed parcel" + pl + " waiting. " : "No packed parcels. "}` + (pk ? `Courier booked: ${fmt(pk.from)} to ${fmt(pk.to)}. Be here when they come.` : "No courier booked. Book a pickup on MarketPlaza (phone or PC).")));
     }
   };
-  draw(); offs = ["stock:changed", "order:packed", "order:shipped", "tick"].map(ev => on(ev, () => { if (ev !== "tick") draw(); }));
+  draw(); offs = ["stock:changed", "order:packed", "order:shipped", "courier:arrived", "courier:left", "tick"].map(ev => on(ev, () => { if (ev !== "tick") draw(); }));
 }
 const row = (icon, title, sub, action) => h("div", { class: "ordrow" }, icon, h("div", { class: "grow" }, h("b", { class: "lil" }, title), h("div", { class: "small mute" }, sub)), action);

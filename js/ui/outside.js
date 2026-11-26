@@ -65,20 +65,21 @@ let lastNow = 0, lastBoxes = 0, lastParcels = 0;
 export function outsideItems(now, ctx = {}) {
   const out = [], t = S.t, base = t - tod(), R = Wd().road, park = doorMid() - 0.3;
   const dt = Math.min(0.05, Math.max(0, (now - lastNow) / 1000)); lastNow = now;
-  // courier at the pickup times (later when the courier is delayed)
-  for (const ct of D.time.courierTimes) {
-    const t0 = base + ct + (S.mods && S.mods.courierDelay ? 60 : 0), v = visit(t, t0, t0 + 25, park - 1.7);
+  // the courier for a booked pickup (D-113): rides in, waits at the door until it leaves
+  for (const pk of (S.shop && S.shop.pickups) || []) {
+    if (pk.status === "booked" && pk.arrive > t + 40) continue;
+    const v = visit(t, pk.arrive, pk.leave, park - 1.7);
     if (v) { const packed = (S.orders || []).filter(o => o.status === "packed").length, d = v.ride ? 12.6 + v.sy : v.x + v.y; const [sx, sy] = P(v.x, v.y);
-      out.push({ d: d + 0.35, bb: [sx - 300, sy - 300, 600, 420], f: g => drawVisit(g, v, lookOf("courier"), "#ff7a1a", packed ? `Courier: ${packed} to collect` : "Courier") }); }
+      out.push({ at: v.ride ? [12.6, v.sy] : [v.x, v.y], d: d + 0.35, bb: [sx - 300, sy - 300, 600, 420], f: g => drawVisit(g, v, lookOf("courier"), "#ff7a1a", packed ? `Courier: ${packed} to collect` : "Courier") }); }
   }
   // the rider who brings a sample
   { const v = visit(t, sampleRiderAt + 9, sampleRiderAt + 30, park - 3.4);
-    if (v) { const d = v.ride ? 12.6 + v.sy : v.x + v.y; const [sx, sy] = P(v.x, v.y); out.push({ d: d + 0.35, bb: [sx - 300, sy - 300, 600, 420], f: g => drawVisit(g, v, lookOf("rider"), "#3a7bf0", "Sample delivered") }); } }
+    if (v) { const d = v.ride ? 12.6 + v.sy : v.x + v.y; const [sx, sy] = P(v.x, v.y); out.push({ at: v.ride ? [12.6, v.sy] : [v.x, v.y], d: d + 0.35, bb: [sx - 300, sy - 300, 600, 420], f: g => drawVisit(g, v, lookOf("rider"), "#3a7bf0", "Sample delivered") }); } }
   // supplier van, parked in the curb strip at the arrival time when boxes come
   { const t0 = base + D.time.supplierArrive, y = roadY(t, t0, t0 + 35, park + 1.0);
     if (y != null && (S.doorBoxes.length || (S.deliveries || []).length || t < t0)) {
       const x = R.curb, [sx, sy] = P(x, y), a = edgeAlpha(y);
-      out.push({ d: x + y + 0.9, bb: [sx - 340, sy - 580, 680, 700], f: g => {
+      out.push({ at: [x, y], d: x + y + 0.9, bb: [sx - 340, sy - 580, 680, 700], f: g => {
         const pa = g.globalAlpha; g.globalAlpha = pa * a;
         if (hasSpr("vh_van_p")) drawSpr(g, "vh_van_p", x, y);
         else { prism(g, x - 0.6, y - 1.3, 1.2, 2.6, 1.05, "#ffffff", "#c9d3ea", "#e3e9f7"); }
@@ -92,7 +93,7 @@ export function outsideItems(now, ctx = {}) {
   const spot = i => [step[0] + (i % 2) * 0.42 + 0.18, step[1] - Math.floor(i / 2) * 0.42 + 0.18];
   for (let i = 0; i < waiting; i++) {
     const [x, y] = spot(i), [sx, sy] = P(x, y), key = "door:" + i; alive.add(key);
-    out.push({ d: x + y + 0.3, bb: [sx - 40, sy - 70, 80, 90], f: g => { const ap = appear(key, now); g.globalAlpha = ap.a; if (!drawSpr(g, "it_box", x, y, { z: ap.z, scale: ap.s })) prism(g, x - 0.18, y - 0.18, 0.36, 0.36, 0.34, "#f2c46b", "#c98f3a", "#ddaa52", ap.z); g.globalAlpha = 1; } });
+    out.push({ at: [x, y], d: x + y + 0.3, bb: [sx - 40, sy - 70, 80, 90], f: g => { const ap = appear(key, now); g.globalAlpha = ap.a; if (!drawSpr(g, "it_box", x, y, { z: ap.z, scale: ap.s })) prism(g, x - 0.18, y - 0.18, 0.36, 0.36, 0.34, "#f2c46b", "#c98f3a", "#ddaa52", ap.z); g.globalAlpha = 1; } });
   }
   forget("door:", alive); if (waiting < lastBoxes) for (let i = waiting; i < lastBoxes; i++) puff(...spot(i)); lastBoxes = waiting;
   // traffic and people (real time)

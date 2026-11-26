@@ -4,6 +4,7 @@
 import { D } from "../core/data.js";
 import { S, fmtMoney } from "../core/state.js";
 import { fmtDay } from "../core/clock.js";
+import { emit } from "../core/bus.js";
 import { three } from "../sim/algo3.js";
 import { artUrl } from "../core/assets.js";
 import { h, btn, art, clear, modal } from "./ui.js";
@@ -16,6 +17,7 @@ export function openResults(postId) {
   const post = S.posts.find(p => p.id === postId); if (!post) return;
   if (win && win.back.isConnected) win.close();
   post.looked = post.done || post.looked;
+  S.stats.looked = (S.stats.looked || 0) + 1; emit("results:opened", post.id);
   const box = h("div", { class: "col" });
   win = modal({ title: `Results: ${D.P[post.pid].name} on ${D.SITE[post.site].name}`, cls: "results", body: box, onClose: () => { clearInterval(timer); win = null; } });
   const draw = () => { const sc = win.body.scrollTop; clear(box); build(box, post); win.body.scrollTop = sc; };

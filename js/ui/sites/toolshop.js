@@ -11,7 +11,7 @@ export function render(root, def, api) {
   const tiles = D.gear.filter(g => g.id !== "shelves" || flag("tier2")).map(g => {
     const own = !!S.gear[g.id];
     return h("div", { class: "tile" }, art(g.art), h("b", {}, g.name), h("div", { class: "sub" }, g.does),
-      own ? h("span", { class: "tag green" }, "Owned") : btn(`Buy ${fmtMoney(g.price)}`, S.cash >= g.price ? "b-gold sm" : "b-grey sm", () => {
+      own ? h("span", { class: "tag green" }, "Owned") : btn(`Buy ${fmtMoney(g.price)}`, (S.cash >= g.price ? "b-gold sm" : "b-grey sm") + " ts-" + g.id, () => {
         if (!spend(g.price, "Gear: " + g.name)) return;
         S.gear[g.id] = true; emit("gear:changed"); toast(`${g.name} installed.`); sfx("coin"); api.rerender();
       }));

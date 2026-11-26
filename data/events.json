@@ -66,9 +66,9 @@
       ],
       "explain": "It was a rainy week: fans dropped and indoor items rose." },
     { "id": "courier", "weight": 2, "name": "Courier delay", "target": { "kind": "all" }, "durationH": 36, "leadMin": 0,
-      "headline": "Courier delay: pickups are running about 3 hours late.",
-      "signals": { "inbox": { "title": "Courier delay", "text": "The courier says pickups are running about 3 hours late." }, "feed": { "by": "Seller Hub News", "text": "Courier delays everywhere. Parcels are slow." } },
-      "effects": [ { "kind": "courierDelay", "minutes": 180 } ],
+      "headline": "Courier delay: pickups are running about an hour late.",
+      "signals": { "inbox": { "title": "Courier delay", "text": "The courier says pickups are running about an hour late." }, "feed": { "by": "Seller Hub News", "text": "Courier delays everywhere. Parcels are slow." } },
+      "effects": [ { "kind": "courierDelay", "minutes": 60 } ],
       "explain": "A courier delay slowed pickups." }
   ]
 }

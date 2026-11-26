@@ -1,10 +1,10 @@
-/* CAMERA. The world is bigger than the 1920x1080 stage. The camera has a centre in world pixels and a zoom (0.7 to 1.3).
+/* CAMERA. The world is bigger than the 1920x1080 stage. The camera has a centre in world pixels and a zoom (0.7 to 1.3), times 1.3 indoors.
    follow() eases toward the player with a small dead zone and clamps to the world box. Wheel or pinch changes the zoom.
    toWorld/toScreen convert between stage pixels and world pixels. matrix() is the same transform for CSS or SVG.
    Events out: camera:moved (throttled). */
 import { emit } from "../core/bus.js";
 
-export const cam = { cx: 0, cy: 0, z: 1, snap: true, pinchAt: 0 };
+export const cam = { cx: 0, cy: 0, z: 1, zu: 1, inner: 0, snap: true, pinchAt: 0 };   // z = zu (player's zoom) x the indoor zoom-in
 const VW = 1920, VH = 1080, ZMIN = 0.7, ZMAX = 1.3;
 let box = { x0: 0, y0: 0, x1: 1920, y1: 1080 }, lastEmit = 0;
 export const setBounds = b => { box = b; clamp(); };
@@ -31,14 +31,18 @@ export function follow(px, py, dt) {
   clamp();
   if ((Math.abs(cam.cx - ox) > 0.4 || Math.abs(cam.cy - oy) > 0.4) && performance.now() - lastEmit > 80) { lastEmit = performance.now(); emit("camera:moved"); }
 }
-export function zoomTo(z) { const o = cam.z; cam.z = Math.max(ZMIN, Math.min(ZMAX, z)); if (cam.z !== o) { clamp(); emit("camera:moved"); } }
-export const zoomBy = f => zoomTo(cam.z * f);
+const INNER = 0.3;
+function setZ() { const o = cam.z; cam.z = cam.zu * (1 + INNER * cam.inner); if (cam.z !== o) { clamp(); emit("camera:moved"); } }
+export function zoomTo(z) { cam.zu = Math.max(ZMIN, Math.min(ZMAX, z)); setZ(); }
+export const zoomBy = f => zoomTo(cam.zu * f);
+/* Indoors (k = 1) the camera leans in; k eases between 0 and 1 as the player passes the door. */
+export function setInner(k) { if (Math.abs(k - cam.inner) < 1e-4) return; cam.inner = k; setZ(); }
 /* Wheel zoom and two-finger pinch on an element. A pinch sets cam.pinchAt so the lifted finger does not count as a click. */
 export function initCameraInput(el) {
   el.addEventListener("wheel", e => { e.preventDefault(); zoomBy(Math.exp(-e.deltaY * 0.0012)); }, { passive: false });
   const pts = new Map(); let d0 = 0, z0 = 1;
   const dist = () => { const [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
-  el.addEventListener("pointerdown", e => { if (e.pointerType !== "touch") return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size === 2) { d0 = dist(); z0 = cam.z; cam.pinchAt = performance.now(); } });
+  el.addEventListener("pointerdown", e => { if (e.pointerType !== "touch") return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (pts.size === 2) { d0 = dist(); z0 = cam.zu; cam.pinchAt = performance.now(); } });
   el.addEventListener("pointermove", e => {
     const p = pts.get(e.pointerId); if (!p) return; p.x = e.clientX; p.y = e.clientY;
     if (pts.size === 2 && d0 > 0) { zoomTo(z0 * dist() / d0); cam.pinchAt = performance.now(); }

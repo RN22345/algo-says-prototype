@@ -75,5 +75,5 @@ function drawCar(g, c) {
   g.globalAlpha = prev;
 }
 export function trafficItems() {
-  return cars.map(c => { const [sx, sy] = P(c.x, c.y); return { d: c.x + c.y + 0.75, bb: [sx - 300, sy - 380, 600, 480], f: g => drawCar(g, c) }; });
+  return cars.map(c => { const [sx, sy] = P(c.x, c.y); return { at: [c.x, c.y], d: c.x + c.y + 0.75, bb: [sx - 300, sy - 380, 600, 480], f: g => drawCar(g, c) }; });
 }

@@ -3,7 +3,7 @@
    Also registers the Stock Sheet window. Several browser windows can be open at once (up to 4).
    Exports: openBrowser(tab). Events in: open:browser (stations.js calls openBrowser). Events out: browser:opened {tab}, open:studio (from the site pages). */
 import { D } from "../core/data.js";
-import { flag } from "../core/state.js";
+import { flag, tier2On } from "../core/state.js";
 import { on, emit } from "../core/bus.js";
 import { h, clear } from "./ui.js";
 import { registerApp, openWindow, listWindows, focusWindow, setTitle, openPC, renderIcons } from "./pc/desktop.js";
@@ -15,9 +15,10 @@ import * as hub from "./sites/hub.js";
 import * as toolshop from "./sites/toolshop.js";
 import * as supplier from "./sites/supplier.js";
 import * as property from "./sites/property.js";
+import * as shop from "./sites/shop.js";
 
-const PAGES = { site: social, affiliate, hub, toolshop, supplier, property };
-const EVS = ["stock:changed", "cash:changed", "post:created", "order:paid", "order:new", "gear:changed", "sample:arrived", "sample:requested", "inbox:changed", "event:signal", "update:applied", "post:done", "property:bought", "furniture:bought", "layout:changed"];
+const PAGES = { site: social, affiliate, hub, toolshop, supplier, property, shop };
+const EVS = ["stock:changed", "cash:changed", "post:created", "order:paid", "order:new", "gear:changed", "sample:arrived", "sample:requested", "inbox:changed", "event:signal", "update:applied", "post:done", "property:bought", "furniture:bought", "layout:changed", "shop:changed", "order:packed", "order:shipped", "courier:arrived", "courier:left"];
 const MAX_BROWSERS = 4;
 
 const sites = () => D.sites.browser.filter(t => (!t.flag || flag(t.flag)) && (t.kind !== "property" || propList().length));
@@ -30,6 +31,7 @@ const ICON = [
   { id: "affiliate", label: "Affiliate", emoji: "🤝", grad: ["#2fd9cf", "#1d8c82"], show: () => flag("affiliate"), open: () => openBrowser("affiliate") },
   { id: "hub", label: "Seller Hub", emoji: "📊", grad: ["#b744c9", "#6a2ab0"], open: () => openBrowser("hub") },
   { id: "supplier", label: "Supplier", emoji: "🚚", grad: ["#3ec45a", "#26923b"], show: () => flag("tier2"), open: () => openBrowser("supplier") },
+  { id: "shop", label: "MarketPlaza", emoji: "🛍️", grad: ["#ff5fa2", "#e8344f"], show: () => tier2On(), open: () => openBrowser("shop") },
   { id: "toolshop", label: "Tool Shop", emoji: "🛠️", grad: ["#ffa23a", "#e8601a"], open: () => openBrowser("toolshop") },
   { id: "property", label: "Property", emoji: "🏠", grad: ["#ffd84a", "#e8a010"], show: () => propList().length > 0, open: () => openBrowser("property") },
   { id: "stock", label: "Stock Sheet", emoji: "📋", grad: ["#9be85a", "#3ec45a"], open: () => openStock() }

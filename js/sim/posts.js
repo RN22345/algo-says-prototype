@@ -3,7 +3,7 @@
    Events in: post:submit {video, post}, tick. Events out: post:created, post:analysed, post:done, order:new, inbox:add, summary:add, followers:changed.
    Reads S.market, S.mods, S.followers, S.trust, S.shelves. Uses the pure viewerModel. */
 import { D } from "../core/data.js";
-import { S, uid, hashStr, clamp } from "../core/state.js";
+import { S, uid, hashStr, clamp, priceConv } from "../core/state.js";
 import { on, emit } from "../core/bus.js";
 import { simulate, waveCum } from "./viewerModel.js";
 
@@ -57,6 +57,7 @@ function onTick({ t0, t1, dt }) {
       const rate = res.search.base * Math.max(res.search.floor, S.market.heat[post.pid] ?? 0.2) / 60 * dt;
       dv += rate; dor += rate * res.search.conv; post.searchViews += rate;
     }
+    if (post.mode === "own") dor *= priceConv(post.pid);   // the listing price shifts how many viewers buy (MarketPlaza)
     post.vf += dv; post.of += dor;
     post.views = Math.floor(post.vf);
     if (res.viewers.total > 0) { post.ff += dv * res.followGain / res.viewers.total; const g = Math.floor(post.ff) - post.folGained; if (g > 0) { post.folGained += g; S.followers[post.site] = (S.followers[post.site] || 0) + g; emit("followers:changed", post.site); } }

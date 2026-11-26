@@ -14,7 +14,7 @@ export function openPacking() {
   const draw = () => {
     clear(box);
     const todo = S.orders.filter(o => o.status === "toPack"), packed = S.orders.filter(o => o.status === "packed");
-    box.append(h("div", { class: "panel" }, `Pack costs ${D.time.energy.pack} energy each. Courier pickups at ${D.time.courierTimes.map(m => Math.floor(m / 60) + ":00").join(" and ")}. ${packed.length} parcel${packed.length === 1 ? "" : "s"} waiting.`));
+    box.append(h("div", { class: "panel" }, `Pack costs ${D.time.energy.pack} energy each. Book a courier pickup on MarketPlaza and hand parcels over at the door. ${packed.length} parcel${packed.length === 1 ? "" : "s"} waiting.`));
     if (!todo.length) box.append(h("div", { class: "panel" }, "No orders to pack. Orders come when your posts get buyers and the shelf has stock."));
     for (const o of todo) {
       const n = prog[o.id] || 0;

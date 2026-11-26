@@ -1,7 +1,7 @@
 /* Loads every data/*.json into D. Everything tunable lives there.
    D.P is a product map, D.SITE the live site values, D.sitesBase the untouched values (platform updates are replayed from it after a load). */
 export const D = {};
-const FILES = ["config", "time", "products", "shots", "viewers", "sites", "lessons", "gear", "room", "market", "assets", "intro", "events", "world", "rig"];
+const FILES = ["config", "time", "products", "shots", "viewers", "sites", "lessons", "gear", "room", "market", "assets", "guide", "events", "world", "rig", "shop"];
 
 export async function loadData() {
   const res = await Promise.all(FILES.map(f => fetch(`data/${f}.json`, { cache: "no-cache" })

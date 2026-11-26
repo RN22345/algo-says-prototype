@@ -39,7 +39,7 @@ index.html            one page, six layers (room, hud, algo, phone, modals, fx)
 css/style.css         the artist palette, Lilita One + Fredoka, buttons, cards
 data/                 EVERYTHING tunable (JSON)
   config.json         feature flags, editor mode, start values, seed trends, save version
-  time.json           day length, daylight, nap/sleep, supplier and courier hours, energy costs, rent
+  time.json           day length, daylight, nap/sleep, supplier hours, energy costs, rent
   products.json       products: traits, price, unit cost, commission, sample delay, art ids
   shots.json          actions, angles, lights: what each answers, how each fits each trait
   viewers.json        viewer types, mixes, model constants, comment words, the reason table for Mr. Algo
@@ -50,7 +50,8 @@ data/                 EVERYTHING tunable (JSON)
   market.json         trend lifecycles, fizzles, rivals, creators, feed comments
   events.json         calendar events and random events (see below)
   assets.json         every art id from the artist list, with size and kind
-  intro.json          guided start steps and Mr. Algo hints
+  guide.json          first-run guide steps (affiliate, reseller) and Mr. Algo hints
+  shop.json           MarketPlaza: price levels, search orders, courier pickup window, ship-by, reviews
 img/                  artist PNGs go here, named by art id (st_desk.png, product_tote.png ...)
 img/ph/               stand-in art (old product icons, Mr. Algo, avatars)
 js/core/              bus, data, state, clock, save, assets, fit, sound, actions
@@ -101,7 +102,7 @@ Random: about 3 to 5 a week, weighted. Creator sighting, defect report, supplier
 - Walk with WASD or arrows, or click the floor. Click a station to walk there and use it; E or Space uses the station in reach.
 - Move (dock button or M): click a piece to pick it up, R rotates, click to drop on a green spot. Saved in `S.layout`. `"fixed": true` in room.json stops a piece moving.
 - House size and door gap are in `data/room.json` (`view.Nx/Ny`, `front`); the yard, street and extra rooms are in `data/world.json` (see World below). Riders, the supplier van, and traffic are drawn by `js/ui/outside.js` from the clock and events (visual only).
-- New game asks: Affiliate or Reseller. Reseller sets the `affiliate` flag off, gives shelves and `start.reseller.cash` (config.json), and uses `stepsReseller` in intro.json.
+- New game asks: Affiliate or Reseller. Reseller sets the `affiliate` flag off, gives shelves and `start.reseller.cash` (config.json), and runs only the reseller steps of guide.json.
 - Dev server without caching: `python tools/serve.py 8771`.
 
 ## Screens (Builder B, round 3: D-107 to D-109)
@@ -112,7 +113,7 @@ Random: about 3 to 5 a week, weighted. Creator sighting, defect report, supplier
 - **HUD** (`js/ui/hud.js`, round 4): soft glass panels, no artist HUD art. Top left: one stat strip (cash, followers on each site, trust, energy) and the goal line (click to fold). Top right: clock (sun or moon, time, day, day progress) with round bell and settings buttons. Bottom right: dock with Bag (I), Phone (P), Move (M). Calm mode fades the panels while the player walks; any change wakes them. H hides the HUD down to the clock (also in Settings). Icons are one line-icon set in `js/ui/icons.js` (`ic(name)`).
 - **Inventory** (`js/ui/inventory.js`): bottom bar (in hand, stock box, parcels) and the bag (key I, Parcel button, `bag:open {tab}`): Orders, Stock, Furniture (Place emits `layout:place {id}`), Gear.
 - **Title** (`showTitle` in `js/main.js`, styles in `css/ui2.css`).
-- Styles for all of this are in `css/ui2.css`. The intro spotlight uses `.sp-order` and `.aff-req` (classes on the supplier and affiliate buttons) inside the focused window.
+- Styles for all of this are in `css/ui2.css`. The guide pulses buttons by class: `.sp-order`, `.aff-req`, `.ts-shelves`, `.mp-list`, `.mp-book` (map `UI` in `js/ui/guide.js`).
 
 ## World (Builder A, round 3: D-105 to D-106)
 
@@ -133,6 +134,13 @@ Random: about 3 to 5 a week, weighted. Creator sighting, defect report, supplier
 - **Light.** A night tint and lamp glow follow the clock (dark before 6:00, light by 6:30, dusk from 17:00).
 - **UI.** Tokens at the top of `css/ui2.css` (`--g-bg` light glass, `--d-bg` dark glass, `--ink`, `--line`, blur, shadow). Cards and site rows have hairline edges and soft shadows, not thick outlines. The PC windows have light glass title bars and a floating taskbar. The title is a blurred view of the live world.
 
+## Round 5: two scenes, guide, MarketPlaza, courier pickups (D-112 to D-117)
+
+- **Two scenes.** `terrain.js` draws three layers: ground chunks and the building exterior (outdoor), and the interior (floors, back walls, front wall). `room.js` draws the outdoor scene or the indoor scene and crossfades between them when the player passes the door (`ia`). Outdoor items are sorted in front of or behind the house by their `at` world point. Clicking the house from outside walks to the door. Move mode always shows the inside.
+- **Guide.** `data/guide.json` has the steps; `js/ui/guide.js` has the condition registry (`COND`), the runner (checked every 400 ms, passed steps latched in `S.intro.ok`), the goal line (`guideGoal()`), the gold pulse, and the hints. Mr. Algo (`algo.js`) only speaks. Settings has Guide On or Off; the bubble has Skip guide.
+- **MarketPlaza.** `js/sim/shop.js` (listings, search orders, price levels, reviews and rating, pickups) and `js/ui/shopview.js` (the blocks), used by the phone app and the PC page `js/ui/sites/shop.js`. Own orders carry a ship-by time. The Orders phone app stays for the affiliate tier.
+- **Courier.** Book a pickup window on MarketPlaza. The courier arrives at an unknown time inside it, waits about 40 minutes, and the door dialog hands over the packed parcels. A courier delay event moves the visit later.
+
 ## Moving to Unity
 
 The prototype keeps data, rules and drawing apart so each part has a Unity home.
@@ -150,4 +158,7 @@ The prototype keeps data, rules and drawing apart so each part has a Unity home.
 | `fx.js` pop-in and dust | DOTween or Animator scale tween plus a small ParticleSystem |
 | Night tint and lamp glow | Global light colour and intensity curves, lamp point lights |
 | Stations, `hitStation` | Prefabs with colliders and an Interactable component; outline shader on hover |
+| Outdoor and indoor layers (`terrain.js`, `room.js` two scenes) | Two layers (Exterior, Interior) on one camera; entering swaps the culling mask and eases the zoom |
+| Guide (`guide.json`, `guide.js`) | TutorialStep ScriptableObjects and a TutorialRunner that polls a condition dictionary and toggles a Highlight component |
+| MarketPlaza and pickups (`shop.json`, `sim/shop.js`) | ShopSystem plain C# class plus a ShopConfig ScriptableObject |
 | HUD, phone, PC, cards (`css/ui2.css` tokens) | UI Toolkit (UXML plus USS); the CSS tokens become USS variables; icons from `icons.js` as SVG or one sprite atlas |

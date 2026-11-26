@@ -100,10 +100,10 @@ function calendarItems() {
   const add = (at, em, title, sub) => out.push({ at, em, title, sub });
   for (let k = 0; k < 2; k++) {
     const base = d0 + k * 1440;
-    for (const m of T.courierTimes) { const packed = S.orders.filter(o => o.status === "packed").length; add(base + m, "🛵", "Courier pickup", k === 0 && base + m > now ? `${packed} parcel${packed === 1 ? "" : "s"} packed` : "Packed parcels leave"); }
     if (flag("tier2")) { add(base + T.supplierArrive, "🚚", "Supplier trucks arrive", "Boxes ordered the day before come to the door"); add(base + T.supplierCutoff, "⏰", "Supplier order cut-off", "Order before this time to get stock tomorrow"); }
   }
   for (const d of S.deliveries) add(d.at, "📦", "Your stock arrives", productLine(d.items));
+  for (const pk of (S.shop && S.shop.pickups) || []) if (pk.status === "booked" || pk.status === "here") { const n = S.orders.filter(o => o.status === "packed").length; add(pk.from, "🛵", `Courier pickup, ${fmt(pk.from)} to ${fmt(pk.to)}`, `Be at the door. ${n} parcel${n === 1 ? "" : "s"} packed`); }
   for (const s of S.samplePending) add(s.at, "🎁", "Sample arrives", D.P[s.pid].name);
   if (flag("rent")) { if (S.rent.due > 0) add(now, "🏠", "Rent is due now", fmtMoney(S.rent.due)); else if (S.rent.nextDay - day <= 3) add(absAt(S.rent.nextDay, 0), "🏠", "Rent day", `${fmtMoney(weeklyRent())} comes due`); }
   for (const e of S.events.list) if (e.signaled) add(Math.min(e.start, Math.max(now, e.signalAt || now)), "📣", e.headline || e.name, now >= e.start ? "Happening now" : "Coming soon");
