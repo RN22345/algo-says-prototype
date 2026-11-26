@@ -1,13 +1,13 @@
 /* Loads every data/*.json into D. Everything tunable lives there.
    D.P is a product map, D.SITE the live site values, D.sitesBase the untouched values (platform updates are replayed from it after a load). */
 export const D = {};
-const FILES = ["config", "time", "products", "shots", "viewers", "sites", "lessons", "gear", "room", "market", "assets", "intro", "events"];
+const FILES = ["config", "time", "products", "shots", "viewers", "sites", "lessons", "gear", "room", "market", "assets", "intro", "events", "world"];
 
 export async function loadData() {
   const res = await Promise.all(FILES.map(f => fetch(`data/${f}.json`, { cache: "no-cache" })
     .then(r => { if (!r.ok) throw new Error(`data/${f}.json ${r.status}`); return r.json(); })));
   FILES.forEach((f, i) => { D[f] = res[i]; });
-  D.products = D.products.products; D.gear = D.gear.gear; D.lessons = D.lessons.lessons; D.assets = D.assets.assets;
+  D.products = D.products.products; { const gj = D.gear; D.gear = gj.gear; D.gear.furniture = gj.furniture || []; D.F = Object.fromEntries(D.gear.furniture.map(f => [f.id, f])); } D.lessons = D.lessons.lessons; D.assets = D.assets.assets;
   D.P = Object.fromEntries(D.products.map(p => [p.id, p]));
   D.G = Object.fromEntries(D.gear.map(g => [g.id, g]));
   D.sitesBase = JSON.parse(JSON.stringify(D.sites.sites));

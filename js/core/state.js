@@ -18,7 +18,9 @@ export function makeState() {
     rent: { due: 0, nextDay: D.time.rent.days + 1, fee: 0, warned: false },
     intro: { step: 0, done: false }, updatesApplied: [], updatesRumoured: [],
     events: { list: [], hist: [], next: null, headlines: [], created: {} }, mods: {},
-    stats: { sold: 0, missed: 0, returned: 0, earned: 0 }, started: false, mode: "affiliate", player: null, layout: {}
+    stats: { sold: 0, missed: 0, returned: 0, earned: 0 }, started: false, mode: "affiliate", player: null, layout: {},
+    ui: { pbSeen: {} },   // Builder B: Playbook entries the player has opened (phone badge)
+    property: {}, furniture: [], placed: [], shelfOwn: {}   // property: owned room ids. furniture: unplaced piece ids. placed: [{uid,id}] (position in layout[uid]). shelfOwn: station id -> [first shelf, count]
   };
 }
 export function resetState() { for (const k of Object.keys(S)) delete S[k]; Object.assign(S, makeState()); }

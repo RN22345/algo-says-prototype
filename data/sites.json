@@ -169,37 +169,49 @@
   "browser": [
     {
       "id": "tiktik",
+      "addr": "tiktik.ph/feed",
       "label": "TikTik",
       "kind": "site",
       "site": "tiktik"
     },
     {
       "id": "youview",
+      "addr": "youview.ph",
       "label": "YouView",
       "kind": "site",
       "site": "youview"
     },
     {
       "id": "affiliate",
+      "addr": "affiliate.ph/samples",
       "label": "Affiliate",
       "kind": "affiliate",
       "flag": "affiliate"
     },
     {
       "id": "hub",
+      "addr": "sellerhub.ph",
       "label": "Seller Hub",
       "kind": "hub"
     },
     {
       "id": "toolshop",
+      "addr": "toolshop.ph",
       "label": "Tool Shop",
       "kind": "toolshop"
     },
     {
       "id": "supplier",
+      "addr": "supply.ph/wholesale",
       "label": "Supplier",
       "kind": "supplier",
       "flag": "tier2"
+    },
+    {
+      "id": "property",
+      "addr": "homes.ph/extend",
+      "label": "Homes",
+      "kind": "property"
     }
   ],
   "updates": [

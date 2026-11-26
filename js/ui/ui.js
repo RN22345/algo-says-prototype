@@ -25,13 +25,34 @@ export const btn = (label, cls, onClick, attrs = {}) => h("button", { class: "bt
 export const art = (id, cls) => artEl(id, cls);
 export const clear = el => { while (el.firstChild) el.removeChild(el.firstChild); return el; };
 
+/* ---------- artist HUD kit (img/v/*.png). Missing files fall back to emoji. The list comes from img/_have.json "v"
+   (python tools/make_have.py). If the list has no "v" key, each file is probed once. ---------- */
+let vSet;
+const vList = () => vSet || (vSet = fetch("img/_have.json", { cache: "no-cache" }).then(r => r.json()).then(j => (j.v ? new Set(j.v) : null)).catch(() => null));
+const vOk = {};                                  // id -> true/false once known
+export const vHas = id => vList().then(set => {
+  if (id in vOk) return vOk[id];
+  if (set) return (vOk[id] = set.has(id));
+  return new Promise(res => { const i = new Image(); i.onload = () => res(vOk[id] = true); i.onerror = () => res(vOk[id] = false); i.src = `img/v/${id}.png`; });
+});
+/* A span with an emoji, replaced by img/v/<id>.png when that file exists. ids: one id or a list of ids to try in order. */
+export function vimg(ids, emoji = "", cls = "") {
+  ids = [].concat(ids).filter(Boolean);
+  const s = h("span", { class: "ico " + cls }, emoji);
+  const put = id => { s.textContent = ""; s.classList.add("img"); s.append(Object.assign(new Image(), { src: `img/v/${id}.png`, alt: "", draggable: false })); };
+  const known = ids.find(id => vOk[id]); if (known) { put(known); return s; }
+  (async () => { for (const id of ids) if (await vHas(id)) { put(id); return; } })();
+  return s;
+}
+export const icon = (id, emoji, cls) => vimg("ic_" + id, emoji, cls);
+
 /* ---------- modals ---------- */
 const stack = [];
 let nid = 0;
 export const modalOpen = () => stack.length > 0;
 export const modalCount = () => stack.length;
 
-export function modal({ title, body, cls = "", pause: p = false, onClose, noClose = false, headerExtra, layer } = {}) {
+export function modal({ title, body, cls = "", pause: p = false, onClose, noClose = false, headerExtra, layer, keepPhone = false } = {}) {
   const id = ++nid, key = "modal" + id;
   const x = noClose ? null : h("button", { class: "x", type: "button", "aria-label": "Close", onClick: () => api.close() }, "×");
   const bodyEl = h("div", { class: "card-b" }, body);
@@ -41,12 +62,12 @@ export function modal({ title, body, cls = "", pause: p = false, onClose, noClos
   (layer || document.getElementById("modals")).append(back);
   if (p) pause(key);
   const api = {
-    el: card, body: bodyEl, back,
+    el: card, body: bodyEl, back, key,
     setTitle: t => { card.querySelector(".card-t").textContent = t; },
     setBody: n => { clear(bodyEl); bodyEl.append(n); },
     close: () => { if (!back.isConnected) return; back.remove(); resume(key); const i = stack.indexOf(api); if (i >= 0) stack.splice(i, 1); if (onClose) onClose(); emit("modal:close", key); }
   };
-  stack.push(api); emit("modal:open", key); return api;
+  stack.push(api); emit("modal:open", key, { keepPhone }); return api;
 }
 export const topModal = () => stack[stack.length - 1];
 export function closeAll() { while (stack.length) stack[stack.length - 1].close(); }

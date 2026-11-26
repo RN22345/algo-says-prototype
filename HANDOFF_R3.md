@@ -27,7 +27,9 @@ Finish the prototype as a whole game. Specifically:
 - **Sources:** `05_ART/SOURCES.md` is updated.
 - **Projection:** the artist uses true isometric. Set `view.th` to 46.19 and `view.zUnit` to 92 in `data/room.json`. Builder A was told to do this.
 
-## In progress when this was written (two Sonnet builders, not committed)
+## Update: both builders finished and the work is committed. Builder A: camera, street, property, furniture tray, joystick, save v3. Lead smoke test: a reseller new game renders the new world with no errors after a hard reload. Open items are in PROGRESS.md (mirrored neighbour houses face away from the road; the shelf unit cannot go back in the tray; touch not tested on a real phone; the shell canvas is about 38 MB, so check it on a low-end phone).
+
+## Original state (two Sonnet builders) (two Sonnet builders, not committed)
 
 - **Builder A, the world:**
   - Owns `js/ui/room.js`, `outside.js`, `layout.js`, new `js/ui/world*.js`, `js/sim/property.js`, `data/room.json`, new `data/world.json`, and `css/world.css`.
@@ -35,6 +37,9 @@ Finish the prototype as a whole game. Specifically:
 - **Builder B, the screens:**
   - Owns `js/ui/phone*`, `js/ui/browser.js`, new `js/ui/pc/*`, `js/ui/hud.js`, new `js/ui/inventory.js`, `js/ui/sites/*`, `showTitle` in `js/main.js`, and `css/ui2.css`.
   - Work: a phone with a frame and home-screen apps, a desktop OS look with draggable windows and a browser with fake addresses, a Stock Sheet, Property and furniture shopping, the inventory bar and bag panel (key I), the HUD restyle with the artist's icons, and the title screen.
+- **Update: Builder B finished.** Phone, desktop PC, inventory, HUD and title are all built and tested in both start modes, and its report is in `PROGRESS.md`.
+  - B's open items: rent is computed as base plus `rentAdd` in `js/ui/pc/helpers.js` `weeklyRent` (check it matches `money.js`); `ic_energy`, `ic_followers` and `ic_rank` icons do not exist yet (emoji used); the "In hand" slot reads orders with status `picked`.
+  - Not run end to end: the studio and results screens.
 - Both were told to write what they finished and what they did not into `PROGRESS.md` and `README.md`. If the account ran out mid-task, they stopped wherever they were. Their files may be half-edited.
 
 ## Next session: steps

@@ -1,11 +1,110 @@
 {
-  "_note": "Equipment opens features (D-70). unlocks.light, unlocks.site, unlocks.tier2. effects.shootMult scales shoot minutes and energy.",
-  "gear": [
-    { "id": "ringlight", "name": "Ring light", "price": 1200, "art": "gear_ringlight", "emoji": "💡",
-      "does": "True colour at any hour. Faster shooting.", "unlocks": { "light": "ring" }, "effects": { "shootMult": 0.8 } },
-    { "id": "camera", "name": "Second-hand camera", "price": 4500, "art": "gear_camera", "emoji": "📷",
-      "does": "Opens YouView long videos.", "unlocks": { "site": "youview" } },
-    { "id": "shelves", "name": "Shelves and packing table", "price": 3500, "art": "st_shelves", "emoji": "📦",
-      "does": "Opens reselling: buy stock, shelve it, pack orders.", "unlocks": { "tier2": true } }
-  ]
+ "_note": "Equipment opens features (D-70). unlocks.light, unlocks.site, unlocks.tier2. effects.shootMult scales shoot minutes and energy.",
+ "gear": [
+  {
+   "id": "ringlight",
+   "name": "Ring light",
+   "price": 1200,
+   "art": "gear_ringlight",
+   "emoji": "💡",
+   "does": "True colour at any hour. Faster shooting.",
+   "unlocks": {
+    "light": "ring"
+   },
+   "effects": {
+    "shootMult": 0.8
+   }
+  },
+  {
+   "id": "camera",
+   "name": "Second-hand camera",
+   "price": 4500,
+   "art": "gear_camera",
+   "emoji": "📷",
+   "does": "Opens YouView long videos.",
+   "unlocks": {
+    "site": "youview"
+   }
+  },
+  {
+   "id": "shelves",
+   "name": "Shelves and packing table",
+   "price": 3500,
+   "art": "st_shelves",
+   "emoji": "📦",
+   "does": "Opens reselling: buy stock, shelve it, pack orders.",
+   "unlocks": {
+    "tier2": true
+   }
+  }
+ ],
+ "furniture": [
+  {
+   "id": "plant",
+   "name": "Potted plant",
+   "price": 200,
+   "art": "fn_plant",
+   "sprite": "fn_plant",
+   "emoji": "🪴",
+   "does": "A bit of green for any room.",
+   "tile": [
+    0,
+    0,
+    0.7,
+    0.7
+   ],
+   "deco": true
+  },
+  {
+   "id": "lamp",
+   "name": "Floor lamp",
+   "price": 350,
+   "art": "fn_lamp",
+   "sprite": "fn_lamp",
+   "emoji": "💡",
+   "does": "A warm lamp for the corner.",
+   "tile": [
+    0,
+    0,
+    0.5,
+    0.5
+   ],
+   "deco": true
+  },
+  {
+   "id": "sofa",
+   "name": "Sofa",
+   "price": 1500,
+   "art": "fn_sofa",
+   "sprite": "fn_sofa",
+   "emoji": "🛋️",
+   "does": "A place to sit. Looks good on camera.",
+   "tile": [
+    0,
+    0,
+    2,
+    0.95
+   ],
+   "deco": true
+  },
+  {
+   "id": "shelfunit",
+   "name": "Extra shelf unit",
+   "price": 1800,
+   "art": "st_shelves",
+   "sprite": "st_shelf_unit",
+   "emoji": "📚",
+   "does": "Two more shelves of 6 places. Place it in any room.",
+   "tile": [
+    0,
+    0,
+    0.8,
+    1.6
+   ],
+   "opens": "shelves",
+   "shelves": 2,
+   "scale": 0.82,
+   "dy": 6
+  }
+ ]
 }

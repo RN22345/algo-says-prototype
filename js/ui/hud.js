@@ -1,55 +1,88 @@
-/* HUD: stat pills (cash, followers, trust, energy), clock and day, phone button, sound, full screen, dev button, goal line.
-   Updates on bus events (cash:changed, energy:changed, followers:changed, trust:changed, inbox:changed) and each frame for the clock. */
+/* HUD (D-109), styled after the artist's mockup. Top left: pills for cash, followers, trust and energy, each with a round icon badge on its left end.
+   Under them: the goal board (ui_board.png). Top right: DAY pill, clock pill, round bell (opens the phone on Messages) and settings (sound, music, full screen, new game).
+   Right edge: Parcel (opens the bag, js/ui/inventory.js) and Phone buttons with labels. Icons come from img/v/ic_*.png and fall back to emoji.
+   Updates on bus events and each frame for the clock. Events out: phone:toggle, phone:open, bag:toggle. */
 import { D } from "../core/data.js";
 import { S, flag, fmtMoney } from "../core/state.js";
 import { fmt, dayNo } from "../core/clock.js";
 import { on, emit } from "../core/bus.js";
-import { h } from "./ui.js";
-import { isMuted, setMuted } from "../core/sound.js";
+import { h, icon, vHas } from "./ui.js";
+import { isMuted, setMuted, musicEnabled, setMusic } from "../core/sound.js";
 import { toggleFull } from "../core/fit.js";
+import { wipe } from "../core/save.js";
 
-let el = {};
+let el = {}, menuOpen = false, confirmNew = false;
+
+/* A chunky pill with a round icon badge. kids go in the body. */
+const pill = (ic, emoji, cls, ...kids) => h("div", { class: "hp " + cls }, h("span", { class: "hp-badge" }, icon(ic, emoji)), h("div", { class: "hp-body" }, ...kids));
+const rbtn = (ic, emoji, label, cls, fn) => h("button", { class: "hr " + cls, type: "button", "aria-label": label, title: label, onClick: fn }, icon(ic, emoji), h("span", { class: "nb", hidden: true }));
+const big = (ic, emoji, label, cls, fn) => h("button", { class: "hb " + cls, type: "button", "aria-label": label, onClick: fn }, h("span", { class: "hb-i" }, icon(ic, emoji), h("span", { class: "nb", hidden: true })), h("span", { class: "hb-l" }, label));
+
 export function initHud() {
   const root = document.getElementById("hud");
-  el.cash = h("span", {}, ""); el.fol = h("span", {}, ""); el.trust = h("span", {}, ""); el.en = h("i", {}); el.enT = h("span", {}, "");
-  el.clk = h("div", { class: "clk" }); el.day = h("div", { class: "day" });
-  el.badge = h("span", { class: "badge", hidden: true });
-  el.phone = h("button", { class: "rbtn o", type: "button", "aria-label": "Phone", onClick: () => emit("phone:toggle") }, "📱", el.badge);
-  el.snd = h("button", { class: "rbtn g", type: "button", "aria-label": "Sound", onClick: () => { setMuted(!isMuted()); sync(); } }, "🔊");
-  el.full = h("button", { class: "rbtn g", type: "button", "aria-label": "Full screen", onClick: toggleFull }, "⛶");
-  el.energyPill = h("div", { class: "pill energy" }, h("span", { class: "ic", style: { background: "var(--green)" } }, "⚡"), h("div", { class: "ebar" }, el.en), el.enT);
+  el.cash = h("b", {}, ""); el.tt = h("b", {}, ""); el.yv = h("b", {}, ""); el.trust = h("b", {}, ""); el.en = h("i", {}); el.enT = h("b", {}, "");
+  el.clk = h("b", {}, ""); el.day = h("b", {}, "");
+  el.energy = pill("energy", "⚡", "energy", h("div", { class: "ebar" }, el.en), el.enT);
   const tl = h("div", { class: "tl" },
-    h("div", { class: "pill" }, h("span", { class: "ic" }, "₱"), el.cash),
-    h("div", { class: "pill" }, h("span", { class: "ic", style: { background: "var(--teal)" } }, "👥"), el.fol),
-    h("div", { class: "pill" }, h("span", { class: "ic", style: { background: "var(--red)", color: "#fff" } }, "♥"), el.trust, h("small", {}, "Trust")),
-    el.energyPill);
-  const tc = h("div", { class: "tc" }, el.clk, el.day);
-  const tr = h("div", { class: "tr" }, el.full, el.snd, el.phone);
-  el.goal = h("div", { class: "goal" });
-  root.append(tl, tc, tr, el.goal);
-  for (const ev of ["cash:changed", "energy:changed", "followers:changed", "trust:changed", "inbox:changed", "flag:changed", "newgame", "stock:changed", "post:created", "sample:taken", "gear:changed"]) on(ev, sync);
+    pill("cash", "₱", "cash", el.cash),
+    pill("followers", "👥", "fol", el.tt, h("small", {}, "TikTik"), el.yv, h("small", {}, "YouView")),
+    pill("trust", "🤝", "trust", el.trust, h("small", {}, "Trust")),
+    el.energy);
+  el.bell = rbtn("bell", "🔔", "Messages", "bell", () => emit("phone:open", { tab: "inbox" }));
+  el.set = rbtn("settings", "⚙️", "Settings", "set", () => toggleMenu());
+  el.menu = h("div", { class: "hud-menu", hidden: true });
+  const tr = h("div", { class: "tr" }, pill("day", "📅", "day", el.day), pill("clock", "⏰", "clock", el.clk), el.bell, el.set, el.menu);
+  el.parcel = big("parcel", "📦", "Parcel", "parcel", () => emit("bag:toggle"));
+  el.phoneB = big("phone", "📱", "Phone", "phoneb", () => emit("phone:toggle"));
+  const rail = h("div", { class: "hrail" }, el.parcel, el.phoneB);
+  el.goal = h("div", { class: "goalb css" }, h("div", { class: "goal" }));
+  root.append(tl, tr, rail, el.goal);
+  vHas("ui_board").then(ok => { if (ok) el.goal.classList.remove("css"); });
+  vHas("ui_pill").then(ok => { if (ok) root.classList.add("pillart"); });
+  document.addEventListener("pointerdown", e => { if (menuOpen && !e.target.closest(".hud-menu") && !e.target.closest(".hr.set")) toggleMenu(false); });
+  for (const ev of ["cash:changed", "energy:changed", "followers:changed", "trust:changed", "inbox:changed", "flag:changed", "newgame", "stock:changed", "post:created", "sample:taken", "gear:changed", "order:new", "order:packed", "order:paid"]) on(ev, sync);
   on("frame", clock);
+  on("modal:open", () => toggleMenu(false));
   sync(); clock();
 }
 function clock() {
-  const t = fmt(), d = "Day " + dayNo();
+  const t = fmt(), d = "DAY " + dayNo();
   if (el.clk.textContent !== t) el.clk.textContent = t;
   if (el.day.textContent !== d) el.day.textContent = d;
 }
+function badge(btn, n) { const b = btn.querySelector(".nb"); b.hidden = !n; b.textContent = n || ""; }
 function sync() {
   el.cash.textContent = fmtMoney(S.cash);
-  el.fol.textContent = `${S.followers.tiktik} TikTik · ${S.followers.youview} YouView`;
+  el.tt.textContent = S.followers.tiktik; el.yv.textContent = S.followers.youview;
   el.trust.textContent = Math.round(S.trust);
   const max = D.time.energy.max;
   el.en.style.width = Math.max(0, S.energy / max * 100) + "%"; el.enT.textContent = Math.round(S.energy);
-  el.energyPill.classList.toggle("low", S.energy < 20);
-  el.energyPill.style.display = flag("energy") ? "" : "none";
+  el.energy.classList.toggle("low", S.energy < 20);
+  el.energy.style.display = flag("energy") ? "" : "none";
   const un = S.inbox.filter(m => !m.read).length;
-  el.badge.hidden = un === 0; el.badge.textContent = un;
-  el.snd.textContent = isMuted() ? "🔇" : "🔊";
+  badge(el.bell, un); badge(el.phoneB, un);
+  badge(el.parcel, S.orders.filter(o => o.status === "toPack" || o.status === "picked").length + S.doorBoxes.length + S.doorSamples.length);
   const rent = S.rent.due > 0 && flag("rent") ? ` Rent due: ${fmtMoney(S.rent.due)}.` : "";
-  el.goal.innerHTML = goalText() + (rent ? `<br><b>${rent}</b>` : "");
+  el.goal.firstChild.innerHTML = goalText() + (rent ? `<br><b>${rent}</b>` : "");
 }
+
+/* ---------- settings ---------- */
+function toggleMenu(force) {
+  menuOpen = force === undefined ? !menuOpen : force; confirmNew = false; el.menu.hidden = !menuOpen;
+  if (menuOpen) drawMenu();
+}
+function drawMenu() {
+  el.menu.replaceChildren();
+  const row = (label, state, fn, cls = "") => h("button", { class: "mrow " + cls, type: "button", onClick: fn }, h("span", {}, label), state != null ? h("b", {}, state) : null);
+  el.menu.append(h("div", { class: "mh" }, "Settings"),
+    row("Sound effects", isMuted() ? "Off" : "On", () => { setMuted(!isMuted()); drawMenu(); }),
+    row("Music", musicEnabled() ? "On" : "Off", () => { setMusic(!musicEnabled()); drawMenu(); }),
+    row("Full screen", null, () => { toggleFull(); toggleMenu(false); }),
+    confirmNew ? h("div", { class: "mconf" }, h("div", {}, "Erase this game and start again?"),
+      h("div", { class: "row" }, h("button", { class: "btn b-red sm", type: "button", onClick: () => { wipe(); location.reload(); } }, "Yes, new game"), h("button", { class: "btn b-grey sm", type: "button", onClick: () => { confirmNew = false; drawMenu(); } }, "Keep playing")))
+      : row("New game", null, () => { confirmNew = true; drawMenu(); }, "danger"));
+}
+
 /* A short line about what to do next. Not a grade. */
 function goalText() {
   if (!S.posts.length && S.mode === "reseller") {

@@ -26,13 +26,14 @@ export function initAlgo() {
   on("sample:requested", () => advanceIntro("sample:requested"));
   on("sample:taken", () => advanceIntro("sample:taken"));
   on("stock:order", o => { if (o && o.ok) advanceIntro("stock:ordered"); });
-  on("browser:opened", () => { if (waiting === "stock:ordered") { elOverride = () => document.querySelector(".bview .btn.b-gold.sm"); setTimeout(drawSpot, 350); } });
+  on("browser:opened", () => { if (waiting === "stock:ordered") { elOverride = () => document.querySelector(".win.active .bview .sp-order") || document.querySelector(".bview .sp-order"); setTimeout(drawSpot, 350); } });
   on("newgame", () => { setMood("neutral"); dismiss(); });
   on("post:created", () => { if (S.posts.length === 1) say(["Posted! Now time does the work. Views come in waves.", "Followers see it first. Then strangers decide how far it goes.", "Results show up on your phone in about half an hour of game time."], { mood: "happy" }); });
   on("modal:open", () => { if (!elOverride) hideSpot(); });
   on("modal:close", () => { if (modalCount() === 0) { elOverride = null; drawSpot(); } });
-  on("browser:opened", () => { if (waiting === "sample:requested") { elOverride = () => document.querySelector(".bview .tile .btn.b-orange"); setTimeout(drawSpot, 350); } });
+  on("browser:opened", () => { if (waiting === "sample:requested") { elOverride = () => document.querySelector(".win.active .bview .aff-req") || document.querySelector(".bview .aff-req"); setTimeout(drawSpot, 350); } });
   setInterval(() => { if (elOverride) drawSpot(); }, 300);
+  on("camera:moved", () => { if (spotStation && !elOverride) drawSpot(); });
   on("sample:arrived", () => { if (!S.intro.done && waiting == null && S.mode !== "reseller" && S.intro.step === 3) runStep(); });
 }
 export function setMood(m) { mood = m; face.src = artUrl("algo_" + m); }

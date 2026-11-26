@@ -13,7 +13,7 @@ export function render(root, def, api) {
     if (have) action = h("span", { class: "tag green" }, "You have a sample");
     else if (atDoor) action = h("span", { class: "tag gold" }, "At your door");
     else if (pend) action = h("span", { class: "tag teal" }, "Arrives " + fmtDay(pend.at));
-    else action = btn("Request sample", "b-orange sm", () => { const q = { pid: p.id, ok: false }; emit("sample:request", q); if (q.ok) api.rerender(); });
+    else action = btn("Request sample", "b-orange sm aff-req", () => { const q = { pid: p.id, ok: false }; emit("sample:request", q); if (q.ok) api.rerender(); });
     return h("div", { class: "tile" }, art(p.icon), h("b", {}, p.name), h("div", { class: "sub" }, `Sells for ${fmtMoney(p.price)}`),
       h("div", { class: "sub" }, `You earn ${Math.round(p.commission * 100)}% = ${fmtMoney(p.price * p.commission)} per sale`), action);
   });

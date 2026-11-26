@@ -1,0 +1,443 @@
+{
+ "_note": "The street block, ground, props and property rooms. Tile coordinates (1 tile = 1 grid square). ground: painted in order onto a tile map (later rects win), each with a sprite id and a fallback colour. walk: where the player may stand outside the house (x0,y0,x1,y1). road: blocked except the crosswalk. props: id is a sprite id (od_*), cx and cy the footprint centre, fw and fd override the sprite footprint, block false lets the player walk through, flip mirrors it. properties: house extensions along +y; floor [x,y,w,d]; doorway [x0,x1] in the wall at floor.y; stations are added when bought; sign is the for-sale sign tile. clouds are screen decoration in world pixels.",
+ "bounds": {
+  "x0": -1,
+  "y0": -1,
+  "x1": 21,
+  "y1": 20
+ },
+ "walk": {
+  "x0": 9,
+  "y0": -0.5,
+  "x1": 17,
+  "y1": 18
+ },
+ "road": {
+  "rect": [
+   12,
+   -1,
+   4,
+   21
+  ],
+  "lanes": {
+   "p": 13.85,
+   "n": 15.15
+  },
+  "curb": 12.6,
+  "cross": [
+   12,
+   7,
+   4,
+   3
+  ]
+ },
+ "ground": [
+  {
+   "tile": "tl_grass",
+   "fb": "#9fd67a",
+   "rect": [
+    -1,
+    -1,
+    22,
+    21
+   ]
+  },
+  {
+   "tile": "tl_rock",
+   "fb": "#d9dde6",
+   "rect": [
+    11,
+    -1,
+    1,
+    21
+   ]
+  },
+  {
+   "tile": "tl_road",
+   "fb": "#5d6475",
+   "rect": [
+    12,
+    -1,
+    4,
+    21
+   ]
+  },
+  {
+   "tile": "tl_rock",
+   "fb": "#d9dde6",
+   "rect": [
+    16,
+    -1,
+    1,
+    21
+   ]
+  },
+  {
+   "tile": "tl_road_white",
+   "fb": "#f4f1e4",
+   "rect": [
+    12,
+    7,
+    4,
+    1
+   ]
+  },
+  {
+   "tile": "tl_road_white",
+   "fb": "#f4f1e4",
+   "rect": [
+    12,
+    9,
+    4,
+    1
+   ]
+  },
+  {
+   "tile": "tl_rock",
+   "fb": "#e9d3b0",
+   "rect": [
+    9,
+    3,
+    2,
+    1
+   ]
+  }
+ ],
+ "floors": {
+  "house": "tl_floor2",
+  "bought": "tl_floor1",
+  "fbHouse": [
+   "#f1d9a8",
+   "#ebcf98"
+  ],
+  "fbBought": [
+   "#d9b98a",
+   "#d2b07c"
+  ]
+ },
+ "player": {
+  "faces": "right",
+  "sprite": "ch_player_front"
+ },
+ "props": [
+  {
+   "id": "od_tree_round",
+   "cx": 10.3,
+   "cy": 0.7
+  },
+  {
+   "id": "od_tree_round",
+   "cx": 10.3,
+   "cy": 6.1
+  },
+  {
+   "id": "od_tree_ball",
+   "cx": 10.4,
+   "cy": 13.4
+  },
+  {
+   "id": "od_tree_round",
+   "cx": 10.3,
+   "cy": 17.8
+  },
+  {
+   "id": "od_bush",
+   "cx": 9.6,
+   "cy": 1.6,
+   "fw": 0.7,
+   "fd": 0.7
+  },
+  {
+   "id": "od_bush",
+   "cx": 9.6,
+   "cy": 5.9,
+   "fw": 0.7,
+   "fd": 0.7
+  },
+  {
+   "id": "od_mailbox",
+   "cx": 10.2,
+   "cy": 2.3,
+   "fw": 0.35,
+   "fd": 0.35
+  },
+  {
+   "id": "od_lamp_post",
+   "cx": 11.5,
+   "cy": 2.0
+  },
+  {
+   "id": "od_lamp_post",
+   "cx": 11.5,
+   "cy": 11.0
+  },
+  {
+   "id": "od_lamp_post",
+   "cx": 11.5,
+   "cy": 16.0
+  },
+  {
+   "id": "od_bench",
+   "cx": 11.4,
+   "cy": 5.0
+  },
+  {
+   "id": "od_bin",
+   "cx": 11.6,
+   "cy": 13.6
+  },
+  {
+   "id": "od_lamp_old",
+   "cx": 16.5,
+   "cy": 2.5
+  },
+  {
+   "id": "od_lamp_old",
+   "cx": 16.5,
+   "cy": 11.5
+  },
+  {
+   "id": "od_lamp_old",
+   "cx": 16.5,
+   "cy": 16.5
+  },
+  {
+   "id": "od_bench",
+   "cx": 16.5,
+   "cy": 5.5
+  },
+  {
+   "id": "od_bin",
+   "cx": 16.5,
+   "cy": 8.6
+  },
+  {
+   "id": "od_tree_ball",
+   "cx": 17.9,
+   "cy": 0.2,
+   "block": false
+  },
+  {
+   "id": "od_tree_round",
+   "cx": 18.0,
+   "cy": 6.3,
+   "block": false
+  },
+  {
+   "id": "od_tree_ball",
+   "cx": 18.0,
+   "cy": 12.2,
+   "block": false
+  },
+  {
+   "id": "od_tree_round",
+   "cx": 18.0,
+   "cy": 18.6,
+   "block": false
+  },
+  {
+   "id": "od_house_a",
+   "cx": 19.3,
+   "cy": 3.2,
+   "flip": true,
+   "block": false
+  },
+  {
+   "id": "od_house_b",
+   "cx": 19.3,
+   "cy": 9.4,
+   "flip": true,
+   "block": false
+  },
+  {
+   "id": "od_house_a",
+   "cx": 19.3,
+   "cy": 15.6,
+   "flip": true,
+   "block": false
+  }
+ ],
+ "clouds": [
+  {
+   "art": "fx_cloud_a",
+   "x": -700,
+   "y": 300,
+   "s": 1.0,
+   "v": 6,
+   "front": false
+  },
+  {
+   "art": "fx_cloud_b",
+   "x": 300,
+   "y": -100,
+   "s": 0.8,
+   "v": 4,
+   "front": false
+  },
+  {
+   "art": "fx_cloud_a",
+   "x": 1900,
+   "y": 120,
+   "s": 1.2,
+   "v": 5,
+   "front": false
+  },
+  {
+   "art": "fx_cloud_b",
+   "x": 2300,
+   "y": 900,
+   "s": 1.0,
+   "v": 7,
+   "front": false
+  },
+  {
+   "art": "fx_cloud_a",
+   "x": -300,
+   "y": 1700,
+   "s": 1.1,
+   "v": 5,
+   "front": true
+  },
+  {
+   "art": "fx_cloud_b",
+   "x": 1500,
+   "y": 2350,
+   "s": 0.9,
+   "v": 6,
+   "front": true
+  },
+  {
+   "art": "fx_cloud_a",
+   "x": 2600,
+   "y": 1900,
+   "s": 1.0,
+   "v": 4,
+   "front": true
+  }
+ ],
+ "properties": [
+  {
+   "id": "studio",
+   "name": "Studio room",
+   "price": 5000,
+   "rentAdd": 200,
+   "does": "A bright room with a backdrop for filming. Shooting takes about a quarter less time here.",
+   "floor": [
+    0,
+    7,
+    9,
+    5
+   ],
+   "doorway": [
+    3.0,
+    4.4
+   ],
+   "sign": [
+    9.6,
+    8.6
+   ],
+   "stations": [
+    {
+     "id": "studio_set",
+     "label": "Studio set",
+     "art": "st_filming",
+     "sprite": "st_studio_set",
+     "tile": [
+      5.2,
+      7.3,
+      3.0,
+      2.1
+     ],
+     "scale": 0.7,
+     "dy": 6,
+     "z": 3,
+     "opens": "studio",
+     "effects": {
+      "shootMult": 0.75
+     },
+     "emoji": "🎬",
+     "color": "#b744c9"
+    }
+   ]
+  },
+  {
+   "id": "stockroom",
+   "name": "Stockroom",
+   "price": 3500,
+   "rentAdd": 150,
+   "requires": "studio",
+   "does": "Two shelf units. Each holds 2 more shelves of 6 places, so you can keep more stock.",
+   "floor": [
+    0,
+    12,
+    9,
+    5
+   ],
+   "doorway": [
+    3.0,
+    4.4
+   ],
+   "sign": [
+    9.6,
+    13.6
+   ],
+   "stations": [
+    {
+     "id": "unit_a",
+     "label": "Shelf unit A",
+     "art": "st_shelves",
+     "sprite": "st_shelf_unit",
+     "tile": [
+      0.15,
+      12.4,
+      0.8,
+      1.6
+     ],
+     "scale": 0.82,
+     "dy": 6,
+     "z": 2,
+     "opens": "shelves",
+     "shelves": 2,
+     "emoji": "📚",
+     "color": "#d9a066"
+    },
+    {
+     "id": "unit_b",
+     "label": "Shelf unit B",
+     "art": "st_shelves",
+     "sprite": "st_shelf_unit",
+     "tile": [
+      0.15,
+      14.4,
+      0.8,
+      1.6
+     ],
+     "scale": 0.82,
+     "dy": 6,
+     "z": 2,
+     "opens": "shelves",
+     "shelves": 2,
+     "emoji": "📚",
+     "color": "#d9a066"
+    },
+    {
+     "id": "crates",
+     "label": "Crates",
+     "art": "st_packing",
+     "sprite": "st_crates",
+     "tile": [
+      5.4,
+      13.2,
+      1.0,
+      1.0
+     ],
+     "scale": 0.5,
+     "z": 4,
+     "deco": true,
+     "emoji": "📦",
+     "color": "#d9a066"
+    }
+   ]
+  }
+ ]
+}

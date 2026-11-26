@@ -4,6 +4,9 @@ import { D } from "../core/data.js";
 import { S, flag, fmtMoney } from "../core/state.js";
 import { on, emit } from "../core/bus.js";
 
+/* Base rent plus the rentAdd of each bought room (data/world.json properties). */
+const rentAmount = () => D.time.rent.amount + (D.world.properties || []).reduce((a, p) => a + (S.property && S.property[p.id] ? p.rentAdd || 0 : 0), 0);
+
 function ledger(amount, why) { S.ledger.unshift({ t: S.t, amount, why }); if (S.ledger.length > 60) S.ledger.length = 60; }
 
 export function init() {
@@ -30,11 +33,11 @@ export function init() {
       emit("summary:add", "Rent is late. A late fee was added.");
     }
     if (day >= S.rent.nextDay) {
-      S.rent.due += R.amount; S.rent.nextDay += R.days; S.rent.feeApplied = false;
-      emit("inbox:add", { kind: "system", title: "Rent is due", text: `Rent of ${fmtMoney(R.amount)} is due. Pay it in the Wallet tab. A late fee applies if you wait a day.` });
+      S.rent.due += rentAmount(); S.rent.nextDay += R.days; S.rent.feeApplied = false;
+      emit("inbox:add", { kind: "system", title: "Rent is due", text: `Rent of ${fmtMoney(rentAmount())} is due. Pay it in the Wallet tab. A late fee applies if you wait a day.` });
       emit("summary:add", "Rent is due.");
     } else if (day === S.rent.nextDay - R.remindDaysBefore && S.rent.due <= 0) {
-      emit("inbox:add", { kind: "system", title: "Rent tomorrow", text: `Rent of ${fmtMoney(R.amount)} is due tomorrow. Keep the cash ready.` });
+      emit("inbox:add", { kind: "system", title: "Rent tomorrow", text: `Rent of ${fmtMoney(rentAmount())} is due tomorrow. Keep the cash ready.` });
     }
   });
 }

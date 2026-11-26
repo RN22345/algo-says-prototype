@@ -15,7 +15,7 @@ export function render(root, def, api) {
       h("div", {}, h("b", {}, p.name), " ", S.market.inDemand[p.id] ? h("span", { class: "tag teal" }, "In demand") : null, up ? h("span", { class: "tag", style: { marginLeft: ".3em" } }, "Price up") : null,
         h("div", { class: "tiny mute" }, `Sells for ${fmtMoney(p.price)} · you have ${shelf(p.id)} on shelves, ${S.boxes[p.id] || 0} in boxes`)),
       h("span", { class: "lil" }, `${fmtMoney(unit)} each`),
-      btn(on_ ? `Order ${q} (${fmtMoney(unit * q)})` : "Locked", on_ ? "b-gold sm" : "b-grey sm", () => { if (!on_) return emit("toast", "Buy Shelves and packing table in the Tool Shop first."); const o = { pid: p.id, qty: q, ok: false }; emit("stock:order", o); if (o.ok) api.rerender(); }));
+      btn(on_ ? `Order ${q} (${fmtMoney(unit * q)})` : "Locked", on_ ? "b-gold sm sp-order" : "b-grey sm sp-order", () => { if (!on_) return emit("toast", "Buy Shelves and packing table in the Tool Shop first."); const o = { pid: p.id, qty: q, ok: false }; emit("stock:order", o); if (o.ok) api.rerender(); }));
   });
   const arr = S.deliveries.map(d => h("div", { class: "banner" }, `On the way: ${Object.entries(d.items).map(([k, v]) => `${v} x ${D.P[k].short}`).join(", ")}. Arrives ${fmtDay(d.at)}.`));
   root.append(h("div", { class: "site" },

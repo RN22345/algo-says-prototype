@@ -1,0 +1,13 @@
+/* WORLD (builder A): sky behind the floating diorama, the camera-moved tag layer, the touch joystick, the furniture tray. */
+#room{background:linear-gradient(180deg,#4fc3f7 0%,#b3e5fc 100%)}
+#room .tags{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;transform-origin:0 0}
+/* decor has no tag and takes no clicks, except while moving furniture */
+#room svg polygon.deco{pointer-events:none}
+#room.editing svg polygon.deco{pointer-events:all}
+/* move furniture: bar and tray sit above the bottom row so they never cover the inventory bar */
+#room .movebar{bottom:140px}
+#room .movetray{position:absolute;left:50%;bottom:210px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:1200px;background:rgba(28,36,82,.92);border:4px solid var(--teal);border-radius:22px;padding:.4em .9em .1em;color:#fff;z-index:3;font:600 .72em var(--body)}
+#room .movetray .tt{font:400 1.1em var(--lil);color:var(--gold)}
+/* virtual joystick (touch devices) */
+#room .joy{position:absolute;left:60px;bottom:230px;width:210px;height:210px;border-radius:50%;background:rgba(255,255,255,.28);border:5px solid rgba(28,36,82,.55);touch-action:none;z-index:4;pointer-events:auto}
+#room .joy .knob{position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;background:var(--gold);border:5px solid var(--navy);box-shadow:0 5px 0 rgba(0,0,0,.25)}

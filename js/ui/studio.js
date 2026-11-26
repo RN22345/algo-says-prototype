@@ -11,6 +11,7 @@ import { h, btn, art, clear, modal } from "./ui.js";
 import { getScale } from "../core/fit.js";
 import { sceneEl, flawNotes, actionOf, angleOf, lightOf } from "./scene.js";
 import { editVideo } from "./editor.js";
+import { where } from "../sim/property.js";
 
 let win = null, main = null, foot = null, stepsEl = null;
 const STEPS = [["board", "1 Plan"], ["shoot", "2 Shoot"], ["edit", "3 Edit"], ["post", "4 Post"]];
@@ -18,7 +19,7 @@ const STEPS = [["board", "1 Plan"], ["shoot", "2 Shoot"], ["edit", "3 Edit"], ["
 export const availableProducts = () => D.products.filter(p => S.samples[p.id] || shelfTotal(p.id) > 0);
 const shelfTotal = id => S.shelves.reduce((a, sh) => a + sh.filter(x => x === id).length, 0) + (S.boxes[id] || 0);
 const shelfOnly = id => S.shelves.reduce((a, sh) => a + sh.filter(x => x === id).length, 0);
-const gearMult = () => D.gear.reduce((m, g) => m * (S.gear[g.id] && g.effects && g.effects.shootMult ? g.effects.shootMult : 1), 1);
+const gearMult = () => D.gear.reduce((m, g) => m * (S.gear[g.id] && g.effects && g.effects.shootMult ? g.effects.shootMult : 1), 1) * where.shootMult;
 
 function newDraft(pid, site) { return { site: site || "tiktik", pid, step: "board", slots: {}, setup: {}, clips: {}, edit: null, title: "", tags: [], mode: "affiliate", sel: null }; }
 

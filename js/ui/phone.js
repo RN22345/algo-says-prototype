@@ -1,97 +1,88 @@
-/* PHONE. A drawer from the right edge: Inbox (with "while you slept"), Feeds, Orders and posts, Wallet (rent), Playbook (flag playbook).
-   Events in: phone:toggle, phone:open {tab}, inbox:changed, order:*, lesson:new, cash:changed. Events out: open:results. */
-import { D } from "../core/data.js";
-import { S, flag, fmtMoney } from "../core/state.js";
-import { fmtDay, fmt, dayOf } from "../core/clock.js";
-import { feedFor } from "../sim/rivals.js";
-import { on, emit } from "../core/bus.js";
-import { h, btn, art, clear } from "./ui.js";
+/* PHONE (D-107). A phone held in the hand: rounded body, bezel, camera notch, status bar (game clock, signal, battery), home screen with app icons,
+   home bar. It slides up from the bottom right. Apps open full screen inside the phone with a back arrow; the home bar goes home (and closes the phone from home).
+   Apps: Messages, TikTik, YouView, Orders, Bank, Calendar, Playbook (js/ui/phone/*). Unread badges sit on the icons.
+   Events in: phone:toggle, phone:open {tab|app}, modal:open (closes the phone unless keepPhone), inbox:changed, order:*, lesson:new, cash:changed, post:created, newgame, frame.
+   Events out: open:results. Old tab ids map to apps: inbox, feeds, orders, wallet, playbook. */
+import { S, flag } from "../core/state.js";
+import { fmt, dayNo } from "../core/clock.js";
+import { on } from "../core/bus.js";
+import { h, clear, vimg } from "./ui.js";
+import { messagesApp, ordersApp, bankApp, calendarApp, playbookApp } from "./phone/apps.js";
+import { tiktikApp, youviewApp, feedCard } from "./phone/feedapp.js";
 
-let ph, body, tabsEl, open = false, tab = "inbox", feedSite = "tiktik";
+export { feedCard };
+const MAP = { inbox: "messages", feeds: "tiktik", orders: "orders", wallet: "bank", playbook: "playbook" };
+let apps = [], el = {}, open = false, cur = null, backFn = null, lastClock = "";
 
-const TABS = () => [
-  { id: "inbox", label: "Inbox" }, { id: "feeds", label: "Feeds" }, { id: "orders", label: "Orders" }, { id: "wallet", label: "Wallet" },
-  ...(flag("playbook") ? [{ id: "playbook", label: "Playbook" }] : [])
-];
+const appList = () => [messagesApp, tiktikApp(), youviewApp(), ordersApp, bankApp, calendarApp, ...(flag("playbook") ? [playbookApp] : [])];
+export const isOpen = () => open;
 
 export function initPhone() {
   const root = document.getElementById("phone");
-  ph = h("div", { class: "ph" });
-  tabsEl = h("div", { class: "ph-tabs" }); body = h("div", { class: "ph-body" });
-  ph.append(h("div", { class: "ph-top" }, "📱 My phone", h("button", { class: "x", style: { width: "44px", height: "44px", borderRadius: "50%", border: "3px solid #fff", background: "var(--red)", color: "#fff", font: "400 26px var(--lil)", cursor: "pointer" }, type: "button", onClick: () => toggle(false) }, "×")), tabsEl, body);
-  root.append(ph, h("div", { class: "peek", onClick: () => toggle() }, "📱"));
-  on("modal:open", () => { if (open) toggle(false); });
-  on("phone:toggle", () => toggle()); on("phone:open", ({ tab: t }) => { if (t) tab = t; toggle(true); });
-  for (const ev of ["inbox:changed", "order:paid", "order:packed", "order:shipped", "order:new", "order:returned", "lesson:new", "cash:changed", "post:created", "newgame"]) on(ev, () => { if (open) render(); });
+  el.status = h("div", { class: "ph-status" }, el.clk = h("span", { class: "clk" }, fmt()),
+    h("span", { class: "sys" }, h("span", { class: "sig" }, h("i"), h("i"), h("i"), h("i")), h("span", { class: "bat" }, h("i"))));
+  el.app = h("div", { class: "ph-app" });
+  el.home = h("div", { class: "ph-homebar", role: "button", "aria-label": "Home", onClick: homeBar }, h("i"));
+  el.screen = h("div", { class: "ph-screen" }, h("div", { class: "ph-notch" }), el.status, el.app, el.home);
+  el.phone = h("div", { class: "phone" }, h("div", { class: "ph-body" }, el.screen));
+  root.append(el.phone);
+  on("modal:open", (key, o) => { if (open && !(o && o.keepPhone)) toggle(false); });
+  on("phone:toggle", () => toggle());
+  on("phone:open", (o = {}) => {
+    const id = o.app || MAP[o.tab] || o.tab;
+    if (id && (id !== cur || id === "messages")) goApp(id, true); else if (!open && cur === null) goApp(null, true);
+    toggle(true);
+  });
+  for (const ev of ["inbox:changed", "order:paid", "order:packed", "order:shipped", "order:new", "order:returned", "lesson:new", "cash:changed", "post:created", "newgame", "stock:changed", "event:signal", "feed:post"]) on(ev, () => { if (open) render(); });
+  on("frame", () => { if (!open) return; const t = fmt(); if (t !== lastClock) { lastClock = t; el.clk.textContent = t; if (cur === null) render(); } });
 }
 function toggle(force) {
-  open = force === undefined ? !open : force; ph.classList.toggle("open", open);
+  open = force === undefined ? !open : force; el.phone.classList.toggle("open", open);
   if (open) render();
 }
-export const isOpen = () => open;
+function goApp(id, fromOutside) {
+  const a = id && appList().find(x => x.id === id);
+  if (a && a.enter && fromOutside) a.enter();
+  cur = a ? a.id : null; render();
+}
+function homeBar() { if (cur === null) toggle(false); else goApp(null); }
 
 function render() {
-  clear(tabsEl); clear(body);
-  if (!TABS().some(t => t.id === tab)) tab = "inbox";
-  for (const t of TABS()) {
-    const n = t.id === "inbox" ? S.inbox.filter(m => !m.read).length : 0;
-    tabsEl.append(h("button", { class: "chip" + (tab === t.id ? " sel" : ""), type: "button", onClick: () => { tab = t.id; render(); } }, t.label, n ? h("span", { class: "tag" }, n) : null));
-  }
-  ({ inbox, feeds, orders, wallet, playbook })[tab]();
-  if (tab === "inbox") { S.inbox.forEach(m => { if (m.read) return; setTimeout(() => { m.read = true; emit("inbox:changed"); }, 1800); }); }
+  const keep = el.scroll ? el.scroll.scrollTop : 0, sameApp = el.scroll && el.scroll.dataset.app === String(cur);
+  apps = appList(); backFn = null; clear(el.app);
+  if (cur !== null && !apps.some(a => a.id === cur)) cur = null;
+  el.screen.classList.toggle("home", cur === null);
+  if (cur === null) { drawHome(); return; }
+  const a = apps.find(x => x.id === cur);
+  el.head = h("div", { class: "ph-head" }); el.tabs = h("div", { class: "ph-tabs", hidden: true }); el.scroll = h("div", { class: "ph-scroll", "data-app": cur });
+  el.app.append(el.head, el.tabs, el.scroll);
+  const ctx = {
+    scroll: el.scroll, refresh: render, go: id => goApp(id, true), setBack: fn => { backFn = fn; paintBack(); },
+    setHead(title, o = {}) {
+      el.head.style.background = o.bg || "#fff"; el.head.style.color = o.fg || "#fff"; el.screen.style.background = o.solid || "#fff"; el.screen.dataset.tone = o.fg === "#1c2452" ? "dark" : "light"; el.screen.classList.toggle("darkapp", !!o.dark);
+      el.head.append(h("button", { class: "back", type: "button", "aria-label": "Back", onClick: () => (backFn ? backFn() : goApp(null)) }, "‹"),
+        h("div", { class: "ttl" + (o.brand ? " brand" : "") }, title, o.sub ? h("small", {}, o.sub) : null),
+        ...(o.action ? [h("button", { class: "act", type: "button", onClick: o.action.fn }, o.action.label)] : []));
+    },
+    setTabs(list, curTab, pick) {
+      el.tabs.hidden = false;
+      for (const t of list) el.tabs.append(h("button", { class: "seg" + (t.id === curTab ? " on" : ""), type: "button", onClick: () => pick(t.id) }, t.label));
+    }
+  };
+  a.draw(ctx);
+  if (sameApp) el.scroll.scrollTop = keep;
 }
+function paintBack() { /* the back arrow always calls backFn when set; nothing to repaint */ }
 
-function inbox() {
-  if (!S.inbox.length) { body.append(h("div", { class: "panel" }, "No messages yet.")); return; }
-  for (const m of S.inbox.slice(0, 40)) {
-    const el = h("div", { class: `msg ${m.kind}${m.read ? "" : " unread"}`, style: m.link ? { cursor: "pointer" } : {}, onClick: m.link ? () => emit("open:results", m.link) : null },
-      h("b", {}, m.title), h("span", {}, m.text), h("div", { class: "when" }, fmtDay(m.at)));
-    body.append(el);
+function drawHome() {
+  el.screen.style.background = ""; el.screen.dataset.tone = "light"; el.screen.classList.remove("darkapp"); el.scroll = null;
+  const grid = h("div", { class: "ph-grid" });
+  for (const a of apps) {
+    const n = a.badge();
+    grid.append(h("button", { class: "ph-ico", type: "button", onClick: () => goApp(a.id, true) },
+      h("span", { class: "itile", style: { background: `linear-gradient(150deg,${a.grad[0]},${a.grad[1]})` } }, a.vicon ? vimg(a.vicon, a.emoji) : h("span", { class: "em" }, a.emoji), n ? h("span", { class: "nb" }, n) : null),
+      h("span", { class: "lb" }, a.label)));
   }
-}
-function feeds() {
-  body.append(h("div", { class: "row" }, ...["tiktik", "youview"].map(s => h("button", { class: "chip" + (feedSite === s ? " sel" : ""), type: "button", onClick: () => { feedSite = s; render(); } }, D.SITE[s].name))));
-  const list = feedFor(feedSite, 14);
-  if (!list.length) body.append(h("div", { class: "panel" }, "The feed is quiet right now."));
-  for (const f of list) body.append(feedCard(f));
-}
-export function feedCard(f) {
-  const p = f.p ? D.P[f.p] : null;
-  return h("div", { class: "feed-card" }, p ? art(p.icon, "ic") : h("div", { class: "ic", style: { fontSize: "2em", textAlign: "center" } }, "📰"),
-    h("div", { class: "grow" }, h("b", {}, f.news && !p ? f.text : (p ? p.short : "News")), " ", h("span", { class: "style-tag" }, f.style),
-      h("div", { class: "meta" }, h("span", {}, "by " + f.by), f.views ? h("span", {}, f.views.toLocaleString() + " views") : null, f.likes ? h("span", {}, f.likes.toLocaleString() + " likes") : null, h("span", {}, fmt(f.at))),
-      f.news && p ? h("div", { class: "top-c" }, f.text) : null, f.top ? h("div", { class: "top-c" }, `"${f.top}"`) : null));
-}
-function orders() {
-  body.append(h("h3", { style: { color: "var(--gold)" } }, "My posts"));
-  const ps = S.posts.slice().reverse().slice(0, 8);
-  if (!ps.length) body.append(h("div", { class: "panel" }, "No posts yet. Film a video at the filming corner."));
-  for (const p of ps) body.append(h("div", { class: "feed-card", style: { cursor: "pointer" }, onClick: () => emit("open:results", p.id) }, art(D.P[p.pid].icon, "ic"),
-    h("div", { class: "grow" }, h("b", {}, D.P[p.pid].short), " ", h("span", { class: "style-tag" }, D.SITE[p.site].name), p.done ? h("span", { class: "tag green", style: { marginLeft: ".4em" } }, "ended") : h("span", { class: "tag teal", style: { marginLeft: ".4em" } }, "live"),
-      h("div", { class: "meta" }, h("span", {}, p.views + " views"), h("span", {}, p.orders + " orders"), h("span", {}, fmtMoney(p.profit))))));
-  body.append(h("h3", { style: { color: "var(--gold)" } }, "Orders"));
-  const os = S.orders.slice().reverse().slice(0, 12);
-  if (!os.length) body.append(h("div", { class: "panel" }, "No orders yet."));
-  const lab = { toPack: "Pack it", packed: "Waiting for courier", shipped: "On the way", paid: "Paid", cancelled: "Cancelled", new: "New" };
-  for (const o of os) body.append(h("div", { class: "feed-card" }, art(D.P[o.pid].icon, "ic"), h("div", { class: "grow" }, h("b", {}, `#${o.no} ${D.P[o.pid].short}`), h("div", { class: "meta" }, h("span", {}, o.mode === "affiliate" ? "Commission " + fmtMoney(o.comm) : fmtMoney(o.price)), h("span", {}, lab[o.status] || o.status)))));
-}
-function wallet() {
-  body.append(h("div", { class: "msg", style: { borderLeftColor: "var(--gold)" } }, h("b", {}, "Cash: " + fmtMoney(S.cash)), `Earned in total: ${fmtMoney(S.stats.earned)}`));
-  if (flag("rent")) {
-    body.append(h("div", { class: "msg", style: { borderLeftColor: S.rent.due > 0 ? "var(--red)" : "var(--green)" } },
-      h("b", {}, S.rent.due > 0 ? `Rent due: ${fmtMoney(S.rent.due)}` : "Rent is paid"), `Next rent: day ${S.rent.nextDay}, ${fmtMoney(D.time.rent.amount)}.`));
-    if (S.rent.due > 0) body.append(btn("Pay rent " + fmtMoney(S.rent.due), "b-gold", () => { const p = { ok: false }; emit("rent:pay", p); if (p.ok) render(); }));
-  }
-  body.append(h("h3", { style: { color: "var(--gold)" } }, "Recent"));
-  for (const l of S.ledger.slice(0, 14)) body.append(h("div", { class: "msg", style: { borderLeftColor: l.amount >= 0 ? "var(--green)" : "var(--red)", padding: ".15em .6em" } }, h("span", {}, `${l.amount >= 0 ? "+" : "-"}${fmtMoney(Math.abs(l.amount))}  ${l.why}`), h("div", { class: "when" }, fmtDay(l.t))));
-}
-function playbook() {
-  const ids = Object.keys(S.playbook);
-  if (!ids.length) { body.append(h("div", { class: "panel" }, "Nothing here yet. Post videos and Mr. Algo will add what you learn.")); return; }
-  for (const id of ids.sort((a, b) => S.playbook[b].at - S.playbook[a].at)) {
-    const e = S.playbook[id], l = D.lessons.find(x => x.id === id); if (!l) continue;
-    body.append(h("div", { class: "pb" + (e.outdated ? " old" : ""), style: { cursor: "pointer" }, onClick: () => emit("open:results", e.postId) },
-      h("b", {}, l.title), e.outdated ? h("span", { class: "tag", style: { background: "var(--orange)", marginLeft: ".5em" } }, "may be outdated") : null,
-      h("div", {}, l.text), h("div", { class: "ev" }, "Evidence: " + e.evidence + " · " + fmtDay(e.at))));
-  }
+  el.app.append(h("div", { class: "ph-widget" }, h("div", { class: "t" }, fmt()), h("div", { class: "d" }, "Day " + dayNo())), grid,
+    h("div", { class: "ph-foot" }, "Tap an app. Press the bar at the bottom to go back."));
 }
