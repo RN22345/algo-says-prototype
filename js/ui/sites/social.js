@@ -19,7 +19,7 @@ export function render(root, def) {
   if (sub[id] === "feed") {
     const list = feedFor(id, 16);
     if (!list.length) body.append(h("div", { class: "banner" }, "Quiet right now. Check back later."));
-    for (const f of list) { const c = feedCard(f); c.style.background = "#fff"; c.style.border = "3px solid var(--navy)"; body.append(c); }
+    for (const f of list) { const c = feedCard(f); body.append(c); }
   } else {
     const mine = S.posts.filter(p => p.site === id).slice().reverse();
     if (!mine.length) body.append(h("div", { class: "banner" }, `No ${site.name} posts yet. Film a video at the filming corner.`));

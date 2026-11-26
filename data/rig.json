@@ -1,0 +1,16 @@
+{
+ "_note": "Box-rig characters (js/ui/rig.js). looks: named characters. palette: what random pedestrians pick from. style: short | long | bun | cap. size multiplies the rig (1 = adult).",
+ "looks": {
+  "player": { "skin": "#f2c9a0", "hair": "#5a3a26", "top": "#fbf6ea", "bottom": "#4f9d5b", "shoes": "#3b3f5c", "style": "long", "size": 1.04 },
+  "courier": { "skin": "#d9a27a", "hair": "#2b2230", "top": "#ff7a1a", "bottom": "#2c3a82", "shoes": "#2a2d44", "style": "cap", "cap": "#ff7a1a", "size": 1.02 },
+  "rider": { "skin": "#e8b88f", "hair": "#2b2230", "top": "#3a7bf0", "bottom": "#3b3f5c", "shoes": "#2a2d44", "style": "cap", "cap": "#3a7bf0", "size": 1.0 }
+ },
+ "palette": {
+  "skin": ["#f6d3b3", "#f2c9a0", "#e3b08a", "#d29a72", "#b97c58", "#8f5c3e"],
+  "hair": ["#2b2230", "#3d2a20", "#5a3a26", "#7a4a2a", "#c98f3a", "#1c1c28", "#8a8a96"],
+  "top": ["#e8344f", "#3a7bf0", "#2fc7b8", "#ffc61a", "#b744c9", "#ff7a1a", "#f7f3e8", "#6a73a0", "#3ec45a", "#ff9fb2"],
+  "bottom": ["#2c3a82", "#3b3f5c", "#5d6475", "#7a5a3a", "#4f9d5b", "#26307a", "#9aa3c7"],
+  "shoes": ["#2a2d44", "#ffffff", "#7a4a2a", "#e8344f"],
+  "styles": ["short", "short", "long", "bun", "cap"]
+ }
+}

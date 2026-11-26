@@ -7,6 +7,10 @@ import { S } from "../../core/state.js";
 import { fmt, dayNo } from "../../core/clock.js";
 import { on, emit } from "../../core/bus.js";
 import { h, clear, modal, drag } from "../ui.js";
+import { ic } from "../icons.js";
+
+const ICON = { browser: "globe", affiliate: "handshake", hub: "chart", supplier: "truck", toolshop: "tool", property: "home", stock: "sheet" };
+const icOf = a => ic(ICON[a.id] || a.icon || "box");
 
 const apps = [], wins = [];
 let mon = null, dom = {}, zTop = 10, nid = 1, offFrame = null, menuOpen = false;
@@ -17,16 +21,18 @@ export const listWindows = kind => wins.filter(w => !kind || w.kind === kind);
 const visibleApps = () => apps.filter(a => !a.show || a.show());
 
 const WALL = `<svg viewBox="0 0 1480 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<defs><linearGradient id="pcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58b6ff"/><stop offset=".7" stop-color="#bfe6ff"/><stop offset="1" stop-color="#eaf7ff"/></linearGradient></defs>
-<rect width="1480" height="780" fill="url(#pcsky)"/>
-<circle cx="1210" cy="150" r="78" fill="#fff3a8"/><circle cx="1210" cy="150" r="58" fill="#ffc61a"/>
-<g fill="#fff" opacity=".95"><ellipse cx="420" cy="130" rx="110" ry="34"/><ellipse cx="500" cy="112" rx="70" ry="30"/><ellipse cx="360" cy="140" rx="60" ry="24"/>
-<ellipse cx="900" cy="250" rx="130" ry="38"/><ellipse cx="990" cy="232" rx="80" ry="32"/><ellipse cx="780" cy="260" rx="60" ry="24"/></g>
-<path d="M0 560 Q200 430 420 520 T860 500 T1300 480 T1480 520 V780 H0Z" fill="#7ad8a0"/>
-<path d="M0 640 Q260 540 520 620 T1000 600 T1480 610 V780 H0Z" fill="#3ec45a"/>
-<path d="M0 720 Q300 650 640 705 T1480 690 V780 H0Z" fill="#2ba24a"/>
-<g font-family="Lilita One, Fredoka, sans-serif" text-anchor="middle"><text x="900" y="430" font-size="150" fill="#1c2452" opacity=".16" stroke="#1c2452" stroke-width="2">ALGO SAYS</text></g>
-<g fill="#ffc61a" stroke="#c8940a" stroke-width="4"><circle cx="1050" cy="620" r="20"/><circle cx="1100" cy="650" r="14"/><circle cx="1010" cy="660" r="11"/></g>
+<defs><linearGradient id="pcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0ff"/><stop offset=".75" stop-color="#d4efff"/><stop offset="1" stop-color="#f1faff"/></linearGradient>
+<radialGradient id="pcglow" cx=".78" cy=".2" r=".5"><stop offset="0" stop-color="#fff6c8" stop-opacity=".9"/><stop offset="1" stop-color="#fff6c8" stop-opacity="0"/></radialGradient></defs>
+<rect width="1480" height="780" fill="url(#pcsky)"/><rect width="1480" height="780" fill="url(#pcglow)"/>
+<g fill="#fff" opacity=".7"><ellipse cx="380" cy="150" rx="120" ry="30"/><ellipse cx="450" cy="134" rx="70" ry="28"/><ellipse cx="1000" cy="240" rx="140" ry="32"/><ellipse cx="1080" cy="224" rx="80" ry="28"/></g>
+<g transform="translate(1000 520)">
+ <path d="M0 -150 L300 0 L0 150 L-300 0Z" fill="#a8dc86"/><path d="M-300 0 L0 150 L0 190 L-300 40Z" fill="#c69a6a"/><path d="M300 0 L0 150 L0 190 L300 40Z" fill="#a97f53"/>
+ <path d="M-40 -100 L80 -40 L80 -150 L-40 -210Z" fill="#dde9fb"/><path d="M80 -40 L170 -85 L170 -195 L80 -150Z" fill="#bcd0ef"/>
+ <path d="M-50 -205 L80 -140 L180 -190 L50 -255Z" fill="#ff8a7a"/><path d="M-50 -205 L80 -140 L80 -128 L-50 -193Z" fill="#e5675a"/>
+ <path d="M10 -95 L40 -80 L40 -125 L10 -140Z" fill="#f2b26b"/><path d="M110 -70 L140 -85 L140 -120 L110 -105Z" fill="#9fd4ff"/>
+ <circle cx="-170" cy="-40" r="44" fill="#5fbf5f"/><circle cx="-195" cy="-60" r="30" fill="#7ed37a"/><rect x="-176" y="-6" width="12" height="30" rx="4" fill="#8a5a2b"/>
+ <circle cx="190" cy="40" r="34" fill="#5fbf5f"/><rect x="185" y="66" width="10" height="22" rx="4" fill="#8a5a2b"/>
+</g>
 </svg>`;
 
 /* ---------- open and close ---------- */
@@ -55,23 +61,23 @@ function buildMonitor() {
   dom.clk = h("div", { class: "tm" }); dom.day = h("div", { class: "dy" });
   dom.menu = h("div", { class: "startmenu", hidden: true });
   dom.start = h("button", { class: "startbtn", type: "button", "aria-label": "Start", onClick: () => toggleMenu() }, h("span", { class: "alogo" }, "A"), h("span", { class: "sl" }, "Start"));
-  const task = h("div", { class: "task" }, dom.start, dom.tasks, h("div", { class: "tray" }, h("span", {}, "🔊"), h("span", {}, "📶"), h("div", { class: "clockbox" }, dom.clk, dom.day)));
+  const task = h("div", { class: "task" }, dom.start, dom.tasks, h("div", { class: "tray" }, ic("sound"), ic("wifi"), h("div", { class: "clockbox" }, dom.clk, dom.day)));
   dom.scr = h("div", { class: "scr" }, dom.wall, dom.icons, dom.area, dom.menu, task);
   dom.scr.addEventListener("pointerdown", e => { if (menuOpen && !e.target.closest(".startmenu") && !e.target.closest(".startbtn")) toggleMenu(false); });
-  const chin = h("div", { class: "chin" }, h("span", { class: "badge-a" }, "A"), h("span", { class: "brand" }, "ALGO PC"), h("span", { class: "grow" }), h("span", { class: "led" }), h("button", { class: "power", type: "button", "aria-label": "Close the PC", title: "Close the PC", onClick: closePC }, "⏻"));
+  const chin = h("div", { class: "chin" }, h("span", { class: "badge-a" }, "A"), h("span", { class: "brand" }, "ALGO PC"), h("span", { class: "grow" }), h("span", { class: "led" }), h("button", { class: "power", type: "button", "aria-label": "Close the PC", title: "Close the PC (Esc)", onClick: closePC }, ic("power")));
   return h("div", { class: "monitor" }, h("div", { class: "bezel" }, dom.scr, chin), h("div", { class: "neck" }), h("div", { class: "foot" }));
 }
 function toggleMenu(force) {
   menuOpen = force === undefined ? !menuOpen : force; dom.menu.hidden = !menuOpen;
   if (!menuOpen) return;
   clear(dom.menu); dom.menu.append(h("div", { class: "mh" }, h("span", { class: "alogo" }, "A"), "Algo PC"));
-  for (const a of visibleApps()) dom.menu.append(h("button", { class: "mi", type: "button", onClick: () => { toggleMenu(false); a.open(); } }, h("span", { class: "e" }, a.emoji), a.label));
-  dom.menu.append(h("button", { class: "mi off", type: "button", onClick: closePC }, h("span", { class: "e" }, "⏻"), "Close the PC"));
+  for (const a of visibleApps()) dom.menu.append(h("button", { class: "mi", type: "button", onClick: () => { toggleMenu(false); a.open(); } }, h("span", { class: "e", style: { background: `linear-gradient(150deg,${a.grad[0]},${a.grad[1]})` } }, icOf(a)), a.label));
+  dom.menu.append(h("button", { class: "mi off", type: "button", onClick: closePC }, h("span", { class: "e" }, ic("power")), "Close the PC"));
 }
 export function renderIcons() {
   if (!dom.icons) return; clear(dom.icons);
   for (const a of visibleApps()) dom.icons.append(h("button", { class: "dico", type: "button", "data-app": a.id, onClick: () => { toggleMenu(false); a.open(); } },
-    h("span", { class: "itile", style: { background: `linear-gradient(150deg,${a.grad[0]},${a.grad[1]})` } }, a.emoji), h("span", { class: "lb" }, a.label)));
+    h("span", { class: "itile", style: { background: `linear-gradient(150deg,${a.grad[0]},${a.grad[1]})` } }, icOf(a)), h("span", { class: "lb" }, a.label)));
 }
 
 /* ---------- windows ---------- */
@@ -100,12 +106,12 @@ function place(rec) {
 function mount(rec) {
   if (!dom.area || rec.el) return;
   const body = h("div", { class: "wbody" });
-  rec.titleEl = h("span", { class: "tt grow", title: "Drag to move. Double-click to maximise." }, h("span", { class: "we" }, rec.emoji), h("span", { class: "wt" }, rec.title));
-  const mk = (cls, label, txt, fn) => h("button", { class: "wb " + cls, type: "button", "aria-label": label, title: label, onClick: e => { e.stopPropagation(); fn(); } }, txt);
-  const bar = h("div", { class: "wbar", style: { background: rec.color } }, rec.titleEl,
-    mk("mn", "Minimise", "–", () => { rec.min = true; place(rec); renderTask(); }),
-    mk("mx", "Maximise", "▢", () => { rec.max = !rec.max; place(rec); }),
-    mk("cl", "Close", "×", () => closeWindow(rec)));
+  rec.titleEl = h("span", { class: "tt grow", title: "Drag to move. Double-click to maximise." }, h("span", { class: "we", style: { background: rec.color } }, ic(ICON[rec.kind === "browser" ? "browser" : rec.key] || "box")), h("span", { class: "wt" }, rec.title));
+  const mk = (cls, label, icon, fn) => h("button", { class: "wb " + cls, type: "button", "aria-label": label, title: label, onClick: e => { e.stopPropagation(); fn(); } }, ic(icon));
+  const bar = h("div", { class: "wbar" }, rec.titleEl,
+    mk("mn", "Minimise", "min", () => { rec.min = true; place(rec); renderTask(); }),
+    mk("mx", "Maximise", "max", () => { rec.max = !rec.max; place(rec); }),
+    mk("cl", "Close", "close", () => closeWindow(rec)));
   const rz = h("div", { class: "rz" });
   rec.el = h("div", { class: "win" }, bar, body, rz);
   rec.el.addEventListener("pointerdown", () => { if (activeRec() !== rec) focusWindow(rec); }, true);
@@ -130,5 +136,5 @@ export function closeWindow(rec) {
 function renderTask() {
   if (!dom.tasks) return; clear(dom.tasks); const act = activeRec();
   for (const w of wins) dom.tasks.append(h("button", { class: "tb" + (w === act ? " on" : "") + (w.min ? " min" : ""), type: "button", title: w.title, onClick: () => { if (w.min || w !== act) focusWindow(w); else { w.min = true; place(w); renderTask(); } } },
-    h("span", { class: "e" }, w.emoji), h("span", { class: "t" }, w.title)));
+    h("span", { class: "e", style: { background: w.color } }, ic(ICON[w.kind === "browser" ? "browser" : w.key] || "box")), h("span", { class: "t" }, w.title)));
 }

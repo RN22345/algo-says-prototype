@@ -1,13 +1,30 @@
-/* WORLD (builder A): sky behind the floating diorama, the camera-moved tag layer, the touch joystick, the furniture tray. */
-#room{background:linear-gradient(180deg,#4fc3f7 0%,#b3e5fc 100%)}
+/* WORLD: sky behind the floating island, the camera-moved name tags, the touch joystick, the Move furniture bar and tray. */
+#room{background:linear-gradient(180deg,#5cc4f5 0%,#bde6fb 100%)}
 #room .tags{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;transform-origin:0 0}
-/* decor has no tag and takes no clicks, except while moving furniture */
-#room svg polygon.deco{pointer-events:none}
-#room.editing svg polygon.deco{pointer-events:all}
-/* move furniture: bar and tray sit above the bottom row so they never cover the inventory bar */
-#room .movebar{bottom:140px}
-#room .movetray{position:absolute;left:50%;bottom:210px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:1200px;background:rgba(28,36,82,.92);border:4px solid var(--teal);border-radius:22px;padding:.4em .9em .1em;color:#fff;z-index:3;font:600 .72em var(--body)}
-#room .movetray .tt{font:400 1.1em var(--lil);color:var(--gold)}
+#room svg rect.floorhit{fill:transparent;pointer-events:all}
+/* name tags: hidden until hovered, in reach, holding a count, or pointed at by the guide */
+.stag{position:absolute;transform:translate(-50%,-100%) scale(.85);display:flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
+ background:rgba(255,255,255,.9);color:var(--navy);font:600 19px var(--body);white-space:nowrap;box-shadow:0 6px 16px rgba(20,30,80,.18);
+ opacity:0;pointer-events:none;transition:opacity .2s,transform .25s cubic-bezier(.2,1.4,.5,1)}
+.stag::after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;border:7px solid transparent;border-top-color:rgba(255,255,255,.9);border-bottom:0}
+.stag kbd{display:none;font:700 14px/1 var(--body);background:var(--navy);color:#fff;border-radius:6px;padding:4px 7px}
+.stag.hl,.stag.near,.stag.hasb,.stag.nudge{opacity:1;transform:translate(-50%,-112%) scale(1)}
+.stag.near kbd{display:inline-block}
+.stag.hasb:not(.hl):not(.near){opacity:.92}
+.stag.lock{color:#7d86b3}
+.stag .badge{position:static;margin-left:2px;min-width:26px;height:26px;font:700 15px/22px var(--body);border-width:2px}
+.stag.nudge{animation:bob 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translate(-50%,-122%)}}
+html.coarse .stag kbd{display:none!important}
+.daynight{position:absolute;inset:0;opacity:0;pointer-events:none}
+/* move furniture: bar and tray above the bottom row */
+#room .movebar{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;padding:8px 10px 8px 22px;border-radius:999px;z-index:3;
+ background:rgba(27,34,86,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff;font:600 19px var(--body);box-shadow:0 12px 30px rgba(15,20,60,.3)}
+#room .movebar .btn{margin-bottom:0}
+#room .movetray{position:absolute;left:50%;bottom:112px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:1200px;padding:10px 16px;border-radius:24px;z-index:3;
+ background:rgba(255,255,255,.75);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 12px 30px rgba(15,20,60,.2);color:var(--navy);font:600 18px var(--body)}
+#room .movetray .tt{font:700 18px var(--body);color:var(--ink2,#5b6390)}
+#room .movetray .btn{margin-bottom:0}
 /* virtual joystick (touch devices) */
-#room .joy{position:absolute;left:60px;bottom:230px;width:210px;height:210px;border-radius:50%;background:rgba(255,255,255,.28);border:5px solid rgba(28,36,82,.55);touch-action:none;z-index:4;pointer-events:auto}
-#room .joy .knob{position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;background:var(--gold);border:5px solid var(--navy);box-shadow:0 5px 0 rgba(0,0,0,.25)}
+#room .joy{position:absolute;left:60px;bottom:200px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.3);border:1.5px solid rgba(255,255,255,.7);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);touch-action:none;z-index:4;pointer-events:auto}
+#room .joy .knob{position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 8px 18px rgba(15,20,60,.25)}

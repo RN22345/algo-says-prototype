@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Rig test</title>
+<style>body{margin:0;background:#bfe3c0;font:14px sans-serif}canvas{display:block}</style>
+<canvas id="c" width="1600" height="900"></canvas>
+<script type="module">
+/* Draws the box rig large: 8 facing angles, a walk cycle, sitting, carrying, the scooter. Open http://localhost:8771/tools/rigtest.html */
+import { D } from "../js/core/data.js";
+D.room = await (await fetch("../data/room.json")).json();
+D.rig = await (await fetch("../data/rig.json")).json();
+const { drawRig, lookOf, drawBoxes, scooterBoxes } = await import("../js/ui/rig.js");
+const { P } = await import("../js/ui/proj.js");
+const c = document.getElementById("c"), g = c.getContext("2d");
+const at = (sx, sy) => { const v = D.room.view, X = (sx - v.ox) / v.tw, Y = (sy - v.oy) / v.th; return [(X + Y) / 2, (Y - X) / 2]; };
+function frame(t) {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 1600, 900); g.setTransform(2.2, 0, 0, 2.2, 0, 0);
+  const L = lookOf("player");
+  for (let i = 0; i < 8; i++) { const [x, y] = at(70 + i * 85, 150); drawRig(g, L, { x, y, ang: i * Math.PI / 4, phase: t / 100, move: i % 2, blink: (t / 1000 % 3) < 0.1 ? 1 : 0, breath: t / 400 }); }
+  const [x1, y1] = at(80, 340); drawRig(g, L, { x: x1, y: y1, ang: Math.PI / 4, carry: true, phase: t / 100, move: 1 });
+  const [x2, y2] = at(200, 340); drawRig(g, lookOf("courier"), { x: x2, y: y2, ang: Math.PI / 4, sit: true });
+  const [x3, y3] = at(330, 360); drawBoxes(g, x3, y3, Math.PI / 2, scooterBoxes("#ff7a1a")); drawRig(g, lookOf("courier"), { x: x3, y: y3 - 0.12, ang: Math.PI / 2, sit: true, z: 0.08, noShadow: true });
+  const [x4, y4] = at(470, 340); drawRig(g, lookOf("rider"), { x: x4, y: y4, ang: Math.PI * 0.6, wave: true });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>

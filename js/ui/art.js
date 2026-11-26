@@ -1,7 +1,7 @@
 /* ART. Loads data/sprites.json (guarded: a missing file means no sprites) and the images in img/v/<id>.png, then draws them by the
    art contract: (ax, ay) is the image pixel of the footprint centre at floor level, images are px times game pixels.
    Anything without a sprite keeps its code-drawn or old-PNG fallback, so the game works with partial art.
-   drawSpr(g, id, cx, cy, opts): (cx, cy) = footprint centre in tiles. opts: z, lift (px), flip, alpha, hue, scale.
+   drawSpr(g, id, cx, cy, opts): (cx, cy) = footprint centre in tiles. A sprite may carry "scale" in sprites.json to match the others' size. opts: z, lift (px), flip, alpha, hue, scale.
    Exports: loadSprites, spr, hasSpr, drawSpr, drawSprAt, sprBox, sprBoxAt, tinted. */
 import { D } from "../core/data.js";
 import { P } from "./proj.js";
@@ -30,13 +30,13 @@ export function tinted(id, hue) {
 /* World-pixel box [x, y, w, h] of a sprite whose anchor sits at world pixel (sx, sy). */
 export function sprBoxAt(id, sx, sy, o = {}) {
   const s = store[id]; if (!s) return null;
-  const k = (o.scale || 1) / px, w = s.w * k, h = s.h * k, ax = s.ax * k, ay = s.ay * k;
+  const k = (o.scale || 1) * (s.scale || 1) / px, w = s.w * k, h = s.h * k, ax = s.ax * k, ay = s.ay * k;
   return [o.flip ? sx - (w - ax) : sx - ax, sy - ay, w, h];
 }
 export function sprBox(id, cx, cy, o = {}) { const [sx, sy] = P(cx, cy, o.z || 0); return sprBoxAt(id, sx, sy - (o.lift || 0), o); }
 export function drawSprAt(g, id, sx, sy, o = {}) {
   const s = store[id]; if (!s) return false;
-  const k = (o.scale || 1) / px, w = s.w * k, h = s.h * k, ax = s.ax * k, ay = s.ay * k, img = o.hue ? tinted(id, o.hue) : s.img, prev = g.globalAlpha;
+  const k = (o.scale || 1) * (s.scale || 1) / px, w = s.w * k, h = s.h * k, ax = s.ax * k, ay = s.ay * k, img = o.hue ? tinted(id, o.hue) : s.img, prev = g.globalAlpha;
   if (o.alpha != null) g.globalAlpha = prev * o.alpha;
   if (o.flip) { g.save(); g.translate(sx, 0); g.scale(-1, 1); g.drawImage(img, -ax, sy - ay, w, h); g.restore(); }
   else g.drawImage(img, sx - ax, sy - ay, w, h);

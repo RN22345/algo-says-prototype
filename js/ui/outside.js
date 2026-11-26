@@ -1,120 +1,117 @@
-/* OUTSIDE. What the player sees beyond the front door: the courier and the sample rider (a character who walks from the curb to
-   the door), the supplier van at the curb, boxes on the doorstep, packed parcels by the door, and passing traffic in two lanes.
-   Visual only: the sims (stock.js, orders.js) decide what arrives and when; this file only shows it, timed by the game clock
-   (courier times, supplier arrival) and by events. Cars keep their lanes and stop at the crosswalk when the player is on it.
-   Uses sprites (ch_courier_0, vh_van_p, vh_car_green_p/_n, it_box, it_parcel) with code-drawn fallbacks.
-   Events in: sample:arrived. Exports: trafficState, outsideItems(now, ctx) -> [{d, f(g), bb}] for depth sorting (ctx = {cross}), drawOutside(g). */
+/* OUTSIDE. What the player sees beyond the front door: the courier and the sample rider (each rides a scooter in along the curb,
+   parks, walks to the door, waits, walks back and rides off), the supplier van, boxes on the doorstep, packed parcels by the door,
+   plus the traffic (traffic.js) and pedestrians (people.js). Things arrive and leave instead of popping: vehicles fade in at the
+   island edge, boxes drop in with a bounce, and a dust puff marks where something was taken.
+   Visual only: the sims (stock.js, orders.js) decide what arrives and when; this file only shows it, timed by the game clock.
+   Events in: sample:arrived. Exports: outsideItems(now, ctx) -> [{d, f(g), bb}] for depth sorting (ctx = {player, dt}), drawOutside(g, now). */
 import { D } from "../core/data.js";
 import { S } from "../core/state.js";
 import { tod } from "../core/clock.js";
 import { on } from "../core/bus.js";
 import { P } from "./proj.js";
-import { prism, label, shade, shadow } from "./drawkit.js";
-import { hasSpr, drawSpr, drawSprAt } from "./art.js";
+import { prism } from "./drawkit.js";
+import { hasSpr, drawSpr } from "./art.js";
+import { drawRig, drawBoxes, lookOf, scooterBoxes } from "./rig.js";
+import { stepTraffic, trafficItems, edgeAlpha } from "./traffic.js";
+import { stepPeople, peopleItems, peopleOnCross } from "./people.js";
+import { crossAt } from "./world.js";
+import { appear, forget, puff } from "./fx.js";
 
 let sampleRiderAt = -1e9;
 on("sample:arrived", () => { sampleRiderAt = S.t; });
 
 const N = () => D.room.view.Nx, doorMid = () => (D.room.front.door[0] + D.room.front.door[1]) / 2;
 const Wd = () => D.world, edge = () => Wd().bounds;
-/* y of a vehicle that drives in along the curb, parks from t0 to t1 (game minutes) and drives on, 6 minutes each way. */
-function roadY(t, t0, t1, park) {
-  const y0 = edge().y0 - 3, y1 = edge().y1 + 3;
-  if (t < t0 - 6 || t > t1 + 6) return null;
-  if (t < t0) return y0 + (park - y0) * (1 - (t0 - t) / 6);
-  if (t > t1) return park + (t - t1) / 6 * (y1 - park);
+const lerp = (a, b, f) => a + (b - a) * f, cl = f => Math.max(0, Math.min(1, f));
+
+/* y of a vehicle along the curb: drives in over din minutes, parks from t0 to t1, drives on over dout minutes. */
+function roadY(t, t0, t1, park, din = 20, dout = 20) {
+  const y0 = edge().y0 - 1.5, y1 = edge().y1 + 1.5;
+  if (t < t0 - din || t > t1 + dout) return null;
+  if (t < t0) { const f = 1 - (t0 - t) / din; return lerp(y0, park, 1 - (1 - f) * (1 - f)); }
+  if (t > t1) { const f = (t - t1) / dout; return lerp(park, y1, f * f); }
   return park;
 }
-/* A person who walks from the sidewalk to the door at t0, waits until t1, walks back. */
-function walker(t, t0, t1) {
-  const w = 5, dm = doorMid(), c = [Wd().road.rect[0] - 0.5, dm + 0.5], d = [N() + 0.6, dm + 0.05];
-  if (t < t0 - w || t > t1 + w) return null;
-  const f = t < t0 ? (t - (t0 - w)) / w : t > t1 ? 1 - (t - t1) / w : 1, moving = f < 1;
-  return { x: c[0] + (d[0] - c[0]) * f, y: c[1] + (d[1] - c[1]) * f, moving, face: t > t1 ? 1 : -1, at: !moving };
+/* A delivery visit: ride in, walk to the door, wait, walk back, ride off. Times in game minutes. */
+function visit(t, tArrive, tLeave, parkY) {
+  const R = 18, Wk = 9;
+  const door = [N() + 0.6, doorMid() + 0.05], walkway = [11.5, doorMid() + 0.5], curb = [12.35, parkY];
+  if (t < tArrive - R - Wk || t > tLeave + Wk + R) return null;
+  const sy = roadY(t, tArrive - Wk, tLeave + Wk, parkY, R, R);
+  if (t < tArrive - Wk || t > tLeave + Wk) return { ride: true, sy, x: 12.6, y: sy, ang: Math.PI / 2 };
+  const out = t > tLeave, f = out ? cl((t - tLeave) / Wk) : cl((t - (tArrive - Wk)) / Wk), g = out ? 1 - f : f;
+  const pts = [curb, walkway, door], seg = g < 0.45 ? 0 : 1, sf = seg === 0 ? g / 0.45 : (g - 0.45) / 0.55;
+  const a = pts[seg], b = pts[seg + 1], x = lerp(a[0], b[0], sf), y = lerp(a[1], b[1], sf);
+  const dx = (b[0] - a[0]) * (out ? -1 : 1), dy = (b[1] - a[1]) * (out ? -1 : 1);
+  return { ride: false, sy: parkY, x, y, ang: Math.atan2(dy, dx), moving: g > 0 && g < 1, at: g >= 1 };
 }
-function person(g, who, text, col, hue) {
-  const bob = who.moving ? Math.abs(Math.sin(performance.now() / 110)) * 5 : 0;
-  shadow(g, who.x, who.y, 0.3, 0.18);
-  if (hasSpr("ch_courier_0")) drawSprAt(g, "ch_courier_0", ...P(who.x, who.y), { flip: who.face < 0, lift: bob, hue });
-  else {   // old stand-in: a scooter with a rider
-    prism(g, who.x - 0.2, who.y - 0.4, 0.45, 1.0, 0.32, col, shade(col, -30), shade(col, -15));
-    const [hx, hy] = P(who.x, who.y, 0.95); g.fillStyle = "#1c2452"; g.beginPath(); g.roundRect ? g.roundRect(hx - 11, hy, 22, 30, 8) : g.rect(hx - 11, hy, 22, 30); g.fill();
-    g.fillStyle = col; g.strokeStyle = "#1c2452"; g.lineWidth = 3; g.beginPath(); g.arc(hx, hy - 6, 12, 0, Math.PI * 2); g.fill(); g.stroke();
-  }
-  if (text && who.at) label(g, who.x, who.y, 2.0, text, col);
+function chip(g, x, y, z, text, col) {
+  const [sx, sy] = P(x, y, z); g.font = "600 17px Fredoka, sans-serif"; const w = g.measureText(text).width + 22;
+  g.fillStyle = "rgba(255,255,255,.88)"; g.beginPath(); g.roundRect ? g.roundRect(sx - w / 2, sy - 30, w, 28, 14) : g.rect(sx - w / 2, sy - 30, w, 28); g.fill();
+  g.fillStyle = col; g.beginPath(); g.arc(sx - w / 2 + 12, sy - 16, 4, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#1c2452"; g.textAlign = "center"; g.fillText(text, sx + 5, sy - 10);
 }
-
-/* ---------- traffic ---------- */
-let cars = null, lastNow = 0;
-function makeCars() {
-  const R = Wd().road, hues = [0, 240, 300, 90, 150, 200], span = edge().y1 - edge().y0 + 6;
-  cars = []; let k = 0;
-  for (const [dir, lane, id] of [[1, R.lanes.p, "vh_car_green_p"], [-1, R.lanes.n, "vh_car_green_n"]])
-    for (let i = 0; i < 3; i++) cars.push({ dir, x: lane, id, hue: hues[k++ % hues.length], y: edge().y0 - 3 + (i * 0.34 + (dir > 0 ? 0 : 0.15)) * span, v: 0, vmax: 1.5 + (k % 3) * 0.25, len: 2 });
-}
-function stepCars(dt, cross) {
-  const [, cy0, , cd] = Wd().road.cross, y0 = edge().y0 - 3, y1 = edge().y1 + 3;
-  for (const c of cars) {
-    let target = c.vmax; const half = c.len / 2;
-    if (cross) {
-      if (c.dir > 0) { const front = c.y + half, line = cy0 - 0.3; if (front < line + 0.05 && line - front < 2.2) target = 0; }
-      else { const front = c.y - half, line = cy0 + cd + 0.3; if (front > line - 0.05 && front - line < 2.2) target = 0; }
-    }
-    for (const o of cars) {
-      if (o === c || o.dir !== c.dir) continue;
-      const gap = c.dir > 0 ? (o.y - half) - (c.y + half) : (c.y - half) - (o.y + half);
-      if (gap > -0.01 && gap < 1.1) target = 0;
-    }
-    c.v += Math.max(-7 * dt, Math.min(3 * dt, target - c.v)); c.y += c.dir * c.v * dt;
-    if (c.dir > 0 && c.y > y1) c.y = y0; else if (c.dir < 0 && c.y < y0) c.y = y1;
+function drawVisit(g, v, look, col, text) {
+  const a = edgeAlpha(v.sy), ph = performance.now() / 95;
+  drawBoxes(g, 12.6, v.sy, Math.PI / 2, scooterBoxes(col), { alpha: a });
+  if (v.ride) drawRig(g, look, { x: 12.6, y: v.sy - 0.12, ang: Math.PI / 2, sit: true, z: 0.08, alpha: a, noShadow: true });
+  else {
+    drawRig(g, look, { x: v.x, y: v.y, ang: v.ang, phase: ph, move: v.moving ? 1 : 0, alpha: 1, wave: v.at && Math.sin(ph / 6) > 0.6 });
+    if (v.at && text) chip(g, v.x, v.y, 1.9, text, col);
   }
 }
-function drawCar(g, c) {
-  if (hasSpr(c.id)) { drawSpr(g, c.id, c.x, c.y, { hue: c.hue }); return; }
-  const col = ["#3ec45a", "#e8344f", "#ffc61a", "#3a7bf0", "#b744c9", "#2fd9cf"][(c.hue / 60 | 0) % 6];
-  prism(g, c.x - 0.5, c.y - 1.0, 1.0, 2.0, 0.45, shade(col, 20), shade(col, -40), col);
-  prism(g, c.x - 0.42, c.y - 0.6, 0.84, 0.9, 0.7, "#cfe6ff", "#8fb2d9", "#a9c8ea", 0.45);
-}
 
-export const trafficState = () => cars;   // for testing
+let lastNow = 0, lastBoxes = 0, lastParcels = 0;
 export function outsideItems(now, ctx = {}) {
-  const out = [], t = S.t, m = tod(), base = t - m, R = Wd().road, park = doorMid() - 0.3, [vx, vy] = P(R.curb, park);
-  // courier on foot at the pickup times (later when the courier is delayed)
+  const out = [], t = S.t, base = t - tod(), R = Wd().road, park = doorMid() - 0.3;
+  const dt = Math.min(0.05, Math.max(0, (now - lastNow) / 1000)); lastNow = now;
+  // courier at the pickup times (later when the courier is delayed)
   for (const ct of D.time.courierTimes) {
-    const t0 = base + ct + (S.mods && S.mods.courierDelay ? 60 : 0), w = walker(t, t0, t0 + 25);
-    if (w) { const packed = (S.orders || []).filter(o => o.status === "packed").length; out.push({ d: w.x + w.y + 0.35, bb: [vx - 700, vy - 400, 1100, 700], f: g => person(g, w, packed ? `Courier: ${packed} to collect` : "Courier", "#ff7a1a") }); }
+    const t0 = base + ct + (S.mods && S.mods.courierDelay ? 60 : 0), v = visit(t, t0, t0 + 25, park - 1.7);
+    if (v) { const packed = (S.orders || []).filter(o => o.status === "packed").length, d = v.ride ? 12.6 + v.sy : v.x + v.y; const [sx, sy] = P(v.x, v.y);
+      out.push({ d: d + 0.35, bb: [sx - 300, sy - 300, 600, 420], f: g => drawVisit(g, v, lookOf("courier"), "#ff7a1a", packed ? `Courier: ${packed} to collect` : "Courier") }); }
   }
   // the rider who brings a sample
-  { const w = walker(t, sampleRiderAt, sampleRiderAt + 14); if (w) out.push({ d: w.x + w.y + 0.45, bb: [vx - 700, vy - 400, 1100, 700], f: g => person(g, w, "Sample delivered", "#3a7bf0", 200) }); }
+  { const v = visit(t, sampleRiderAt + 9, sampleRiderAt + 30, park - 3.4);
+    if (v) { const d = v.ride ? 12.6 + v.sy : v.x + v.y; const [sx, sy] = P(v.x, v.y); out.push({ d: d + 0.35, bb: [sx - 300, sy - 300, 600, 420], f: g => drawVisit(g, v, lookOf("rider"), "#3a7bf0", "Sample delivered") }); } }
   // supplier van, parked in the curb strip at the arrival time when boxes come
   { const t0 = base + D.time.supplierArrive, y = roadY(t, t0, t0 + 35, park + 1.0);
     if (y != null && (S.doorBoxes.length || (S.deliveries || []).length || t < t0)) {
-      const x = R.curb, [sx, sy] = P(x, y);
+      const x = R.curb, [sx, sy] = P(x, y), a = edgeAlpha(y);
       out.push({ d: x + y + 0.9, bb: [sx - 340, sy - 580, 680, 700], f: g => {
-        if (hasSpr("vh_van_p")) { drawSpr(g, "vh_van_p", x, y); }
-        else { prism(g, x - 0.6, y - 1.3, 1.2, 2.6, 1.05, "#ffffff", "#c9d3ea", "#e3e9f7"); g.fillStyle = "#3a7bf0"; g.font = "400 18px 'Lilita One', sans-serif"; g.textAlign = "center"; const [bx, by] = P(x + 0.6, y, 0.55); g.fillText("SUPPLY", bx + 4, by); }
-        if (Math.abs(y - (park + 1.0)) < 0.01) label(g, x, y, 2.6, "Supplier van", "#3a7bf0");
+        const pa = g.globalAlpha; g.globalAlpha = pa * a;
+        if (hasSpr("vh_van_p")) drawSpr(g, "vh_van_p", x, y);
+        else { prism(g, x - 0.6, y - 1.3, 1.2, 2.6, 1.05, "#ffffff", "#c9d3ea", "#e3e9f7"); }
+        g.globalAlpha = pa;
+        if (Math.abs(y - (park + 1.0)) < 0.01) chip(g, x, y, 2.6, "Supplier van", "#3a7bf0");
       } });
     }
   }
-  // boxes and samples waiting on the doorstep
-  const step = [N() + 0.35, D.room.front.door[0] - 0.35], waiting = S.doorSamples.length + S.doorBoxes.length;
-  for (let i = 0; i < Math.min(waiting, 4); i++) {
-    const x = step[0] + (i % 2) * 0.42 + 0.18, y = step[1] - Math.floor(i / 2) * 0.42 + 0.18, [sx, sy] = P(x, y);
-    out.push({ d: x + y + 0.3, bb: [sx - 40, sy - 70, 80, 90], f: g => { if (!drawSpr(g, "it_box", x, y)) prism(g, x - 0.18, y - 0.18, 0.36, 0.36, 0.34, "#f2c46b", "#c98f3a", "#ddaa52"); } });
+  // boxes and samples waiting on the doorstep: they drop in, and puff when taken
+  const step = [N() + 0.35, D.room.front.door[0] - 0.35], waiting = Math.min(4, S.doorSamples.length + S.doorBoxes.length), alive = new Set();
+  const spot = i => [step[0] + (i % 2) * 0.42 + 0.18, step[1] - Math.floor(i / 2) * 0.42 + 0.18];
+  for (let i = 0; i < waiting; i++) {
+    const [x, y] = spot(i), [sx, sy] = P(x, y), key = "door:" + i; alive.add(key);
+    out.push({ d: x + y + 0.3, bb: [sx - 40, sy - 70, 80, 90], f: g => { const ap = appear(key, now); g.globalAlpha = ap.a; if (!drawSpr(g, "it_box", x, y, { z: ap.z, scale: ap.s })) prism(g, x - 0.18, y - 0.18, 0.36, 0.36, 0.34, "#f2c46b", "#c98f3a", "#ddaa52", ap.z); g.globalAlpha = 1; } });
   }
-  // passing traffic (real time)
-  if (!cars) makeCars();
-  const dt = Math.min(0.05, Math.max(0, (now - lastNow) / 1000)); lastNow = now; stepCars(dt, ctx.cross);
-  for (const c of cars) { const [sx, sy] = P(c.x, c.y); out.push({ d: c.x + c.y + 0.75, bb: [sx - 300, sy - 380, 600, 480], f: g => drawCar(g, c) }); }
+  forget("door:", alive); if (waiting < lastBoxes) for (let i = waiting; i < lastBoxes; i++) puff(...spot(i)); lastBoxes = waiting;
+  // traffic and people (real time)
+  const pl = ctx.player || { x: -99, y: -99 }, occ = peopleOnCross(), pk = crossAt(pl.x, pl.y, 0.5);
+  if (pk >= 0) occ.add(pk);
+  stepTraffic(dt, [...occ]); stepPeople(dt, pl);
+  out.push(...trafficItems(), ...peopleItems());
   return out;
 }
 
 /* Packed parcels stacked inside, by the door. */
-export function drawOutside(g) {
-  const packed = (S.orders || []).filter(o => o.status === "packed").length;
-  for (let i = 0; i < Math.min(packed, 6); i++) {
-    const x = N() - 0.6 - (i % 2) * 0.4, y = D.room.front.door[1] + 0.3 + Math.floor(i / 2) * 0.05, z = Math.floor(i / 2) * 0.3;
-    if (!drawSpr(g, "it_parcel", x, y, { z })) prism(g, x - 0.17, y - 0.17, 0.34, 0.34, 0.3, "#e6b877", "#b9833f", "#d29b55", z);
+export function drawOutside(g, now = performance.now()) {
+  const packed = Math.min(6, (S.orders || []).filter(o => o.status === "packed").length), alive = new Set();
+  const at = i => [N() - 0.6 - (i % 2) * 0.4, D.room.front.door[1] + 0.3 + Math.floor(i / 2) * 0.05, Math.floor(i / 2) * 0.3];
+  for (let i = 0; i < packed; i++) {
+    const [x, y, z] = at(i), key = "parcel:" + i, ap = appear(key, now); alive.add(key);
+    g.globalAlpha = ap.a;
+    if (!drawSpr(g, "it_parcel", x, y, { z: z + ap.z, scale: ap.s })) prism(g, x - 0.17, y - 0.17, 0.34, 0.34, 0.3, "#e6b877", "#b9833f", "#d29b55", z);
+    g.globalAlpha = 1;
   }
+  forget("parcel:", alive); if (packed < lastParcels) for (let i = packed; i < lastParcels; i++) puff(at(i)[0], at(i)[1]); lastParcels = packed;
 }

@@ -1,8 +1,9 @@
-/* TERRAIN. Draws the static world once onto an offscreen "shell" canvas (a floating diorama): ground tiles painted back to front
-   (grass, sidewalk, road, crosswalk, floors of the house and bought rooms), lane marks, the back walls, low dividers and the
-   end wall. Redrawn when art loads, a room is bought or the daylight changes the window. Also: the front wall with the door
+/* TERRAIN. Draws the static world (ground tiles, lane marks, back walls, low dividers, the window) into lazily built chunk canvases
+   of CH world pixels, so a large island costs memory only where the camera has been (least recently used chunks are dropped).
+   Chunks are rebuilt when art loads, a room is bought or the daylight changes the window. Also: the front wall with the door
    (drawn over the room's items), props as depth-sortable items (trees, lamps, fences, houses), and drifting clouds.
-   Exports: initShell, drawShell, shellCanvas, shellOrigin, drawFront, propItems, drawClouds. */
+   Unity: the ground maps to a Tilemap (isometric), props to prefabs, chunks are what the Tilemap renderer already does.
+   Exports: initShell, drawShell, drawGround, shellOrigin, drawFront, propItems, drawClouds. */
 import { D } from "../core/data.js";
 import { artImg } from "../core/assets.js";
 import { isDaylight } from "../core/clock.js";
@@ -11,14 +12,13 @@ import { polyOn, fallbackProp } from "./drawkit.js";
 import { hasSpr, spr, drawSpr, sprBoxAt } from "./art.js";
 import { walls, rooms, props, version } from "./world.js";
 
-let shell = null, sg = null, SX0 = 0, SY0 = 0, SW = 1, SH = 1;
-export const shellCanvas = () => shell;
+const CH = 1024, MAXCH = 28;
+let SX0 = 0, SY0 = 0, SW = 1, SH = 1, chunks = new Map(), tiles = null, stamp = 0;
 export const shellOrigin = () => [SX0, SY0, SW, SH];
 export function initShell() {
   const b = D.world.bounds;
   SX0 = Math.floor(P(b.x0, b.y1)[0] - 120); SY0 = Math.floor(P(b.x0, b.y0)[1] - 560);
   SW = Math.ceil(P(b.x1, b.y0)[0] + 120 - SX0); SH = Math.ceil(P(b.x1, b.y1)[1] + 160 - SY0);
-  shell = document.createElement("canvas"); shell.width = SW; shell.height = SH; sg = shell.getContext("2d");
 }
 
 /* ---------- ground ---------- */
@@ -27,22 +27,32 @@ function tileMap() {
   for (const g of D.world.ground) put(g.rect, { tile: g.tile, fb: g.fb, kind: g.tile === "tl_grass" ? "grass" : "flat" });
   const F = D.world.floors;
   for (const r of rooms()) put(r.rect, { tile: r.bought ? F.bought : F.house, fb: r.bought ? F.fbBought : F.fbHouse, kind: "floor" });
-  return [...m.values()].sort((a, b) => (a.i + a.j) - (b.i + b.j) || a.i - b.i);
+  const list = [...m.values()].sort((a, b) => (a.i + a.j) - (b.i + b.j) || a.i - b.i);
+  for (const t of list) { const [x, y] = P(t.i + 0.5, t.j + 0.5); t.bb = [x - 100, y - 110, 200, 200]; }
+  return list;
 }
-let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+/* A stable per-tile random number, so a chunk paints the same wherever it starts. */
+const hash = (i, j, k) => { let x = Math.imul(i * 374761393 + j * 668265263 + k * 2147483647, 1274126177); x ^= x >>> 13; x = Math.imul(x, 1274126177); return ((x ^ (x >>> 16)) >>> 0) / 4294967296; };
 function paintTile(c, t) {
   if (hasSpr(t.tile)) { drawSpr(c, t.tile, t.i + 0.5, t.j + 0.5); return; }
   const q = [P(t.i, t.j), P(t.i + 1, t.j), P(t.i + 1, t.j + 1), P(t.i, t.j + 1)];
   polyOn(c, q, Array.isArray(t.fb) ? t.fb[(t.i + t.j) & 1] : (t.kind === "grass" && (t.i + t.j) & 1 ? "#93cc6e" : t.fb));
-  if (t.kind === "grass") {      // light tuft texture, drawn once
+  if (t.kind === "grass") {      // light tuft texture
     c.strokeStyle = "#7fbf5a"; c.lineWidth = 2; c.beginPath();
-    for (let k = 0; k < 7; k++) { const p = P(t.i + 0.1 + rnd() * 0.8, t.j + 0.1 + rnd() * 0.8); c.moveTo(p[0] - 4, p[1]); c.lineTo(p[0], p[1] - 8); c.lineTo(p[0] + 4, p[1]); }
+    for (let k = 0; k < 7; k++) { const p = P(t.i + 0.1 + hash(t.i, t.j, k) * 0.8, t.j + 0.1 + hash(t.i, t.j, k + 9) * 0.8); c.moveTo(p[0] - 4, p[1]); c.lineTo(p[0], p[1] - 8); c.lineTo(p[0] + 4, p[1]); }
     c.stroke();
   }
 }
 function laneMarks(c) {
-  const R = D.world.road, b = D.world.bounds, x = (R.lanes.p + R.lanes.n) / 2, [, cy, , cd] = R.cross;
-  for (let y = b.y0 + 0.2; y < b.y1 - 0.5; y += 1) { if (y + 0.5 > cy - 0.2 && y < cy + cd + 0.2) continue; polyOn(c, [P(x - 0.04, y), P(x + 0.04, y), P(x + 0.04, y + 0.5), P(x - 0.04, y + 0.5)], "#f4f1e4"); }
+  const R = D.world.road, b = D.world.bounds, x = (R.lanes.p + R.lanes.n) / 2, cs = R.crosses || [R.cross];
+  for (let y = b.y0 + 0.2; y < b.y1 - 0.5; y += 1) { if (cs.some(([, cy, , cd]) => y + 0.5 > cy - 0.2 && y < cy + cd + 0.2)) continue; polyOn(c, [P(x - 0.04, y), P(x + 0.04, y), P(x + 0.04, y + 0.5), P(x - 0.04, y + 0.5)], "#f4f1e4"); }
+}
+/* Island edge: a soft earth rim under the ground so the diorama has thickness. */
+function rim(c) {
+  const b = D.world.bounds, d = 0.55 * D.room.view.zUnit;
+  const a = P(b.x0, b.y1), r = P(b.x1, b.y1), q = P(b.x1, b.y0);
+  c.fillStyle = "#b98b5a"; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(r[0], r[1]); c.lineTo(r[0], r[1] + d); c.lineTo(a[0], a[1] + d); c.closePath(); c.fill();
+  c.fillStyle = "#9c7046"; c.beginPath(); c.moveTo(r[0], r[1]); c.lineTo(q[0], q[1]); c.lineTo(q[0], q[1] + d); c.lineTo(r[0], r[1] + d); c.closePath(); c.fill();
 }
 
 /* ---------- walls ---------- */
@@ -76,11 +86,29 @@ function wallsInShell(c) {
     polyOn(c, [P(0, m.t[1], m.z[0]), P(0, m.t[0], m.z[0]), P(0, m.t[0], m.z[1]), P(0, m.t[1], m.z[1])], null, "#ffffffcc", 6);
   }
 }
-export function drawShell() {
-  if (!sg) return;
-  sg.setTransform(1, 0, 0, 1, 0, 0); sg.clearRect(0, 0, SW, SH); sg.setTransform(1, 0, 0, 1, -SX0, -SY0); seed = 7;
-  for (const t of tileMap()) paintTile(sg, t);
-  laneMarks(sg); wallsInShell(sg);
+/* Drop every chunk; they are rebuilt when next seen. */
+export function drawShell() { chunks.clear(); tiles = null; }
+function buildChunk(ix, iy) {
+  const c = document.createElement("canvas"); c.width = CH + 2; c.height = CH + 2;
+  const g = c.getContext("2d"), x0 = SX0 + ix * CH - 1, y0 = SY0 + iy * CH - 1;
+  g.setTransform(1, 0, 0, 1, -x0, -y0);
+  if (!tiles) tiles = tileMap();
+  rim(g);
+  for (const t of tiles) { const bb = t.bb; if (bb[0] > x0 + CH + 2 || bb[0] + bb[2] < x0 || bb[1] > y0 + CH + 2 || bb[1] + bb[3] < y0) continue; paintTile(g, t); }
+  laneMarks(g); wallsInShell(g);
+  return { c, x0, y0, used: 0 };
+}
+/* Draw the ground for the view rect vr = [x, y, w, h] in world pixels. */
+export function drawGround(g, vr) {
+  const i0 = Math.max(0, Math.floor((vr[0] - SX0) / CH)), i1 = Math.min(Math.ceil(SW / CH) - 1, Math.floor((vr[0] + vr[2] - SX0) / CH));
+  const j0 = Math.max(0, Math.floor((vr[1] - SY0) / CH)), j1 = Math.min(Math.ceil(SH / CH) - 1, Math.floor((vr[1] + vr[3] - SY0) / CH));
+  stamp++; let built = 0;
+  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+    const k = i + "," + j; let ch = chunks.get(k);
+    if (!ch) { if (built > 2 && chunks.size) continue; ch = buildChunk(i, j); chunks.set(k, ch); built++; }   // at most 3 new chunks a frame
+    ch.used = stamp; g.drawImage(ch.c, ch.x0, ch.y0);
+  }
+  if (chunks.size > MAXCH) { const old = [...chunks.entries()].sort((a, b) => a[1].used - b[1].used).slice(0, chunks.size - MAXCH); for (const [k] of old) chunks.delete(k); }
 }
 /* Front walls (low, with the door gap) are drawn after the room's items so they sit in front. */
 export function drawFront(g) {

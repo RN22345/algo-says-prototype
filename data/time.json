@@ -1,6 +1,6 @@
 {
   "_note": "All times are game minutes unless a name says Hour. Clock values are minutes since midnight.",
-  "minPerRealSec": 1.5,
+  "minPerRealSec": 3,
   "simStep": 5,
   "dayStart": 360,
   "dayEnd": 1440,

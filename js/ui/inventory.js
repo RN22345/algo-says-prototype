@@ -1,5 +1,5 @@
-/* INVENTORY (D-108, D-89). An always-on bar at the bottom centre: what you hold (picked orders with numbers), the stock box (units in boxes on the floor),
-   and parcels (orders to pack, parcels ready for the courier). Click it or press I (or the Parcel button) to open the bag.
+/* INVENTORY (D-108, D-89). A bar at the bottom centre that shows only what you hold: picked orders with numbers, units in boxes on the floor,
+   parcels ready for the courier and orders to pack. It hides when there is nothing (minimal HUD); the carried box also shows in the player's arms. Click it or press I (or the Parcel button) to open the bag.
    Bag tabs: Orders, Stock (shelves, boxes, door, on the way), Furniture (unplaced pieces, Place), Gear (owned equipment).
    Events in: bag:toggle, bag:open {tab}, stock:changed, order:*, gear:changed, furniture:bought, newgame. Events out: layout:place {id}. */
 import { D } from "../core/data.js";
@@ -7,6 +7,7 @@ import { S, fmtMoney } from "../core/state.js";
 import { fmtDay } from "../core/clock.js";
 import { on, emit } from "../core/bus.js";
 import { h, btn, art, clear, modal, vimg } from "./ui.js";
+import { ic } from "./icons.js";
 import { unplaced, furnDef } from "./pc/helpers.js";
 
 const TABS = [["orders", "Orders"], ["stock", "Stock"], ["furn", "Furniture"], ["gear", "Gear"]];
@@ -36,11 +37,12 @@ function drawBar() {
   clear(bar);
   const picked = S.orders.filter(o => o.status === "picked"), toPack = S.orders.filter(o => o.status === "toPack").length, packed = S.orders.filter(o => o.status === "packed").length;
   const boxes = Object.values(S.boxes).reduce((a, b) => a + b, 0);
-  const slot = (cls, ic, label, val, kids) => h("div", { class: "is " + cls }, vimg(ic[0], ic[1], "ii"), h("div", { class: "it" }, h("small", {}, label), kids || h("b", {}, val)));
-  bar.append(
-    slot("hand" + (picked.length ? " on" : ""), ["it_box", "✋"], "In hand", "Hands free", picked.length ? h("div", { class: "nos" }, ...picked.slice(0, 3).map(o => h("span", { class: "no" }, "#" + o.no)), picked.length > 3 ? h("span", { class: "no" }, "+" + (picked.length - 3)) : null) : null),
-    slot("box" + (boxes ? " on" : ""), ["it_box", "📦"], "Stock box", boxes ? boxes + (boxes === 1 ? " unit" : " units") : "Empty"),
-    slot("parcel" + (toPack + packed ? " on" : ""), ["it_parcel", "📮"], "Parcels", toPack + packed ? `${packed} ready` + (toPack ? `, ${toPack} to pack` : "") : "None"));
+  const chip = (icon, label, val) => h("div", { class: "is" }, ic(icon), h("small", {}, label), h("b", {}, val));
+  if (picked.length) bar.append(chip("hand", "Holding", picked.slice(0, 3).map(o => "#" + o.no).join(" ") + (picked.length > 3 ? ` +${picked.length - 3}` : "")));
+  if (boxes) bar.append(chip("box", "In boxes", boxes + (boxes === 1 ? " unit" : " units")));
+  if (packed) bar.append(chip("parcel", "Ready to ship", String(packed)));
+  if (toPack) bar.append(chip("parcel", "To pack", String(toPack)));
+  bar.classList.toggle("empty", !bar.children.length);
 }
 
 /* ---------- the bag ---------- */
@@ -48,7 +50,7 @@ function toggle(force) {
   const want = force === undefined ? !win : force;
   if (want && !win) {
     tabsEl = h("div", { class: "bagtabs" }); body = h("div", { class: "bagbody" });
-    win = modal({ title: "🎒 Bag", cls: "bagwin", body: [tabsEl, body], onClose: () => { win = null; } });
+    win = modal({ title: "Bag", cls: "bagwin", body: [tabsEl, body], onClose: () => { win = null; } });
     drawBag();
   } else if (!want && win) win.close();
 }

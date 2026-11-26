@@ -113,7 +113,8 @@
    "ay": 466.7,
    "fw": 0.4,
    "fd": 0.4,
-   "src": "artist"
+   "src": "artist",
+   "scale": 0.9
   },
   "od_lamp_old": {
    "w": 140,
@@ -131,7 +132,8 @@
    "ay": 333.0,
    "fw": 1.3,
    "fd": 0.6,
-   "src": "artist"
+   "src": "artist",
+   "scale": 0.8
   },
   "od_bin": {
    "w": 127,
@@ -140,7 +142,8 @@
    "ay": 152.6,
    "fw": 0.45,
    "fd": 0.45,
-   "src": "artist"
+   "src": "artist",
+   "scale": 0.85
   },
   "vh_van_p": {
    "w": 600,

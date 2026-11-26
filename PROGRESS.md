@@ -54,3 +54,22 @@ Not done or uncertain:
 - Mirrored neighbour houses show the door on the far side; the lead should check how it looks.
 - The shelf-unit furniture cannot go back in the tray (its shelves stay in `S.shelves`).
 - Builder B's Property page should use `D.world.properties`, `S.property` and `property:buy`; `property:bought` and `furniture:bought` are emitted after a buy.
+
+## Round 4 (lead model, no subagents, on Rnwn's request)
+
+Done:
+- Bigger map (40 by 48 tiles): houses on both sides of the road, a park, a garden, two crosswalks, edge woods. Bench, bin and lamp sprites scaled to match.
+- Walking: one walk grid with player and NPC layers, BFS plus string-pulling, wall sliding, smaller body. Pixel-perfect station hits with a hover and in-reach outline. Tags only when useful.
+- Box-rig characters for the player, courier, rider and passers-by: walk cycle, eyes and blink, breathing, carry, sit, wave, scooter.
+- Traffic: fewer cars, longer gaps, night headlights, fade at the map edges. People: spawn at the edges, walk, sit on benches, use crosswalks, avoid the player.
+- Pop-in with dust for boxes, parcels and new stations. Night tint and lamp glow drawn on the canvas.
+- UI redesign: artist HUD PNGs removed; glass stat strip, goal line, clock, dock; calm and hidden modes; line icons; soft cards, buttons, toasts and modals; PC with light glass windows and a floating taskbar; blurred live title.
+- Time runs 2x (`minPerRealSec` 3).
+- Fixes found while testing: Move furniture dropped the piece on the same click (now fixed); the game frame could scroll and push the HUD off screen (now `overflow: clip`); feed cards had an inline navy border; the bag panel was fixed-height.
+
+Tested in the browser pane: title, HUD, phone home, PC (TikTik, Supplier), bag, Move pick and drop, hover outline and tag, click to walk and open, supplier order to van to door to inventory bar, dawn light, phone landscape size. No console errors. Simulations stepped by script (2,400 steps in 74 ms; up to 9 people; sitting and crossing work).
+
+Not done or uncertain:
+- Not played on a real phone. The pane was hidden, so frame rate was not measured.
+- Houses across the road face away from it.
+- The studio, editor and results screens got the soft theme through shared classes only; they were not checked one by one.

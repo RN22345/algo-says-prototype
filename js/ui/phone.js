@@ -6,7 +6,10 @@
 import { S, flag } from "../core/state.js";
 import { fmt, dayNo } from "../core/clock.js";
 import { on } from "../core/bus.js";
-import { h, clear, vimg } from "./ui.js";
+import { h, clear } from "./ui.js";
+import { ic } from "./icons.js";
+
+const ICON = { messages: "chat", tiktik: "play", youview: "video", orders: "box", bank: "bank", calendar: "calendar", playbook: "book" };
 import { messagesApp, ordersApp, bankApp, calendarApp, playbookApp } from "./phone/apps.js";
 import { tiktikApp, youviewApp, feedCard } from "./phone/feedapp.js";
 
@@ -60,7 +63,7 @@ function render() {
     scroll: el.scroll, refresh: render, go: id => goApp(id, true), setBack: fn => { backFn = fn; paintBack(); },
     setHead(title, o = {}) {
       el.head.style.background = o.bg || "#fff"; el.head.style.color = o.fg || "#fff"; el.screen.style.background = o.solid || "#fff"; el.screen.dataset.tone = o.fg === "#1c2452" ? "dark" : "light"; el.screen.classList.toggle("darkapp", !!o.dark);
-      el.head.append(h("button", { class: "back", type: "button", "aria-label": "Back", onClick: () => (backFn ? backFn() : goApp(null)) }, "‹"),
+      el.head.append(h("button", { class: "back", type: "button", "aria-label": "Back", onClick: () => (backFn ? backFn() : goApp(null)) }, ic("back")),
         h("div", { class: "ttl" + (o.brand ? " brand" : "") }, title, o.sub ? h("small", {}, o.sub) : null),
         ...(o.action ? [h("button", { class: "act", type: "button", onClick: o.action.fn }, o.action.label)] : []));
     },
@@ -80,9 +83,9 @@ function drawHome() {
   for (const a of apps) {
     const n = a.badge();
     grid.append(h("button", { class: "ph-ico", type: "button", onClick: () => goApp(a.id, true) },
-      h("span", { class: "itile", style: { background: `linear-gradient(150deg,${a.grad[0]},${a.grad[1]})` } }, a.vicon ? vimg(a.vicon, a.emoji) : h("span", { class: "em" }, a.emoji), n ? h("span", { class: "nb" }, n) : null),
+      h("span", { class: "itile", style: { background: `linear-gradient(150deg,${a.grad[0]},${a.grad[1]})` } }, ic(ICON[a.id] || "box"), n ? h("span", { class: "nb" }, n) : null),
       h("span", { class: "lb" }, a.label)));
   }
   el.app.append(h("div", { class: "ph-widget" }, h("div", { class: "t" }, fmt()), h("div", { class: "d" }, "Day " + dayNo())), grid,
-    h("div", { class: "ph-foot" }, "Tap an app. Press the bar at the bottom to go back."));
+    h("div", { class: "ph-foot" }, "Tap an app. The bar at the bottom goes home."));
 }

@@ -1,11 +1,11 @@
-/* MOVE FURNITURE. A button on the room toggles edit mode. Click a piece to pick it up; it follows the pointer, snapped to half
+/* MOVE FURNITURE. The Move button in the HUD dock (or M) toggles edit mode (layout:toggle). Click a piece to pick it up; it follows the pointer, snapped to half
    tiles. R or the Rotate button turns it (mirrors the art, swaps width and depth). Click to put it down where the footprint is
    green (inside a room, not on other furniture, the player or a doorway). Esc or Done ends. Positions are saved in S.layout
    {id: {gx, gy, flip}}. Stations with "fixed": true (the door mat, for-sale signs) cannot move.
    Tray: furniture bought in the Tool Shop waits in S.furniture (a list of piece ids). The tray lists it; pick a piece to place
    it. It becomes {uid, id} in S.placed with its position in S.layout[uid]. Decor can go back in the tray; shelf units can be
    moved but not put back (their shelves stay in S.shelves).
-   Events in: layout:place {id}, furniture:changed. Events out: layout:changed, furniture:placed {uid, id}, furniture:changed.
+   Events in: layout:toggle, layout:place {id}, furniture:changed. Events out: layout:mode (bool), layout:changed, furniture:placed {uid, id}, furniture:changed.
    Uses room.js hooks (editing, ghost, pick). */
 import { D } from "../core/data.js";
 import { S, uid } from "../core/state.js";
@@ -15,7 +15,7 @@ import { hooks, tileOf, stations, svgEl, pointerTile } from "./room.js";
 import * as W from "./world.js";
 import { toast, sfx } from "../core/actions.js";
 
-let editing = false, bar = null, btnEl = null, tray = null, putBtn = null;
+let editing = false, bar = null, tray = null, putBtn = null;
 const snap = v => Math.round(v * 2) / 2;
 function valid(st, t) {
   const p = S.player;
@@ -78,20 +78,19 @@ function drawTray() {
 }
 function setMode(onOff) {
   editing = onOff; cancel();
-  btnEl.classList.toggle("sel", editing); bar.hidden = !editing;
+  bar.hidden = !editing; emit("layout:mode", editing);
   document.getElementById("room").classList.toggle("editing", editing); drawTray();
 }
 export function initLayout() {
   hooks.editing = () => editing; hooks.pick = pick;
   const root = document.getElementById("room");
-  btnEl = h("button", { class: "btn b-teal sm movebtn", type: "button", onClick: () => setMode(!editing) }, "🛠 Move furniture");
   putBtn = h("button", { class: "btn b-red sm", type: "button", hidden: true, onClick: putBack }, "Put back in tray");
   bar = h("div", { class: "movebar", hidden: true },
     h("span", {}, "Click furniture to pick it up. Click again to put it down."),
     h("button", { class: "btn b-blue sm", type: "button", onClick: rotate }, "Rotate (R)"), putBtn,
     h("button", { class: "btn b-gold sm", type: "button", onClick: () => setMode(false) }, "Done"));
   tray = h("div", { class: "movetray", hidden: true });
-  root.append(btnEl, bar, tray);
+  root.append(bar, tray);
   const svg = svgEl();
   svg.addEventListener("pointermove", e => { if (editing && hooks.ghost) { const [x, y] = pointerTile(e); setGhostAt(x, y); } });
   svg.addEventListener("click", e => { if (editing && hooks.ghost) { const [x, y] = pointerTile(e); setGhostAt(x, y); drop(); } });
@@ -99,6 +98,7 @@ export function initLayout() {
     if (!editing) return; const k = e.key.toLowerCase();
     if (k === "r") rotate(); if (k === "escape") { if (hooks.ghost) cancel(); else setMode(false); }
   });
+  on("layout:toggle", () => setMode(!editing));
   on("layout:place", ({ id }) => { if (!editing) setMode(true); if (S.furniture.includes(id)) startPlace(id); });
   on("furniture:changed", drawTray); on("layout:changed", drawTray);
   on("modal:open", () => { if (editing) setMode(false); });
